@@ -716,9 +716,17 @@ function debouncedDrawCard() {
 // --- Prevent overlapping draws ---
 let isDrawing = false;
 async function safeDrawCard() {
-  if (isDrawing) return;
+  if (isDrawing) return false; // <-- Return FALSE if skipped
   isDrawing = true;
-  try { await drawCard(); } catch (err) { console.error("drawCard error:", err); } finally { isDrawing = false; }
+  try { 
+    await drawCard(); 
+    return true; // <-- Return TRUE if successful
+  } catch (err) { 
+    console.error("drawCard error:", err); 
+    return false; // <-- Return FALSE on error
+  } finally { 
+    isDrawing = false; 
+  }
 }
 
 /***********************
@@ -1086,8 +1094,6 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
 // initial draw
 document.fonts.ready.then(() => setTimeout(updateAll, 60));
 
-// REPLACE from line 1097 to the end of the file with this:
-
 // --- Download Button Listener (using safeDrawCard) ---
 document.getElementById("downloadBtn").addEventListener("click", async () => {
   const btn = document.getElementById("downloadBtn");
@@ -1096,15 +1102,20 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
   btn.disabled = true;
 
   try {
-    // 1. Run the high-quality, *safe* draw function ONCE.
-    await safeDrawCard(); // <-- This is the fix
+    // 1. Run the high-quality, safe draw function
+    const drawSuccessful = await safeDrawCard();
     
-    // 2. Continue with the download as normal.
-    const canvas = document.getElementById("previewCanvas");
-    const link = document.createElement("a");
-    link.download = `${(nameInput.value.trim() || "card")}.png`;
-    link.href = canvas.toDataURL("image/png", 1.0); // full quality
-    link.click();
+    // 2. ONLY proceed if the draw actually happened
+    if (drawSuccessful) {
+      const canvas = document.getElementById("previewCanvas");
+      const link = document.createElement("a");
+      link.download = `${(nameInput.value.trim() || "card")}.png`;
+      link.href = canvas.toDataURL("image/png", 1.0);
+      link.click();
+    } else {
+      // If the draw was skipped (because it was busy), tell the user.
+      alert("Generator is busy, please wait a moment and try again.");
+    }
     
   } catch (err) {
     console.error("Download failed:", err);
@@ -1142,24 +1153,28 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
   btn.disabled = true;
 
   try {
-    // 1. Run the high-quality, *safe* draw function
-    await safeDrawCard(); // <-- This is the fix
+    // 1. Run the high-quality, safe draw function
+    const drawSuccessful = await safeDrawCard();
     
-    // 2. Get the image data
-    const canvas = document.getElementById("previewCanvas");
-    const dataUrl = canvas.toDataURL("image/png", 1.0);
-    
-    // 3. Set the modal's image src and display it
-    if (modalImage) {
-      modalImage.src = dataUrl;
-    }
-    if (previewModal) {
-      previewModal.style.display = "block";
+    // 2. ONLY proceed if the draw actually happened
+    if (drawSuccessful) {
+      const canvas = document.getElementById("previewCanvas");
+      const dataUrl = canvas.toDataURL("image/png", 1.0);
+      
+      // 3. Set the modal's image src and display it
+      if (modalImage) {
+        modalImage.src = dataUrl;
+      }
+      if (previewModal) {
+        previewModal.style.display = "block";
+      }
+    } else {
+      // If the draw was skipped (because it was busy), tell the user.
+      alert("Generator is busy, please wait a moment and try again.");
     }
 
   } catch (err) {
     console.error("Preview failed:", err);
-    // This alert is now only for *unexpected* errors
     alert("Error: Could not generate preview. Try again.");
   } finally {
     // 4. Restore the button
