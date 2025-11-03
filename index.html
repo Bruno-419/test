@@ -56,6 +56,15 @@
         <input type="file" id="artUpload" accept="image/*">
       </label>
       <button id="previewBtn" type="button">Preview</button>
+        <div id="previewModal" class="modal">
+          <div class="modal-content">
+            <h2>Card Preview</h2>
+            <img id="modalImage" src="" alt="Generated Card Preview" style="background: #000;" />
+            <div class="modal-buttons">
+              <button id="modalCloseBtn" type="button">Close</button>
+            </div>
+          </div>
+        </div>
       <button id="downloadBtn" type="button">Download</button>
     </div>
   </header>
@@ -257,17 +266,8 @@
     toggleStatsVisibility();
     cardTypeSelect.addEventListener('change', toggleStatsVisibility);
   </script>
-  
-  <div id="previewModal" class="modal">
-    <div class="modal-content">
-      <h2>Card Preview</h2>
-      <img id="modalImage" src="" alt="Generated Card Preview" style="background: #000;" />
-      <div class="modal-buttons">
-        <button id="modalCloseBtn" type="button">Close</button>
-      </div>
-    </div>
-  </div>
 
 </body>
 </html>
+
 
