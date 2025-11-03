@@ -695,8 +695,6 @@ async function drawCard() {
   ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
 }
 
-// DELETE THIS ENTIRE SECTION
-/*
 // --- Live updates with Debouncing ---
 let redrawDebounceTimer = null;
 function debouncedDrawCard() {
@@ -722,8 +720,6 @@ async function safeDrawCard() {
   isDrawing = true;
   try { await drawCard(); } catch (err) { console.error("drawCard error:", err); } finally { isDrawing = false; }
 }
-*/
-//END
 
 /***********************
   PREVIEW COLUMN HANDLERS (clamped)
@@ -1157,3 +1153,4 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
