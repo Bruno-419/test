@@ -1119,3 +1119,41 @@ document.getElementById("downloadBtn").addEventListener("click", async () => { /
     btn.disabled = false;
   }
 });
+
+// ADD THIS ENTIRE NEW BLOCK AT THE END OF THE FILE
+
+document.getElementById("previewBtn").addEventListener("click", async () => {
+  // Add a "loading" state to the button
+  const btn = document.getElementById("previewBtn");
+  const originalText = btn.textContent;
+  btn.textContent = "Generating...";
+  btn.disabled = true;
+
+  try {
+    // 1. Run the high-quality draw function ONCE.
+    await drawCard(); 
+    
+    // 2. Get the image data from the hidden canvas.
+    const canvas = document.getElementById("previewCanvas");
+    const dataUrl = canvas.toDataURL("image/png", 1.0);
+    
+    // 3. Open a new tab and display the image.
+    const previewWindow = window.open("");
+    if (previewWindow) {
+      previewWindow.document.title = `${(nameInput.value.trim() || "card")}-preview`;
+      previewWindow.document.body.style.margin = "0";
+      previewWindow.document.body.style.backgroundColor = "#222";
+      previewWindow.document.body.innerHTML = `<img src="${dataUrl}" alt="Card Preview" style="max-width: 100%; height: auto; display: block; margin: auto;">`;
+    } else {
+      alert("Pop-up blocked! Please allow pop-ups for this site to use the preview feature.");
+    }
+
+  } catch (err) {
+    console.error("Preview failed:", err);
+    alert("Error: Could not generate preview. Try again.");
+  } finally {
+    // 4. Restore the button
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+});
