@@ -1086,18 +1086,18 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
 // initial draw
 document.fonts.ready.then(() => setTimeout(updateAll, 60));
 
-// REPLACE the existing downloadBtn listener with this:
-document.getElementById("downloadBtn").addEventListener("click", async () => { // <-- Made async
-  
-  // Add a "loading" state to the button
+// REPLACE from line 1097 to the end of the file with this:
+
+// --- Download Button Listener (using safeDrawCard) ---
+document.getElementById("downloadBtn").addEventListener("click", async () => {
   const btn = document.getElementById("downloadBtn");
   const originalText = btn.textContent;
   btn.textContent = "Generating...";
   btn.disabled = true;
 
   try {
-    // 1. Run the high-quality draw function ONCE.
-    await drawCard(); 
+    // 1. Run the high-quality, *safe* draw function ONCE.
+    await safeDrawCard(); // <-- This is the fix
     
     // 2. Continue with the download as normal.
     const canvas = document.getElementById("previewCanvas");
@@ -1116,7 +1116,8 @@ document.getElementById("downloadBtn").addEventListener("click", async () => { /
   }
 });
 
-// --- NEW PREVIEW MODAL LOGIC ---
+
+// --- NEW PREVIEW MODAL LOGIC (using safeDrawCard) ---
 
 // Get the modal elements
 const previewModal = document.getElementById("previewModal");
@@ -1125,8 +1126,12 @@ const modalCloseBtn = document.getElementById("modalCloseBtn");
 
 // Function to close the modal
 function closeModal() {
-  previewModal.style.display = "none";
-  modalImage.src = ""; // Clear the image source to save memory
+  if (previewModal) {
+    previewModal.style.display = "none";
+  }
+  if (modalImage) {
+    modalImage.src = ""; // Clear the image source to save memory
+  }
 }
 
 // Show the modal when "Preview" is clicked
@@ -1137,19 +1142,24 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
   btn.disabled = true;
 
   try {
-    // 1. Run the high-quality draw function
-    await drawCard(); 
+    // 1. Run the high-quality, *safe* draw function
+    await safeDrawCard(); // <-- This is the fix
     
     // 2. Get the image data
     const canvas = document.getElementById("previewCanvas");
     const dataUrl = canvas.toDataURL("image/png", 1.0);
     
     // 3. Set the modal's image src and display it
-    modalImage.src = dataUrl;
-    previewModal.style.display = "block";
+    if (modalImage) {
+      modalImage.src = dataUrl;
+    }
+    if (previewModal) {
+      previewModal.style.display = "block";
+    }
 
   } catch (err) {
     console.error("Preview failed:", err);
+    // This alert is now only for *unexpected* errors
     alert("Error: Could not generate preview. Try again.");
   } finally {
     // 4. Restore the button
@@ -1159,14 +1169,15 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
 });
 
 // Add event listeners to close the modal
-modalCloseBtn.addEventListener("click", closeModal);
+if (modalCloseBtn) {
+  modalCloseBtn.addEventListener("click", closeModal);
+}
 
-previewModal.addEventListener("click", (e) => {
-  // Close the modal only if the user clicked on the dark background (e.target)
-  // and not the modal content itself.
-  if (e.target === previewModal) {
-    closeModal();
-  }
-});
-
-
+if (previewModal) {
+  previewModal.addEventListener("click", (e) => {
+    // Close the modal only if the user clicked on the dark background
+    if (e.target === previewModal) {
+      closeModal();
+    }
+  });
+}
