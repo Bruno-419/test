@@ -716,17 +716,9 @@ function debouncedDrawCard() {
 // --- Prevent overlapping draws ---
 let isDrawing = false;
 async function safeDrawCard() {
-  if (isDrawing) return false; // <-- Return FALSE if skipped
+  if (isDrawing) return;
   isDrawing = true;
-  try { 
-    await drawCard(); 
-    return true; // <-- Return TRUE if successful
-  } catch (err) { 
-    console.error("drawCard error:", err); 
-    return false; // <-- Return FALSE on error
-  } finally { 
-    isDrawing = false; 
-  }
+  try { await drawCard(); } catch (err) { console.error("drawCard error:", err); } finally { isDrawing = false; }
 }
 
 /***********************
@@ -1094,28 +1086,25 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
 // initial draw
 document.fonts.ready.then(() => setTimeout(updateAll, 60));
 
-// --- Download Button Listener (using safeDrawCard) ---
-document.getElementById("downloadBtn").addEventListener("click", async () => {
+// REPLACE the existing downloadBtn listener with this:
+document.getElementById("downloadBtn").addEventListener("click", async () => { // <-- Made async
+  
+  // Add a "loading" state to the button
   const btn = document.getElementById("downloadBtn");
   const originalText = btn.textContent;
   btn.textContent = "Generating...";
   btn.disabled = true;
 
   try {
-    // 1. Run the high-quality, safe draw function
-    const drawSuccessful = await safeDrawCard();
+    // 1. Run the high-quality draw function ONCE.
+    await drawCard(); 
     
-    // 2. ONLY proceed if the draw actually happened
-    if (drawSuccessful) {
-      const canvas = document.getElementById("previewCanvas");
-      const link = document.createElement("a");
-      link.download = `${(nameInput.value.trim() || "card")}.png`;
-      link.href = canvas.toDataURL("image/png", 1.0);
-      link.click();
-    } else {
-      // If the draw was skipped (because it was busy), tell the user.
-      alert("Generator is busy, please wait a moment and try again.");
-    }
+    // 2. Continue with the download as normal.
+    const canvas = document.getElementById("previewCanvas");
+    const link = document.createElement("a");
+    link.download = `${(nameInput.value.trim() || "card")}.png`;
+    link.href = canvas.toDataURL("image/png", 1.0); // full quality
+    link.click();
     
   } catch (err) {
     console.error("Download failed:", err);
@@ -1127,50 +1116,32 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
   }
 });
 
+// ADD THIS ENTIRE NEW BLOCK AT THE END OF THE FILE
 
-// --- NEW PREVIEW MODAL LOGIC (using safeDrawCard) ---
-
-// Get the modal elements
-const previewModal = document.getElementById("previewModal");
-const modalImage = document.getElementById("modalImage");
-const modalCloseBtn = document.getElementById("modalCloseBtn");
-
-// Function to close the modal
-function closeModal() {
-  if (previewModal) {
-    previewModal.style.display = "none";
-  }
-  if (modalImage) {
-    modalImage.src = ""; // Clear the image source to save memory
-  }
-}
-
-// Show the modal when "Preview" is clicked
 document.getElementById("previewBtn").addEventListener("click", async () => {
+  // Add a "loading" state to the button
   const btn = document.getElementById("previewBtn");
   const originalText = btn.textContent;
   btn.textContent = "Generating...";
   btn.disabled = true;
 
   try {
-    // 1. Run the high-quality, safe draw function
-    const drawSuccessful = await safeDrawCard();
+    // 1. Run the high-quality draw function ONCE.
+    await drawCard(); 
     
-    // 2. ONLY proceed if the draw actually happened
-    if (drawSuccessful) {
-      const canvas = document.getElementById("previewCanvas");
-      const dataUrl = canvas.toDataURL("image/png", 1.0);
-      
-      // 3. Set the modal's image src and display it
-      if (modalImage) {
-        modalImage.src = dataUrl;
-      }
-      if (previewModal) {
-        previewModal.style.display = "block";
-      }
+    // 2. Get the image data from the hidden canvas.
+    const canvas = document.getElementById("previewCanvas");
+    const dataUrl = canvas.toDataURL("image/png", 1.0);
+    
+    // 3. Open a new tab and display the image.
+    const previewWindow = window.open("");
+    if (previewWindow) {
+      previewWindow.document.title = `${(nameInput.value.trim() || "card")}-preview`;
+      previewWindow.document.body.style.margin = "0";
+      previewWindow.document.body.style.backgroundColor = "#222";
+      previewWindow.document.body.innerHTML = `<img src="${dataUrl}" alt="Card Preview" style="max-width: 100%; height: auto; display: block; margin: auto;">`;
     } else {
-      // If the draw was skipped (because it was busy), tell the user.
-      alert("Generator is busy, please wait a moment and try again.");
+      alert("Pop-up blocked! Please allow pop-ups for this site to use the preview feature.");
     }
 
   } catch (err) {
@@ -1182,17 +1153,3 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
-
-// Add event listeners to close the modal
-if (modalCloseBtn) {
-  modalCloseBtn.addEventListener("click", closeModal);
-}
-
-if (previewModal) {
-  previewModal.addEventListener("click", (e) => {
-    // Close the modal only if the user clicked on the dark background
-    if (e.target === previewModal) {
-      closeModal();
-    }
-  });
-}
