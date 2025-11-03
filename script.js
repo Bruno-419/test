@@ -1116,33 +1116,37 @@ document.getElementById("downloadBtn").addEventListener("click", async () => { /
   }
 });
 
-// ADD THIS ENTIRE NEW BLOCK AT THE END OF THE FILE
+// --- NEW PREVIEW MODAL LOGIC ---
 
+// Get the modal elements
+const previewModal = document.getElementById("previewModal");
+const modalImage = document.getElementById("modalImage");
+const modalCloseBtn = document.getElementById("modalCloseBtn");
+
+// Function to close the modal
+function closeModal() {
+  previewModal.style.display = "none";
+  modalImage.src = ""; // Clear the image source to save memory
+}
+
+// Show the modal when "Preview" is clicked
 document.getElementById("previewBtn").addEventListener("click", async () => {
-  // Add a "loading" state to the button
   const btn = document.getElementById("previewBtn");
   const originalText = btn.textContent;
   btn.textContent = "Generating...";
   btn.disabled = true;
 
   try {
-    // 1. Run the high-quality draw function ONCE.
+    // 1. Run the high-quality draw function
     await drawCard(); 
     
-    // 2. Get the image data from the hidden canvas.
+    // 2. Get the image data
     const canvas = document.getElementById("previewCanvas");
     const dataUrl = canvas.toDataURL("image/png", 1.0);
     
-    // 3. Open a new tab and display the image.
-    const previewWindow = window.open("");
-    if (previewWindow) {
-      previewWindow.document.title = `${(nameInput.value.trim() || "card")}-preview`;
-      previewWindow.document.body.style.margin = "0";
-      previewWindow.document.body.style.backgroundColor = "#222";
-      previewWindow.document.body.innerHTML = `<img src="${dataUrl}" alt="Card Preview" style="max-width: 100%; height: auto; display: block; margin: auto;">`;
-    } else {
-      alert("Pop-up blocked! Please allow pop-ups for this site to use the preview feature.");
-    }
+    // 3. Set the modal's image src and display it
+    modalImage.src = dataUrl;
+    previewModal.style.display = "block";
 
   } catch (err) {
     console.error("Preview failed:", err);
@@ -1153,4 +1157,16 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
+// Add event listeners to close the modal
+modalCloseBtn.addEventListener("click", closeModal);
+
+previewModal.addEventListener("click", (e) => {
+  // Close the modal only if the user clicked on the dark background (e.target)
+  // and not the modal content itself.
+  if (e.target === previewModal) {
+    closeModal();
+  }
+});
+
 
