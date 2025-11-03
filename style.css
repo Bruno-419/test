@@ -1,0 +1,762 @@
+/* --------------------------
+   Base / page
+   -------------------------- */
+:root{
+  --bg: #111;
+  --panel: #1a1a1a;
+  --muted: #bbb;
+  --input: #222;
+  --border: #333;
+  --accent: #2aa48a; /* unused but available */
+}
+
+* { box-sizing: border-box; }
+html,body { height:100%; }
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: var(--bg);
+  color: #fff;
+  font-family: 'Roboto', 'Segoe UI', sans-serif;
+}
+
+/* Header */
+header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: 0.6px;
+}
+.subheader {
+  margin: 6px 0 12px 0;
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Preview column (fixed width) */
+.app-grid {
+  display: grid;
+  grid-template-columns: 500px 1fr; /* left preview column fixed at 500px, rest is your existing layout */
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+/* Make your existing .layout sit inside the right column; keep its own grid behavior */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Preview column blocks */
+.preview-column {
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+  padding: 12px;
+}
+
+.preview-block {
+  background: #121212;
+  border: 1px solid #2b2b2b;
+  padding: 10px;
+  border-radius: 8px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.preview-block.small { width: 140px; padding: 8px; }
+
+.preview-title {
+  font-size: 13px;
+  color: #cfcfcf;
+  margin-bottom: 8px;
+}
+
+.preview-canvas {
+  display: block;
+  background: #0b0b0b;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+/* If the canvas should be circular-looking for icon previews */
+.preview-canvas.circle {
+  border-radius: 999px;
+}
+
+/* Slider */
+.zoom-slider {
+  width: 92%;
+  margin-top: 8px;
+  appearance: none;
+}
+
+/* Hint text */
+.preview-hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* Responsive: collapse to single column under 980px */
+@media (max-width: 980px) {
+  .app-grid {
+    grid-template-columns: 1fr;
+  }
+  .preview-column {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 8px;
+  }
+  .preview-block { flex: 0 0 auto; }
+}
+
+/* top buttons */
+.top-buttons {
+  display:flex;
+  justify-content:center;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.upload-btn {
+  background: var(--input);
+  color: #fff;
+  border: 1px solid #444;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.upload-btn input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.upload-btn.small {
+  display: inline-flex;     /* keep natural width */
+  width: auto;              /* no stretching */
+  align-self: flex-start;
+  padding: 7px 12px;
+  font-size: 14px;
+  border-radius: 7px;
+}
+
+/* Buttons */
+button {
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+button:hover, .upload-btn:hover { background: #444; }
+
+/* --------------------------
+   Layout grid: two columns
+   -------------------------- */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content: center;
+  gap: 20px;
+  max-width: 900px; /* narrower overall container */
+  margin: 0 auto;
+  align-items: start;
+}
+
+/* Panels stay visually balanced */
+.left-panel,
+.right-panel {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+/* Generic field */
+.field { display: block; margin-bottom: 14px; }
+.field-label { display:block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+
+/* Inputs */
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%;
+  background: var(--input);
+  color: #fff;
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 15px;
+}
+textarea { min-height: 70px; resize: vertical; }
+
+/* small fields row (cost/atk/def) */
+.stat-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Cost field always fixed width */
+.stat-row .field.small-field:first-child {
+  flex: 0 0 90px; /* adjust to match your preferred width */
+}
+
+/* Container for Attack/Defense */
+#statExtraFields {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  transition: opacity 0.2s ease, max-width 0.2s ease;
+}
+
+/* Hide smoothly without shifting Cost */
+#statExtraFields.hidden {
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+}
+
+#statExtraFields label {
+  flex: 1;
+}
+
+/* --------------------------
+   Checkbox group (aligned)
+   -------------------------- */
+.checkbox-group {
+  margin-top: 6px;
+  margin-bottom: 14px;
+  display:flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Make checkbox and text align: checkbox left, text right */
+.checkbox-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px; /* space between input and text */
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+.checkbox-inline input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #3aa;
+}
+
+/* Canvas */
+.canvas-container { text-align: center; margin: 28px 0 60px; }
+canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #444; background: #000; }
+
+/* --------------------------
+   Modal styles (dark & centered)
+   -------------------------- */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 1200;
+  overflow-y: auto;
+  padding: 40px 18px;
+}
+.modal-content {
+  width: 920px;
+  max-width: calc(100% - 40px);
+  margin: 24px auto;
+  background: linear-gradient(180deg, rgba(26,26,26,1), rgba(17,17,17,1));
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid #2f2f2f;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+  text-align: center;
+}
+.modal-content h2 { margin: 6px 0 12px; font-size: 18px; color: #fff; }
+.modal-content img { width: 100%; height: auto; border-radius: 8px; border: 1px solid #333; }
+.modal-buttons { display:flex; justify-content:center; gap:12px; margin-top:12px; }
+
+/* modal buttons */
+.modal-buttons button { padding:8px 14px; border-radius:8px; }
+
+/* === Art Preview Slider Styling === */
+.preview-column input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #444;
+  border-radius: 2px;
+  outline: none;
+  margin-top: 30px; /* adds spacing above the slider */
+  margin-bottom: 20px; /* adds space below */
+}
+
+/* Track (for Firefox) */
+.preview-column input[type="range"]::-moz-range-track {
+  background: #444;
+  height: 4px;
+  border-radius: 2px;
+}
+
+/* Slider thumb (handle) */
+.preview-column input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.preview-column input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+/* Hover effect for thumb */
+.preview-column input[type="range"]::-webkit-slider-thumb:hover,
+.preview-column input[type="range"]::-moz-range-thumb:hover {
+  background: #fff;
+}
+
+
+/*——————COLOR THINGS———————— */
+/*——————COLOR THINGS———————— */
+/*——————COLOR THINGS———————— */
+
+#cardName {
+  position: relative;
+  border-left: 6px solid #20B2AA; /* red border */
+  padding-left: 10px; /* space so text doesn't touch border */
+  box-shadow: inset 0 0 0 1px rgba(0, 255, 183, 0.15); /* subtle glow */
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+#cardTrait {
+  position: relative;
+  border-left: 6px solid #20B2AA; /* red border */
+  padding-left: 10px; /* space so text doesn't touch border */
+  box-shadow: inset 0 0 0 1px rgba(0, 255, 183, 0.15); /* subtle glow */
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+#illustratorName {
+  position: relative;
+  border-left: 6px solid #20B2AA; /* red border */
+  padding-left: 10px; /* space so text doesn't touch border */
+  box-shadow: inset 0 0 0 1px rgba(0, 255, 183, 0.15); /* subtle glow */
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+#costValue {
+  position: relative;
+  border-left: 6px solid #3CB371; /* red border */
+  padding-left: 10px; /* space so text doesn't touch border */
+  box-shadow: inset 0 0 0 1px rgba(0, 255, 38, 0.15); /* subtle glow */
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+#attackValue {
+  position: relative;
+  border-left: 6px solid #1E90FF; /* red border */
+  padding-left: 10px; /* space so text doesn't touch border */
+  box-shadow: inset 0 0 0 1px rgba(0, 145, 255, 0.15); /* subtle glow */
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+#defenseValue {
+  position: relative;
+  border-left: 6px solid #DC143C; /* red border */
+  padding-left: 10px; /* space so text doesn't touch border */
+  box-shadow: inset 0 0 0 1px rgba(255, 0, 0, 0.15); /* subtle glow */
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+/* Gold adornment for Evolve Text */
+#evolveText {
+  position: relative;
+  border-left: 6px solid #d6a629; /* gold border */
+  padding-left: 10px; /* space so text doesn't touch border */
+  box-shadow: inset 0 0 0 1px rgba(255, 215, 0, 0.15); /* subtle glow */
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+/* Purple adornment for Super-Evolve Text */
+#superEvolveText {
+  position: relative;
+  border-left: 6px solid #8229d6; /* purple border */
+  padding-left: 10px; /* space so text doesn't touch border */
+  box-shadow: inset 0 0 0 1px rgba(255, 0, 255, 0.15); /* subtle glow */
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+/* === Adorned Faith Section === */
+.adorned-faith {
+  position: relative;
+  padding: 14px 16px;
+  border-left: 6px solid #e6781f; /* Orange border */
+  background: #1c1c1c;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(255, 140, 0, 0.2);
+}
+
+/* Keep consistent layout inside */
+.adorned-faith .faith-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.faith-art-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* === Adorned Faith Section === */
+.adorned-crest {
+  position: relative;
+  padding: 14px 16px;
+  border-left: 6px solid #bcbcbc; /* Orange border */
+  background: #1c1c1c;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(147, 143, 139, 0.2);
+}
+
+/* Keep consistent layout inside */
+.adorned-crest .crest-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.crest-art-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+
+
+/* --------------------------
+   Responsive
+   -------------------------- */
+@media (max-width: 980px) {
+  .layout { 
+    grid-template-columns: 1fr;
+    max-width: 600px;
+  }
+  .stat-row { flex-direction: row; gap: 8px; }
+}
+
+@media (max-width: 640px) {
+  .stat-row { flex-direction: column; }
+  .top-buttons { flex-direction: column; gap: 8px; }
+  .checkbox-inline { gap: 8px; }
+}
+
+/* === Make all zoom sliders visually identical === */
+.zoom-slider,
+.icon-preview .zoom-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #444;
+  border-radius: 2px;
+  outline: none;
+  margin-top: 12px;
+  margin-bottom: 20px;
+}
+
+/* Track (for Firefox) */
+.zoom-slider::-moz-range-track,
+.icon-preview .zoom-slider::-moz-range-track {
+  background: #444;
+  height: 4px;
+  border-radius: 2px;
+}
+
+/* Slider thumb (handle) */
+.zoom-slider::-webkit-slider-thumb,
+.icon-preview .zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.zoom-slider::-moz-range-thumb,
+.icon-preview .zoom-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+/* Hover effect */
+.zoom-slider::-webkit-slider-thumb:hover,
+.icon-preview .zoom-slider::-webkit-slider-thumb:hover,
+.zoom-slider::-moz-range-thumb:hover,
+.icon-preview .zoom-slider::-moz-range-thumb:hover {
+  background: #fff;
+}
+
+/* === Crest & Faith section refined layout === */
+.crest-section,
+.faith-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.crest-controls,
+.faith-controls {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Left column: Upload button and Name field */
+.crest-left,
+.faith-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+/* Compact upload button */
+.upload-btn.small {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* Preview (art circle + slider) to the right */
+.crest-preview,
+.faith-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  transform: translateX(-20px); /* pull preview slightly left */
+}
+
+.crest-preview canvas,
+.faith-preview canvas {
+  border-radius: 50%;
+  border: 1px solid #333;
+  background-color: #000;
+}
+
+/* Slider style — matches main art preview */
+.crest-preview input[type="range"],
+.faith-preview input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 80px;
+  height: 3px;
+  background: #333;
+  border-radius: 2px;
+  outline: none;
+}
+
+.crest-preview input[type="range"]::-webkit-slider-thumb,
+.faith-preview input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #00bfa6;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.crest-preview input[type="range"]::-webkit-slider-thumb:hover,
+.faith-preview input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+/* === Narrow Crest & Faith Name Fields + Sliders === */
+
+/* Narrow the name input fields */
+.crest-section input[type="text"],
+.faith-section input[type="text"] {
+  width: 30% !important; /* ensures override */
+  display: inline-block;
+}
+
+/* Tweak layout for tighter alignment */
+.crest-art-container,
+.faith-art-container {
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-left: +50px; /* moves art & slider closer to left edge */
+}
+
+/* Optional: keep everything visually balanced */
+.crest-section,
+.faith-section {
+  gap: 10px;
+}
+
+
+/* === Compact layout for Crest / Faith sections === */
+
+/* Tighten spacing inside each section */
+.crest-section,
+.faith-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Upload button spacing */
+.crest-section .upload-btn.small,
+.faith-section .upload-btn.small {
+  margin-bottom: 4px; /* pull button closer to name field */
+}
+
+/* Name field narrower and tighter */
+.crest-section input[type="text"],
+.faith-section input[type="text"] {
+  width: 70% !important;
+  margin-bottom: 6px; /* slight gap before preview */
+}
+
+/* Compact preview area positioning */
+.crest-art-container,
+.faith-art-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: -2px; /* brings preview closer to text field */
+  margin-bottom: -6px; /* brings text field closer below */
+}
+
+/* Adjusted slider width and spacing */
+.crest-art-container .zoom-slider,
+.faith-art-container .zoom-slider {
+  width: 140px; /* Made longer */
+  margin-top: 12px; /* Matches base slider styles */
+  margin-bottom: 20px; /* Matches base slider styles */
+}
+
+/* === Always show crest/faith upload buttons === */
+#crestUploadBtn,
+#faithUploadBtn {
+  display: inline-flex !important;  /* always visible */
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* === Text formatting toolbar === */
+.text-toolbar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.text-toolbar button {
+  background: #222;
+  border: 1px solid #444;
+  color: #ddd;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transform: translateX(+20px); /* pull preview slightly left */
+  transform: translateY(-5px); /* pull preview slightly left */
+}
+
+.text-toolbar button:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* New CSS: Prevents touch-scrolling the main page when manipulating the art canvas */
+
+/* Target the main card art preview canvas */
+#mainPreviewCanvas {
+  touch-action: none; 
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Target the Crest and Faith art preview canvases */
+#crestPreviewCanvas,
+#faithPreviewCanvas {
+  touch-action: none; 
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Target the zoom sliders */
+.zoom-slider {
+  touch-action: none;
+}
