@@ -505,6 +505,7 @@ async function drawCard() {
     const maskW = MAIN_MASK_W;
     const maskH = MAIN_MASK_H;
     ctx.save();
+    ctx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
     ctx.beginPath();
     ctx.rect(maskX, maskY, maskW, maskH);
     ctx.closePath();
@@ -597,6 +598,7 @@ async function drawCard() {
 
       if (iconImg && t) {
         ctx.save();
+        ctx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
         ctx.beginPath();
         ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
         ctx.closePath();
@@ -1192,4 +1194,5 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
