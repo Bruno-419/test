@@ -500,23 +500,30 @@ async function drawCard() {
 
   // === Masked Main Art ===
   if (uploadedArt) {
-    const maskX = MAIN_ART_X;
-    const maskY = MAIN_ART_Y;
-    const maskW = MAIN_MASK_W;
-    const maskH = MAIN_MASK_H;
-    ctx.save();
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high'; // <-- Add this for better smoothing
-    ctx.beginPath();
-    ctx.rect(maskX, maskY, maskW, maskH);
-    ctx.closePath();
-    ctx.clip();
-    // Apply a subtle blur to antialias the clip and scaling
-    ctx.filter = 'blur(0.1px)'; // <-- ADD THIS LINE
-    ctx.drawImage(uploadedArt, artX, artY, artW, artH);
-    // Reset filter before restoring
-    ctx.filter = 'none'; // <-- ADD THIS LINE
-    ctx.restore();
+    // Get the scaling/panning state from the preview
+    const s = previewState.main;
+    
+    // Calculate the visible region of the *original* image
+    // (sx, sy, sw, sh) = source crop
+    const sx = Math.max(0, -s.tx / s.scale);
+    const sy = Math.max(0, -s.ty / s.scale);
+    const sw = s.maskW / s.scale;
+    const sh = s.maskH / s.scale;
+
+    // Create a high-quality, pre-scaled bitmap from the source
+    // This tells the browser to use its best (e.g., bicubic) algorithm
+    const bmp = await createImageBitmap(uploadedArt, sx, sy, sw, sh, {
+      resizeWidth: MAIN_MASK_W,
+      resizeHeight: MAIN_MASK_H,
+      resizeQuality: "high" 
+    });
+    
+    // Draw the high-quality bitmap directly. 
+    // No clip, blur, or complex drawImage needed.
+    ctx.drawImage(bmp, MAIN_ART_X, MAIN_ART_Y);
+    
+    // Clean up the bitmap from memory
+    bmp.close();
   }
 
   ctx.drawImage(gem, 398, 863);
@@ -601,20 +608,35 @@ async function drawCard() {
       const nameField = document.getElementById(isCrest ? "crestName" : "faithName");
       const nameValue = nameField ? nameField.value.trim() : "";
 
-      if (iconImg && t) {
+      if (iconImg && (isCrest || isFaith)) {
+        // Get the correct preview state
+        const s = previewState[isCrest ? "crest" : "faith"];
+  
+        // Calculate the visible region of the *original* icon art
+        const sx = Math.max(0, -s.tx / s.scale);
+        const sy = Math.max(0, -s.ty / s.scale);
+        const sw = s.maskW / s.scale;
+        const sh = s.maskH / s.scale;
+  
+        // Create the high-quality, pre-scaled bitmap
+        const bmp = await createImageBitmap(iconImg, sx, sy, sw, sh, {
+          resizeWidth: ICON_W,
+          resizeHeight: ICON_H,
+          resizeQuality: "high"
+        });
+  
+        // Draw the bitmap, clipping it to a circle
         ctx.save();
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high'; // <-- Add this for better smoothing
         ctx.beginPath();
         ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
         ctx.closePath();
         ctx.clip();
-        // Apply a subtle blur to antialias the clip and scaling
-        ctx.filter = 'blur(0.1px)'; // <-- ADD THIS LINE
-        ctx.drawImage(t.img, iconX + t.tx, iconY + t.ty, t.img.width * t.scale, t.img.height * t.scale);
-        // Reset filter before restoring
-        ctx.filter = 'none'; // <-- ADD THIS LINE
+        
+        // No filter/blur needed, just draw the pre-scaled bitmap
+        ctx.drawImage(bmp, iconX, iconY);
         ctx.restore();
+        
+        bmp.close();
       }
       
       const defaultName = isCrest ? "Crest" : "Faith";
@@ -1204,6 +1226,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
