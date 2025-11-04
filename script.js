@@ -500,8 +500,7 @@ async function drawCard() {
 
   // === Masked Main Art ===
   if (uploadedArt) {
-    // Get the scaling/panning state from the preview
-    const s = previewState.main;
+    const s = previewState.main; // Get the state
     
     // Calculate the visible region of the *original* image
     // (sx, sy, sw, sh) = source crop
@@ -513,10 +512,12 @@ async function drawCard() {
     // Create a high-quality, pre-scaled bitmap from the source
     // This tells the browser to use its best (e.g., bicubic) algorithm
     const bmp = await createImageBitmap(uploadedArt, sx, sy, sw, sh, {
+      resizeWidth: MAIN_MASK_W,
+      resizeHeight: MAIN_MASK_H,
       resizeQuality: "high" 
     });
     
-    // Draw the high-quality bitmap directly. 
+    // Draw the high-quality bitmap directly at the final position.
     // No clip, blur, or complex drawImage needed.
     ctx.drawImage(bmp, MAIN_ART_X, MAIN_ART_Y);
     
@@ -618,6 +619,8 @@ async function drawCard() {
   
         // Create the high-quality, pre-scaled bitmap
         const bmp = await createImageBitmap(iconImg, sx, sy, sw, sh, {
+          resizeWidth: ICON_W,
+          resizeHeight: ICON_H,
           resizeQuality: "high"
         });
   
@@ -1222,6 +1225,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
