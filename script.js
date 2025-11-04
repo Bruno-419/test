@@ -512,7 +512,7 @@ async function drawCard() {
     ctx.closePath();
     ctx.clip();
     // Apply a subtle blur to antialias the clip and scaling
-    ctx.filter = 'blur(0.3px)'; // <-- ADD THIS LINE
+    ctx.filter = 'blur(0.1px)'; // <-- ADD THIS LINE
     ctx.drawImage(uploadedArt, artX, artY, artW, artH);
     // Reset filter before restoring
     ctx.filter = 'none'; // <-- ADD THIS LINE
@@ -610,7 +610,7 @@ async function drawCard() {
         ctx.closePath();
         ctx.clip();
         // Apply a subtle blur to antialias the clip and scaling
-        ctx.filter = 'blur(0.3px)'; // <-- ADD THIS LINE
+        ctx.filter = 'blur(0.1px)'; // <-- ADD THIS LINE
         ctx.drawImage(t.img, iconX + t.tx, iconY + t.ty, t.img.width * t.scale, t.img.height * t.scale);
         // Reset filter before restoring
         ctx.filter = 'none'; // <-- ADD THIS LINE
@@ -1204,6 +1204,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
