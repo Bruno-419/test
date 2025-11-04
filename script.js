@@ -53,6 +53,7 @@ const assets = {
 // --- DOM elements ---
 const canvas = document.getElementById("previewCanvas");
 const ctx = canvas.getContext("2d");
+ctx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
 const nameInput = document.getElementById("cardName");
 const crestNameInput = document.getElementById("crestName");
 const faithNameInput = document.getElementById("faithName");
@@ -732,21 +733,24 @@ window.ICON_W = ICON_W; window.ICON_H = ICON_H;
 
 const mainPreviewCanvas = document.getElementById("mainPreviewCanvas");
 const mainPreviewCtx = mainPreviewCanvas ? mainPreviewCanvas.getContext("2d") : null;
+if (mainPreviewCtx) mainPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
 const mainZoomSlider = document.getElementById("mainZoomSlider");
 const crestPreviewCanvas = document.getElementById("crestPreviewCanvas");
 const crestPreviewCtx = crestPreviewCanvas ? crestPreviewCanvas.getContext("2d") : null;
+if (crestPreviewCtx) crestPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
 const crestZoomSlider = document.getElementById("crestZoomSlider");
 const faithPreviewCanvas = document.getElementById("faithPreviewCanvas");
 const faithPreviewCtx = faithPreviewCanvas ? faithPreviewCanvas.getContext("2d") : null;
+if (faithPreviewCtx) faithPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
 const faithZoomSlider = document.getElementById("faithZoomSlider");
 const artInput = document.getElementById("artUpload");
 const crestInput = document.getElementById("crestArtUpload");
 const faithInput = document.getElementById("faithArtUpload");
 
 const previewState = {
-  main: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H },
-  crest: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W, maskH: ICON_H },
-  faith: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W, maskH: ICON_H }
+  main: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H, minScale: 1 },
+  crest: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W, maskH: ICON_H, minScale: 1 },
+  faith: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W, maskH: ICON_H, minScale: 1 }
 };
 
 function loadImageFromFile(file) {
@@ -762,6 +766,7 @@ function loadImageFromFile(file) {
 function fitImageToMask(img, s) {
   const scale = Math.max(s.maskW / img.width, s.maskH / img.height);
   s.scale = scale;
+  s.minScale = scale; // <-- Store the minimum scale
   s.tx = (s.maskW - img.width * scale) / 2;
   s.ty = (s.maskH - img.height * scale) / 2;
 }
@@ -904,7 +909,14 @@ if (artInput) {
       const img = await loadImageFromFile(file);
       previewState.main.img = img;
       fitImageToMask(img, previewState.main);
-      if (mainZoomSlider) mainZoomSlider.value = previewState.main.scale;
+      if (mainZoomSlider) {
+        const min = previewState.main.minScale;
+        const max = min * 5; // 500% zoom from fit
+        mainZoomSlider.min = min;
+        mainZoomSlider.max = max;
+        mainZoomSlider.step = (max - min) / 100; // 100 steps in slider
+        mainZoomSlider.value = previewState.main.scale;
+      }
       updateAll();
     } catch (err) {
       console.error("Failed to load main art:", err);
@@ -919,7 +931,14 @@ if (crestInput) {
       const img = await loadImageFromFile(file);
       previewState.crest.img = img;
       fitImageToMask(img, previewState.crest);
-      if (crestZoomSlider) crestZoomSlider.value = previewState.crest.scale;
+      if (crestZoomSlider) {
+        const min = previewState.crest.minScale;
+        const max = min * 8; // 800% zoom from fit for icons
+        crestZoomSlider.min = min;
+        crestZoomSlider.max = max;
+        crestZoomSlider.step = (max - min) / 100; // 100 steps in slider
+        crestZoomSlider.value = previewState.crest.scale;
+      }
       updateAll();
     } catch (err) {
       console.error("Failed to load crest art:", err);
@@ -934,7 +953,14 @@ if (faithInput) {
       const img = await loadImageFromFile(file);
       previewState.faith.img = img;
       fitImageToMask(img, previewState.faith);
-      if (faithZoomSlider) faithZoomSlider.value = previewState.faith.scale;
+      if (faithZoomSlider) {
+        const min = previewState.faith.minScale;
+        const max = min * 8; // 800% zoom from fit for icons
+        faithZoomSlider.min = min;
+        faithZoomSlider.max = max;
+        faithZoomSlider.step = (max - min) / 100; // 100 steps in slider
+        faithZoomSlider.value = previewState.faith.scale;
+      }
       updateAll();
     } catch (err) {
       console.error("Failed to load faith art:", err);
@@ -986,9 +1012,22 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   canvasEl.addEventListener("wheel", (ev) => {
     if (!state.img) return;
     ev.preventDefault();
-    const delta = ev.deltaY > 0 ? -0.05 : 0.05;
+    
+    // Determine zoom speed
+    const zoomIntensity = 0.05;
+    const delta = ev.deltaY > 0 ? -1 : 1; // -1 for zoom out, 1 for zoom in
     const oldScale = state.scale;
-    const newScale = Math.max(0.1, state.scale + delta);
+    
+    // Get min/max from state and slider
+    const minScale = state.minScale;
+    const maxScale = sliderEl ? parseFloat(sliderEl.max) : oldScale * 2;
+    
+    // Calculate new scale
+    let newScale = oldScale * (1 + delta * zoomIntensity);
+    
+    // Clamp to min/max
+    newScale = Math.max(minScale, Math.min(maxScale, newScale));
+    
     const rect = canvasEl.getBoundingClientRect();
     const cx = ev.clientX - rect.left;
     const cy = ev.clientY - rect.top;
@@ -1006,7 +1045,7 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   if (sliderEl) {
     sliderEl.addEventListener("input", (ev) => {
       if (!state.img) return;
-      const newScale = parseFloat(ev.target.value);
+      const newScale = Math.max(state.minScale, parseFloat(ev.target.value)); // Enforce minScale
       const oldScale = state.scale;
       const cx = state.maskW / 2, cy = state.maskH / 2;
       const imgSpaceX = (cx - state.tx) / oldScale;
@@ -1153,3 +1192,4 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
