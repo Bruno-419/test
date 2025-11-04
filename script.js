@@ -53,7 +53,7 @@ const assets = {
 // --- DOM elements ---
 const canvas = document.getElementById("previewCanvas");
 const ctx = canvas.getContext("2d");
-ctx.imageSmoothingEnabled = false; // <-- ADD THIS LINE
+ctx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
 const nameInput = document.getElementById("cardName");
 const crestNameInput = document.getElementById("crestName");
 const faithNameInput = document.getElementById("faithName");
@@ -505,12 +505,14 @@ async function drawCard() {
     const maskW = MAIN_MASK_W;
     const maskH = MAIN_MASK_H;
     ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high'; // <-- Add this for better smoothing
     ctx.beginPath();
     ctx.rect(maskX, maskY, maskW, maskH);
     ctx.closePath();
     ctx.clip();
     // Apply a subtle blur to antialias the clip and scaling
-    ctx.filter = 'blur(0.3px)'; // <-- ADD THIS LINE
+    ctx.filter = 'blur(0.1px)'; // <-- ADD THIS LINE
     ctx.drawImage(uploadedArt, artX, artY, artW, artH);
     // Reset filter before restoring
     ctx.filter = 'none'; // <-- ADD THIS LINE
@@ -601,12 +603,14 @@ async function drawCard() {
 
       if (iconImg && t) {
         ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high'; // <-- Add this for better smoothing
         ctx.beginPath();
         ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
         ctx.closePath();
         ctx.clip();
         // Apply a subtle blur to antialias the clip and scaling
-        ctx.filter = 'blur(0.3px)'; // <-- ADD THIS LINE
+        ctx.filter = 'blur(0.1px)'; // <-- ADD THIS LINE
         ctx.drawImage(t.img, iconX + t.tx, iconY + t.ty, t.img.width * t.scale, t.img.height * t.scale);
         // Reset filter before restoring
         ctx.filter = 'none'; // <-- ADD THIS LINE
@@ -741,12 +745,15 @@ window.ICON_W = ICON_W; window.ICON_H = ICON_H;
 
 const mainPreviewCanvas = document.getElementById("mainPreviewCanvas");
 const mainPreviewCtx = mainPreviewCanvas ? mainPreviewCanvas.getContext("2d") : null;
+if (mainPreviewCtx) mainPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
 const mainZoomSlider = document.getElementById("mainZoomSlider");
 const crestPreviewCanvas = document.getElementById("crestPreviewCanvas");
 const crestPreviewCtx = crestPreviewCanvas ? crestPreviewCanvas.getContext("2d") : null;
+if (crestPreviewCtx) crestPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
 const crestZoomSlider = document.getElementById("crestZoomSlider");
 const faithPreviewCanvas = document.getElementById("faithPreviewCanvas");
 const faithPreviewCtx = faithPreviewCanvas ? faithPreviewCanvas.getContext("2d") : null;
+if (faithPreviewCtx) faithPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
 const faithZoomSlider = document.getElementById("faithZoomSlider");
 const artInput = document.getElementById("artUpload");
 const crestInput = document.getElementById("crestArtUpload");
@@ -1197,8 +1204,6 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
-
-
 
 
 
