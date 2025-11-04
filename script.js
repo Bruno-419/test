@@ -513,8 +513,6 @@ async function drawCard() {
     // Create a high-quality, pre-scaled bitmap from the source
     // This tells the browser to use its best (e.g., bicubic) algorithm
     const bmp = await createImageBitmap(uploadedArt, sx, sy, sw, sh, {
-      resizeWidth: MAIN_MASK_W,
-      resizeHeight: MAIN_MASK_H,
       resizeQuality: "high" 
     });
     
@@ -620,8 +618,6 @@ async function drawCard() {
   
         // Create the high-quality, pre-scaled bitmap
         const bmp = await createImageBitmap(iconImg, sx, sy, sw, sh, {
-          resizeWidth: ICON_W,
-          resizeHeight: ICON_H,
           resizeQuality: "high"
         });
   
@@ -1226,6 +1222,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
