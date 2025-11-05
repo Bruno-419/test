@@ -522,7 +522,6 @@ async function drawCard() {
     
     // 3. Draw the pre-scaled bitmap, panned correctly
     // (s.tx/s.ty are relative to the mask, so we add the mask's position)
-    ctx.filter = "contrast(1.1)";
     ctx.drawImage(
       bmp, 
       MAIN_ART_X + s.tx, 
@@ -638,7 +637,6 @@ async function drawCard() {
         ctx.clip();
         
         // 3. Draw the pre-scaled, panned bitmap
-        ctx.filter = "contrast(1.1)";
         ctx.drawImage(
           bmp,
           iconX + s.tx,
@@ -1236,6 +1234,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
