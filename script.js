@@ -499,10 +499,6 @@ async function drawCard() {
   ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
   // === Masked Main Art ===
-  
-  // Turn OFF smoothing for a sharp, pixel-perfect bitmap draw
-  ctx.imageSmoothingEnabled = false;
-  
   if (uploadedArt) {
     const s = previewState.main; // Get the state
     
@@ -535,9 +531,6 @@ async function drawCard() {
     ctx.restore();
     bmp.close(); // Clean up the bitmap from memory
   }
-
-  // Turn smoothing back ON for text, gems, and UI
-  ctx.imageSmoothingEnabled = true;
 
   ctx.drawImage(gem, 398, 863);
   ctx.drawImage(frame, 48, 153);
@@ -621,9 +614,6 @@ async function drawCard() {
       const nameField = document.getElementById(isCrest ? "crestName" : "faithName");
       const nameValue = nameField ? nameField.value.trim() : "";
 
-      // --- ADD THIS ---
-      ctx.imageSmoothingEnabled = false; // Turn OFF for sharp icon
-
       if (iconImg && (isCrest || isFaith)) {
         // Get the correct preview state
         const s = previewState[isCrest ? "crest" : "faith"];
@@ -656,9 +646,6 @@ async function drawCard() {
         
         bmp.close(); // Clean up
       }
-
-      // --- ADD THIS ---
-      ctx.imageSmoothingEnabled = true; // Turn back ON for text
       
       const defaultName = isCrest ? "Crest" : "Faith";
       const displayName = nameValue || defaultName;
@@ -1247,6 +1234,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
