@@ -502,27 +502,34 @@ async function drawCard() {
   if (uploadedArt) {
     const s = previewState.main; // Get the state
     
-    // Calculate the visible region of the *original* image
-    // (sx, sy, sw, sh) = source crop
-    const sx = Math.max(0, -s.tx / s.scale);
-    const sy = Math.max(0, -s.ty / s.scale);
-    const sw = s.maskW / s.scale;
-    const sh = s.maskH / s.scale;
+    // Calculate the final *scaled* dimensions of the entire image
+    const dWidth = uploadedArt.width * s.scale;
+    const dHeight = uploadedArt.height * s.scale;
 
-    // Create a high-quality, pre-scaled bitmap from the source
-    // This tells the browser to use its best (e.g., bicubic) algorithm
-    const bmp = await createImageBitmap(uploadedArt, sx, sy, sw, sh, {
-      resizeWidth: MAIN_MASK_W,
-      resizeHeight: MAIN_MASK_H,
+    // 1. Create a high-quality, pre-scaled bitmap of the *entire* image
+    const bmp = await createImageBitmap(uploadedArt, 0, 0, uploadedArt.width, uploadedArt.height, {
+      resizeWidth: Math.round(dWidth),   // Use the dynamic scaled width
+      resizeHeight: Math.round(dHeight), // Use the dynamic scaled height
       resizeQuality: "high" 
     });
     
-    // Draw the high-quality bitmap directly at the final position.
-    // No clip, blur, or complex drawImage needed.
-    ctx.drawImage(bmp, MAIN_ART_X, MAIN_ART_Y);
+    // 2. Create the rectangular clip path for the main art
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(MAIN_ART_X, MAIN_ART_Y, MAIN_MASK_W, MAIN_MASK_H);
+    ctx.closePath();
+    ctx.clip();
     
-    // Clean up the bitmap from memory
-    bmp.close();
+    // 3. Draw the pre-scaled bitmap, panned correctly
+    // (s.tx/s.ty are relative to the mask, so we add the mask's position)
+    ctx.drawImage(
+      bmp, 
+      MAIN_ART_X + s.tx, 
+      MAIN_ART_Y + s.ty
+    );
+    
+    ctx.restore();
+    bmp.close(); // Clean up the bitmap from memory
   }
 
   ctx.drawImage(gem, 398, 863);
@@ -611,31 +618,33 @@ async function drawCard() {
         // Get the correct preview state
         const s = previewState[isCrest ? "crest" : "faith"];
   
-        // Calculate the visible region of the *original* icon art
-        const sx = Math.max(0, -s.tx / s.scale);
-        const sy = Math.max(0, -s.ty / s.scale);
-        const sw = s.maskW / s.scale;
-        const sh = s.maskH / s.scale;
-  
-        // Create the high-quality, pre-scaled bitmap
-        const bmp = await createImageBitmap(iconImg, sx, sy, sw, sh, {
-          resizeWidth: ICON_W,
-          resizeHeight: ICON_H,
+        // Calculate the final *scaled* dimensions of the icon
+        const dWidth = iconImg.width * s.scale;
+        const dHeight = iconImg.height * s.scale;
+
+        // 1. Create a high-quality, pre-scaled bitmap
+        const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
+          resizeWidth: Math.round(dWidth),
+          resizeHeight: Math.round(dHeight),
           resizeQuality: "high"
         });
   
-        // Draw the bitmap, clipping it to a circle
+        // 2. Draw the bitmap, clipping it to a circle
         ctx.save();
         ctx.beginPath();
         ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
         ctx.closePath();
         ctx.clip();
         
-        // No filter/blur needed, just draw the pre-scaled bitmap
-        ctx.drawImage(bmp, iconX, iconY);
+        // 3. Draw the pre-scaled, panned bitmap
+        ctx.drawImage(
+          bmp,
+          iconX + s.tx,
+          iconY + s.ty
+        );
         ctx.restore();
         
-        bmp.close();
+        bmp.close(); // Clean up
       }
       
       const defaultName = isCrest ? "Crest" : "Faith";
@@ -1225,6 +1234,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
