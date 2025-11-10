@@ -767,7 +767,7 @@ async function drawCard() {
   if (tokenCheckbox.checked) {
     ctx.font = "28px 'NotoSans'";
     ctx.textAlign = "right";
-    ctx.fillText("*This is a token card.", 1788, 1025);
+    ctx.fillText("*This is a token card.", 1788, canvas.height - 55);
   }
 
   // This logic is now automatically correct because it uses stretchPixels
@@ -1285,6 +1285,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
