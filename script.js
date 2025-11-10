@@ -66,6 +66,7 @@ const attackInput = document.getElementById("attackValue");
 const defenseInput = document.getElementById("defenseValue");
 const tokenCheckbox = document.getElementById("tokenCheckbox");
 const wordCountCheckbox = document.getElementById("wordCountCheckbox");
+const autoDividerCheckbox = document.getElementById("autoDividerCheckbox");
 const textInputs = {
   card: document.getElementById("cardText"),
   evolve: document.getElementById("evolveText"),
@@ -136,14 +137,17 @@ async function getImage(src) {
 // --- Auto insert "----------" marker ---
 Object.values(textInputs).forEach((textarea) => {
   textarea.addEventListener("input", () => {
-    const cursorPos = textarea.selectionStart;
-    const value = textarea.value;
-    const before = value.slice(0, cursorPos);
-    const after = value.slice(cursorPos);
-    if (before.endsWith("\n\n")) {
-      const newValue = before.slice(0, -1) + "----------\n" + after;
-      textarea.value = newValue;
-      textarea.selectionStart = textarea.selectionEnd = cursorPos + 10;
+    // --- MODIFICATION: Only auto-insert if checkbox is checked ---
+    if (autoDividerCheckbox.checked) {
+      const cursorPos = textarea.selectionStart;
+      const value = textarea.value;
+      const before = value.slice(0, cursorPos);
+      const after = value.slice(cursorPos);
+      if (before.endsWith("\n\n")) {
+        const newValue = before.slice(0, -1) + "----------\n" + after;
+        textarea.value = newValue;
+        textarea.selectionStart = textarea.selectionEnd = cursorPos + 10;
+      }
     }
   });
 });
@@ -778,7 +782,7 @@ function debouncedDrawCard() {
 
 [
   nameInput, traitInput, classSelect, raritySelect, costInput, attackInput, defenseInput,
-  tokenCheckbox, wordCountCheckbox,
+  tokenCheckbox, wordCountCheckbox, autoDividerCheckbox,
   ...Object.values(textInputs),
   document.getElementById("illustratorName"),
   document.getElementById("crestName"),
@@ -1263,6 +1267,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
