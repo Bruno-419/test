@@ -529,6 +529,7 @@ async function drawCard() {
   const bottomBarStretchThreshold = 825;
   const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
   
+  // This is the crucial value: how many extra pixels we need
   const stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
   const stretchCount = stretchPixels / 50;
   const boxAsset = showBottomBar ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
@@ -1284,22 +1285,3 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
