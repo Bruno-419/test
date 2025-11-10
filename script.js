@@ -151,11 +151,11 @@ Object.values(textInputs).forEach((textarea) => {
 
 // --- Text highlight keywords ---
 const HIGHLIGHT_KEYWORDS = [
-  "Fanfare","Last Words","Engage","Strike","Storm","Ambush","Bane","Drain","Ward","Rush",
-  "Overflow","Evolve","Super-Evolve","Spellboost","Clash","Mode","Intimidate","Aura","Barrier",
-  "Fuse","Necromancy","Combo","Earth Rite","Rally","Countdown","Reanimate","Earth Sigil",
-  "Crystallize","Invoke","Invoked","Sanguine","Skybound Art","Super Skybound Art","Maneuver",
-  "Enhance","Union Burst","Accelerate"
+  "Fanfare","Last Words","Engage","Strike","Storm","Ambush","Bane","Drain","Ward","Rush","Overflow",
+  "On Spellboost","Clash","Mode","Intimidate","Aura","Barrier","Fuse","Fused","Necromancy","Combo",
+  "Earth Rite","Rally","Countdown","Reanimate","Earth Sigil","Crystallize","Crystallized","Invoke",
+  "Invoked","Sanguine","Skybound Art","Super Skybound Art","Maneuver","Maneuverable","Maneuvering",
+  "Enhance","Union Burst","Accelerate","Burial Rite"
 ];
 const HIGHLIGHT_REGEX = new RegExp(`\\b(${HIGHLIGHT_KEYWORDS.join("|")})\\b`, "g");
 
@@ -215,7 +215,13 @@ async function calculateTextBlockHeight(key, startY) {
   const lineHeight = 50;
   const baseFont = "33px 'Memento'";
   
-  const processedText = textValue.replace(HIGHLIGHT_REGEX, "<K>$&</K>");
+  let processedText = textValue.replace(HIGHLIGHT_REGEX, "<K>$&</K>");
+  if (key === "evolve" && processedText.startsWith("Evolve")) {
+    processedText = processedText.replace(/^Evolve/, "<K>Evolve</K>");
+  }
+  if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) {
+    processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
+  }
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
 
@@ -314,7 +320,13 @@ async function drawTextBlock(key, box, x, startY) {
   const baseFont = "33px 'Memento'";
 
   // --- Pre-process text to wrap keywords in special tags for easier tokenizing ---
-  const processedText = textValue.replace(HIGHLIGHT_REGEX, "<K>$&</K>");
+  let processedText = textValue.replace(HIGHLIGHT_REGEX, "<K>$&</K>");
+  if (key === "evolve" && processedText.startsWith("Evolve")) {
+    processedText = processedText.replace(/^Evolve/, "<K>Evolve</K>");
+  }
+  if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) {
+    processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
+  }
 
   // --- Tokenizer that understands all formatting markers ---
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+)/g;
@@ -1251,6 +1263,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
