@@ -562,9 +562,28 @@ async function drawCard() {
 
   // Load the background image
   const bg = await getImage(assets.backgrounds[classSelect.value]);
+  // --- NEW 2-Slice Background Draw ---
+  const slicePointY = 1000;
+  // Ensure we don't try to slice past the image's actual height
+  const topHeight = Math.min(slicePointY, bg.height);
+  const bottomPartHeight = bg.height - topHeight; // e.g., 1080 - 1000 = 80
 
-  // Draw the background, stretched to fill the new canvas height
-  ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+  // 1. Draw the static top part (0-1000px)
+  ctx.drawImage(bg,
+    0, 0, bg.width, topHeight, // Source (top 1000px of image)
+    0, 0, bg.width, topHeight  // Destination (top 1000px of canvas)
+  );
+
+  // 2. Draw the stretched bottom part (1000-1080px)
+  if (bottomPartHeight > 0) {
+    // The new height for the bottom part is its original height + all stretch pixels
+    const newBottomHeight = bottomPartHeight + stretchPixels;
+    ctx.drawImage(bg,
+      0, topHeight, bg.width, bottomPartHeight, // Source (bottom 80px of image)
+      0, topHeight, bg.width, newBottomHeight   // Destination (fills from 1000px to end of canvas)
+    );
+  }
+  // --- END NEW 2-Slice ---
 
   // Load remaining assets
   const [gem, frame] = await Promise.all([
@@ -628,9 +647,8 @@ async function drawCard() {
   offCanvas.height = dynamicBoxHeight;
   const offCtx = offCanvas.getContext("2d");
   
-  // Draw the section of the *background* (bg) onto the off-screen canvas
-  // This will now correctly sample from the *already stretched* background
-  offCtx.drawImage(bg, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
+// Draw the section of the *main canvas* (which has the stretched bg) onto the off-screen canvas
+  offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
   
   offCtx.filter = "blur(5px)";
   offCtx.drawImage(offCanvas, 0, 0);
@@ -1267,6 +1285,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
