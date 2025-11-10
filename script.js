@@ -529,8 +529,15 @@ async function drawCard() {
   const bottomBarStretchThreshold = 825;
   const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
   
-  // This is the crucial value: how many extra pixels we need
-  const stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
+  // --- NEW: Add a maximum height to prevent browser crashes ---
+  const MAX_CANVAS_HEIGHT = 8192; // 8K pixels, a safe cap for most browsers
+  const baseHeight = 1080;
+  const maxStretchPixels = MAX_CANVAS_HEIGHT - baseHeight;
+  
+  // This line is now modified to respect the cap:
+  const stretchPixels = Math.max(0, Math.min(calculatedTotalY - stretchThreshold, maxStretchPixels));
+  // --- END NEW ---
+
   const stretchCount = stretchPixels / 50;
   const boxAsset = showBottomBar ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
   
@@ -1285,6 +1292,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
