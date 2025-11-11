@@ -910,7 +910,7 @@ if (artInput) {
         mainZoomSlider.step = (max - min) / 100; // 100 steps in slider
         mainZoomSlider.value = previewState.main.scale;
       }
-      updateAll();
+      updateAllPreviews();
     } catch (err) {
       console.error("Failed to load main art:", err);
     }
@@ -1184,3 +1184,4 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(safeDrawCard, 50); 
   });
 });
+
