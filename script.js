@@ -53,7 +53,7 @@ const assets = {
 // --- DOM elements ---
 const canvas = document.getElementById("previewCanvas");
 const ctx = canvas.getContext("2d");
-ctx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
+ctx.imageSmoothingEnabled = true; // This will be reset on canvas resize, so we re-apply it
 const nameInput = document.getElementById("cardName");
 const crestNameInput = document.getElementById("crestName");
 const faithNameInput = document.getElementById("faithName");
@@ -67,6 +67,7 @@ const defenseInput = document.getElementById("defenseValue");
 const tokenCheckbox = document.getElementById("tokenCheckbox");
 const wordCountCheckbox = document.getElementById("wordCountCheckbox");
 const autoDividerCheckbox = document.getElementById("autoDividerCheckbox");
+const illustratorInput = document.getElementById("illustratorName");
 const textInputs = {
   card: document.getElementById("cardText"),
   evolve: document.getElementById("evolveText"),
@@ -74,14 +75,28 @@ const textInputs = {
   crest: document.getElementById("crestText"),
   faith: document.getElementById("faithText")
 };
+const textOrder = [
+  { key: "card", box: null },
+  { key: "evolve", box: "evolve" },
+  { key: "superEvolve", box: "superEvolve" },
+  { key: "crest", box: "crest" },
+  { key: "faith", box: "faith" }
+];
+
 
 // --- Crest and Faith uploads ---
 const crestArtUpload = document.getElementById("crestArtUpload");
 const faithArtUpload = document.getElementById("faithArtUpload");
 
+const mainArtTitle = document.getElementById("mainArtTitle");
+
 let uploadedArt = null;
 let crestArt = null;
 let faithArt = null;
+
+// --- OPTIMIZATION: Cache for drawScaledNumber ---
+// Prevents re-calculating font sizes for the same numbers
+const numberRenderCache = {};
 
 /**
  * Draws a number, scaling down the font size to fit a max width.
@@ -95,6 +110,19 @@ let faithArt = null;
  * @param {number} yNudgeCoefficient - The factor used to calculate the vertical correction (e.g., 0.4).
  */
 function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpacing = 0, yNudgeCoefficient) {
+  const cacheKey = `${text}|${maxFontSize}|${maxWidth}|${letterSpacing}|${yNudgeCoefficient}`;
+  
+  // OPTIMIZATION: Check cache first
+  if (numberRenderCache[cacheKey]) {
+    const cached = numberRenderCache[cacheKey];
+    ctx.font = cached.font;
+    ctx.letterSpacing = cached.letterSpacing;
+    ctx.textAlign = "center";
+    ctx.fillText(text, x, y + cached.yNudge);
+    ctx.letterSpacing = "0px";
+    return;
+  }
+  
   ctx.textAlign = "center";
   ctx.letterSpacing = `${letterSpacing}px`; // Apply your letter spacing
 
@@ -112,8 +140,14 @@ function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpa
   const yNudge = (maxFontSize - fontSize) * yNudgeCoefficient;
 
   ctx.fillText(text, x, y + yNudge);
-
   ctx.letterSpacing = "0px";
+
+  // OPTIMIZATION: Store result in cache
+  numberRenderCache[cacheKey] = {
+    font: ctx.font,
+    letterSpacing: `${letterSpacing}px`,
+    yNudge: yNudge
+  };
 }
 
 // --- Helpers ---
@@ -137,7 +171,6 @@ async function getImage(src) {
 // --- Auto insert "----------" marker ---
 Object.values(textInputs).forEach((textarea) => {
   textarea.addEventListener("input", () => {
-    // --- MODIFICATION: Only auto-insert if checkbox is checked ---
     if (autoDividerCheckbox.checked) {
       const cursorPos = textarea.selectionStart;
       const value = textarea.value;
@@ -199,26 +232,27 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   return topHeight + middleHeight + bottomHeight + stretchAmount;
 }
 
-// --- NEW function to calculate height without drawing ---
-async function calculateTextBlockHeight(key, startY) {
-  const textValue = textInputs[key].value.trim();
-  if (!textValue) return 0;
 
-  // Shared constants for calculation
+// --- REFACTOR: NEW Function to calculate text layout ---
+// This is the "Dry Run". It calculates all positions and heights.
+// It returns a "layout" object that the draw function can use,
+// so we *never* have to measure text twice.
+function calculateTextLayout(key) {
+  const textValue = textInputs[key].value.trim();
+  if (!textValue) return null;
+
+  // --- Constants ---
   const isSpecialBox = (key !== "card");
   const specialLineHeightBefore = 30;
   const specialLineHeightAfter = 20;
-
-  // --- NEW: Add custom heights for the main card box divider ---
-  const cardLineHeightBefore = 30; // Was lineHeight (50)
-  const cardLineHeightAfter = 40;  // Was lineHeight (50)
-  // --- END NEW ---
-  
+  const cardLineHeightBefore = 30;
+  const cardLineHeightAfter = 40;
   const textStartX = 769 + 30; // boxX + 30
   const wrapLimitX = 1716;
   const lineHeight = 50;
   const baseFont = "33px 'Memento'";
-  
+
+  // --- Tokenizing ---
   let processedText = textValue.replace(HIGHLIGHT_REGEX, "<K>$&</K>");
   if (key === "evolve" && processedText.startsWith("Evolve")) {
     processedText = processedText.replace(/^Evolve/, "<K>Evolve</K>");
@@ -229,380 +263,261 @@ async function calculateTextBlockHeight(key, startY) {
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
 
-  // Dry Run: Calculate layout and total height
-  let totalHeight = lineHeight;
+  // --- Layout Calculation ---
+  let lines = []; // This will store our "draw" commands
   let currentX = textStartX;
-  let dryStyle = { bold: false, italic: false, isKeyword: false };
-  let dryLastTokenWasDivider = false;
+  let currentY = lineHeight; // Start at first line's Y
+  let currentLine = [];
+  let style = { bold: false, italic: false, isKeyword: false };
+  let lastTokenWasDivider = false;
 
-  const setDryFont = () => {
-    const weight = dryStyle.bold || dryStyle.isKeyword ? "bold " : "";
-    const style = dryStyle.italic ? "italic " : "";
-    ctx.font = `${weight}${style}${baseFont}`;
+  const setStyleFont = () => {
+    const weight = style.bold || style.isKeyword ? "bold " : "";
+    const styleStr = style.italic ? "italic " : "";
+    ctx.font = `${weight}${styleStr}${baseFont}`;
   };
 
-  for (const token of allTokens) {
-    if (token === "**") { dryStyle.bold = !dryStyle.bold; continue; }
-    if (token === "_") { dryStyle.italic = !dryStyle.italic; continue; }
-    if (token === "<K>") { dryStyle.isKeyword = true; continue; }
-    if (token === "</K>") { dryStyle.isKeyword = false; continue; }
-    if (["<c>", "</c>"].includes(token)) continue;
-
-    if (token === "\n") {
-      // --- MODIFIED: Use cardLineHeightAfter for main box ---
-      totalHeight += dryLastTokenWasDivider ? (isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter) : lineHeight;
-      // --- END MODIFICATION ---
-      currentX = textStartX;
-      dryLastTokenWasDivider = false;
-      continue;
-    }
-    
-    if (token.trim() === "----------") {
-      if (currentX > textStartX) {
-        // --- MODIFIED: Use cardLineHeightBefore for main box ---
-        totalHeight += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
-        // --- END MODIFICATION ---
-      }
-      currentX = textStartX;
-      dryLastTokenWasDivider = true;
-      continue;
-    }
-    
-    dryLastTokenWasDivider = false;
-
-    setDryFont();
-    const tokenWidth = ctx.measureText(token).width;
-    
-    if (currentX > textStartX && currentX + tokenWidth > wrapLimitX && token.trim() !== "") {
-      totalHeight += lineHeight;
-      currentX = textStartX;
-    }
-
-    if (currentX === textStartX && token.trim() === "") continue;
-    currentX += tokenWidth;
-    if (dryStyle.italic) currentX += 3;
-  }
-  
-  // Calculate the height of the box itself
-  const boxImg = assets.boxes[key === "card" ? null : key] ? await getImage(assets.boxes[key]) : null;
-  const stretchCount = Math.max(0, (totalHeight / lineHeight) - 1);
-  let boxHeight = 0;
-  if (boxImg) {
-      const topHeight = (key === "crest" || key === "faith") ? 107 : 40;
-      const bottomHeight = (key === "crest" || key === "faith") ? 28 : 40;
-      const middleHeight = boxImg.height - topHeight - bottomHeight;
-      const stretchAmount = stretchCount * 50;
-      boxHeight = topHeight + middleHeight + bottomHeight + stretchAmount;
-  }
-
-  return Math.max(boxHeight, totalHeight + 40); // Return the greater of the two heights
-}
-
-// --- drawTextBlock ---
-async function drawTextBlock(key, box, x, startY) {
-  const textValue = textInputs[key].value.trim();
-  if (!textValue) return 0;
-
-  // --- MODIFICATION: Define shared constants here ---
-  const isSpecialBox = (key !== "card");
-  const specialLineHeightBefore = 30; // Space *before* divider
-  const specialLineHeightAfter = 20;  // Space *after* divider
-  const specialDividerYOffset = 25;   // Nudge divider up
-
-  // --- NEW: Add constants for the main card box ---
-  const cardLineHeightBefore = 30; // Was 50 (lineHeight)
-  const cardLineHeightAfter = 40;  // Was 50 (lineHeight)
-  const cardDividerYOffset = 15;   // Was 10
-  // --- END NEW ---
-
-  // --- Common setup ---
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
-  const textStartX = x + 30;
-  const wrapLimitX = 1716;
-  const lineHeight = 50;
-  const baseFont = "33px 'Memento'";
-
-  // --- Pre-process text to wrap keywords in special tags for easier tokenizing ---
-  let processedText = textValue.replace(HIGHLIGHT_REGEX, "<K>$&</K>");
-  if (key === "evolve" && processedText.startsWith("Evolve")) {
-    processedText = processedText.replace(/^Evolve/, "<K>Evolve</K>");
-  }
-  if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) {
-    processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
-  }
-
-  // --- Tokenizer that understands all formatting markers ---
-  const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+)/g;
-  const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
-
-  // --- Dry Run: Calculate layout and total height ---
-  let totalHeight = lineHeight; // Start with one line
-  let currentX = textStartX;
-  let dryStyle = { bold: false, italic: false, isKeyword: false };
-  let dryLastTokenWasDivider = false;
-
-  const setDryFont = () => {
-    const weight = dryStyle.bold || dryStyle.isKeyword ? "bold " : "";
-    const style = dryStyle.italic ? "italic " : "";
-    ctx.font = `${weight}${style}${baseFont}`;
+  const pushLine = () => {
+    if (currentLine.length > 0) lines.push(currentLine);
+    currentLine = [];
   };
 
   for (const token of allTokens) {
     // Update style state for measurement
-    if (token === "**") { dryStyle.bold = !dryStyle.bold; continue; }
-    if (token === "_") { dryStyle.italic = !dryStyle.italic; continue; }
-    if (token === "<K>") { dryStyle.isKeyword = true; continue; }
-    if (token === "</K>") { dryStyle.isKeyword = false; continue; }
-    if (["<c>", "</c>"].includes(token)) continue;
+    if (token === "**") { style.bold = !style.bold; continue; }
+    if (token === "_") { style.italic = !style.italic; continue; }
+    if (token === "<K>") { style.isKeyword = true; continue; }
+    if (token === "</K>") { style.isKeyword = false; continue; }
+    if (["<c>", "</c>"].includes(token)) continue; // Color tokens are handled in draw pass
 
     // Handle explicit line breaks
     if (token === "\n") {
-      if (dryLastTokenWasDivider) {
-        // --- MODIFIED: Use cardLineHeightAfter for main box ---
-        totalHeight += isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter;
-      } else {
-        totalHeight += lineHeight;
-      }
+      pushLine();
+      currentY += lastTokenWasDivider ? (isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter) : lineHeight;
       currentX = textStartX;
-      dryLastTokenWasDivider = false;
+      lastTokenWasDivider = false;
       continue;
     }
     
     // Handle dividers
     if (token.trim() === "----------") {
       if (currentX > textStartX) { // Only add a line if not at the start
-        // --- MODIFIED: Use cardLineHeightBefore for main box ---
-        totalHeight += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
+        pushLine();
+        currentY += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
       }
+      lines.push({ type: "divider", y: currentY }); // Add divider command
       currentX = textStartX;
-      dryLastTokenWasDivider = true;
+      lastTokenWasDivider = true;
       continue;
     }
     
-    dryLastTokenWasDivider = false; // Reset on any other token
+    lastTokenWasDivider = false; // Reset on any other token
 
     // Measure token and check for wrapping
-    setDryFont();
+    setStyleFont();
     const tokenWidth = ctx.measureText(token).width;
     
     if (currentX > textStartX && currentX + tokenWidth > wrapLimitX && token.trim() !== "") {
-      totalHeight += lineHeight;
+      pushLine();
+      currentY += lineHeight;
       currentX = textStartX;
     }
 
-    // Don't add width for leading spaces on a new line
+    // Don't add leading spaces on a new line
     if (currentX === textStartX && token.trim() === "") continue;
 
+    currentLine.push({
+      token,
+      x: currentX,
+      y: currentY,
+      style: { ...style } // Copy current style
+    });
+
     currentX += tokenWidth;
-    if (dryStyle.italic) currentX += 3; // Add extra space for italic slant
-  }
-  // --- End of Dry Run ---
-
-  // --- Draw the stretchable box based on the calculated line count ---
-  const boxImg = box ? await getImage(assets.boxes[box]) : null;
-  const stretchCount = Math.max(0, (totalHeight / lineHeight) - 1);
-
-  const boxHeight = boxImg
-    ? drawStretchBox(boxImg, x, startY, stretchCount, key)
-    : 0;
-
-  // --- Wet Run: Actually draw the text onto the canvas ---
-  ctx.textAlign = "left";
-  ctx.shadowColor = "black";
-  ctx.shadowBlur = 4;
-
-  let xPos = textStartX;
-  let textY = startY + 50 + (key === "crest" || key === "faith" ? 90 : 0);
-  let wetStyle = { bold: false, italic: false, color: null, isKeyword: false };
-  let lastTokenWasDivider = false;
-
-  const setWetStyle = () => {
-    const weight = wetStyle.bold || wetStyle.isKeyword ? "bold " : "";
-    const style = wetStyle.italic ? "italic " : "";
-    ctx.font = `${weight}${style}${baseFont}`;
-    ctx.fillStyle = wetStyle.color || (wetStyle.isKeyword ? "#f3d87d" : "#efeee9");
-  };
-
-  const dividerToUse = await getImage(
-    assets.boxes[key === "card" ? "divider" : "small_divider"]
-  );
-
-  for (const token of allTokens) {
-    // Update style state
-    if (token === "**") { wetStyle.bold = !wetStyle.bold; continue; }
-    if (token === "_") { wetStyle.italic = !wetStyle.italic; continue; }
-    if (token === "<c>") { wetStyle.color = "#f3d87d"; continue; }
-    if (token === "</c>") { wetStyle.color = null; continue; }
-    if (token === "<K>") { wetStyle.isKeyword = true; continue; }
-    if (token === "</K>") { wetStyle.isKeyword = false; continue; }
-    
-    // --- MODIFICATION: Updated \n handler ---
-    // Handle line breaks
-    if (token === "\n") {
-      if (lastTokenWasDivider) {
-        // This is the \n *after* a divider
-        textY += isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter; // MODIFIED
-      } else {
-        // This is a normal \n
-        textY += lineHeight;
-      }
-      xPos = textStartX;
-      lastTokenWasDivider = false; // Reset flag
-      continue;
-    }
-    // --- END MODIFICATION ---
-
-    // --- MODIFICATION: Updated "----------" handler ---
-    // Handle divider
-    if (token.trim() === "----------") {
-      // 1. Handle line break *before* divider (if not at start of line)
-      if (xPos > textStartX) {
-        textY += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore; // MODIFIED
-      }
-      
-      // 2. Draw the divider (nudged up)
-      const yOffset = isSpecialBox ? specialDividerYOffset : cardDividerYOffset; // MODIFIED
-      ctx.drawImage(dividerToUse, x, textY - yOffset);
-      
-      // 3. Reset X position and set flag
-      xPos = textStartX;
-      lastTokenWasDivider = true; // Set flag
-      continue;
-    }
-    // --- END MODIFICATION ---
-    
-    // --- MODIFICATION: Reset flag on any other token ---
-    lastTokenWasDivider = false;
-    // --- END MODIFICATION ---
-
-    setWetStyle();
-    const tokenWidth = ctx.measureText(token).width;
-
-    // Check for wrapping
-    if (xPos > textStartX && xPos + tokenWidth > wrapLimitX && token.trim() !== "") {
-      textY += lineHeight;
-      xPos = textStartX;
-    }
-    
-    // Don't draw leading spaces on a new line
-    if (xPos === textStartX && token.trim() === "") continue;
-
-    ctx.fillText(token, xPos, textY);
-    xPos += tokenWidth;
-    if (wetStyle.italic) xPos += 0;
+    if (style.italic) currentX += 3; // Add extra space for italic slant
   }
   
-  return Math.max(boxHeight, textY - startY + 40);
-}
+  // Push any remaining tokens on the last line
+  pushLine();
 
-
-// --- drawCard ---
-async function drawCard() {
-  // --- PRE-CALCULATION STEP (MOVED FROM BELOW) ---
-  // We must calculate the final height *before* drawing anything.
-
-  const textOrder = [
-    { key: "card", box: null },
-    { key: "evolve", box: "evolve" },
-    { key: "superEvolve", box: "superEvolve" },
-    { key: "crest", box: "crest" },
-    { key: "faith", box: "faith" }
-  ];
-  const boxX = 768;
-  const startY = 246;
-
-  // --- STEP 1: Calculate total content height first ---
-  let calculatedTotalY = startY;
-  for (const { key } of textOrder) {
-      if (!textInputs[key].value.trim()) continue;
-      // This function calculates the height of each text block
-      const blockHeight = await calculateTextBlockHeight(key); 
-      calculatedTotalY += blockHeight - 10;
+  // --- Calculate final heights ---
+  const totalTextHeight = currentY; // The Y position of the *last* line
+  const stretchCount = Math.max(0, Math.ceil((totalTextHeight / lineHeight)) - 1);
+  
+  let boxHeight = 0;
+  if (assets.boxes[key === "card" ? null : key]) {
+      const topHeight = (key === "crest" || key === "faith") ? 107 : 40;
+      const bottomHeight = (key ==="crest" || key === "faith") ? 28 : 40;
+      // This is a dummy calculation just to get the box height.
+      // We use a fixed middle height from the asset.
+      const middleHeight = (key === "crest" || key === "faith") ? 38 : (330 - topHeight - bottomHeight); // 330 is fallback img height
+      const stretchAmount = stretchCount * 50;
+      boxHeight = topHeight + middleHeight + bottomHeight + stretchAmount;
   }
 
-  // --- STEP 2 (PARTIAL): Calculate stretch amount ---
-  const illustrator = document.getElementById("illustratorName").value.trim();
-  const showBottomBar = wordCountCheckbox.checked || illustrator;
+  return {
+    lines, // The array of all draw commands
+    stretchCount,
+    // The total height this block will occupy
+    totalHeight: Math.max(boxHeight, totalTextHeight + 40) // Add padding
+  };
+}
+
+// --- REFACTOR: NEW Function to calculate total canvas size ---
+// This runs the layout calculation for all text blocks
+// and determines the final canvas height and stretch.
+async function calculateCanvasDimensions() {
+  const boxX = 768;
+  const startY = 246;
+  const baseHeight = 1080;
+  
+  let layouts = {}; // Store results
+  let calculatedTotalY = startY;
+
+  for (const { key } of textOrder) {
+      const layout = calculateTextLayout(key); // Run the dry run
+      if (layout) {
+          layouts[key] = layout;
+          calculatedTotalY += layout.totalHeight - 10;
+      }
+  }
+
+  // --- Calculate stretch amount for the *main box* ---
+  const illustrator = illustratorInput.value.trim();
+  const showBottomBar = wordCountCheckbox.checked || !!illustrator;
 
   const defaultStretchThreshold = 900;
   const bottomBarStretchThreshold = 825;
   const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
   
-  // This is the crucial value: how many extra pixels we need
   const stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
-  const stretchCount = stretchPixels / 50;
-  const boxAsset = showBottomBar ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
-  
-  // We need to load the main box image to get its base height for the blur logic
-  const mainBoxImg = await getImage(boxAsset);
-  
-  // --- NEW: CANVAS RESIZING LOGIC ---
-  const baseHeight = 1080; // Your canvas's default height
-  const baseWidth = 1920;  // Your canvas's default width
   const newHeight = baseHeight + stretchPixels;
+  
+  // Calculate dynamic Y position for illustrator/word count
+  const bottomBarBaseY = 911;
+  const dynamicBottomBarY = bottomBarBaseY + stretchPixels;
 
-  // Only resize if necessary. This avoids clearing the canvas if the size is the same.
+  return {
+    layouts, // All pre-calculated text layouts
+    newHeight,
+    stretchPixels,
+    dynamicBottomBarY,
+    illustrator,
+    showBottomBar
+  };
+}
+
+
+// --- REFACTOR: Modified drawTextBlock ---
+// This is now the "Wet Run". It *only* draws.
+// It receives the pre-calculated layout object.
+async function drawTextBlock(key, box, startY, layout) {
+  if (!layout) return 0; // No text, do nothing
+
+  // --- Constants ---
+  const isSpecialBox = (key !== "card");
+  const specialDividerYOffset = 25;
+  const cardDividerYOffset = 15;
+  const textStartX = 769 + 30; // boxX + 30
+  const baseFont = "33px 'Memento'";
+
+  // --- Draw the stretchable box ---
+  const boxImg = box ? await getImage(assets.boxes[box]) : null;
+  const boxHeight = boxImg
+    ? drawStretchBox(boxImg, 768, startY, layout.stretchCount, key)
+    : 0;
+
+  // --- Draw the text ---
+  ctx.textAlign = "left";
+  ctx.shadowColor = "black";
+  ctx.shadowBlur = 4;
+
+  // Get the correct divider image
+  const dividerToUse = await getImage(
+    assets.boxes[key === "card" ? "divider" : "small_divider"]
+  );
+
+  let wetStyle = { bold: false, italic: false, color: null, isKeyword: false };
+
+  const setWetStyle = (style) => {
+    const weight = style.bold || style.isKeyword ? "bold " : "";
+    const styleStr = style.italic ? "italic " : "";
+    ctx.font = `${weight}${styleStr}${baseFont}`;
+    ctx.fillStyle = wetStyle.color || (style.isKeyword ? "#f3d87d" : "#efeee9");
+  };
+  
+  // This is now a simple loop, no more logic/measurement
+  for (const line of layout.lines) {
+    // Handle dividers
+    if (line.type === "divider") {
+      const yOffset = isSpecialBox ? specialDividerYOffset : cardDividerYOffset;
+      ctx.drawImage(dividerToUse, 768, startY + line.y - yOffset);
+      continue;
+    }
+    
+    // Handle text lines
+    // (Reset color at the start of each line)
+    wetStyle.color = null; 
+    for (const item of line) {
+        // Tokenizer logic for colors (not part of measurement)
+        if (item.token === "<c>") { wetStyle.color = "#f3d87d"; continue; }
+        if (item.token === "</c>") { wetStyle.color = null; continue; }
+
+        setWetStyle(item.style);
+        ctx.fillText(item.token, item.x, startY + item.y);
+    }
+  }
+  
+  // Return the pre-calculated height
+  return layout.totalHeight;
+}
+
+
+// --- REFACTOR: Heavily modified drawCard function ---
+async function drawCard() {
+  // --- STEP 1: Calculate all layouts and canvas size ---
+  // This one function now does all the "thinking".
+  const { 
+    layouts, 
+    newHeight, 
+    stretchPixels, 
+    dynamicBottomBarY, 
+    illustrator, 
+    showBottomBar 
+  } = await calculateCanvasDimensions();
+
+  // --- STEP 2: Resize canvas (if needed) and clear ---
   if (canvas.height !== newHeight) {
     canvas.height = newHeight;
   }
-  // (Optional) If you ever needed to stretch width, you'd do it here too.
-  if (canvas.width !== baseWidth) {
-    canvas.width = baseWidth;
+  if (canvas.width !== 1920) {
+    canvas.width = 1920;
   }
-
-  // --- REGULAR DRAWING START ---
-  
-  // Clear the (potentially larger) canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // !! IMPORTANT: Resizing the canvas resets all context properties.
-  // We must re-apply image smoothing.
+  // !! IMPORTANT: Re-apply context properties reset by resize
   ctx.imageSmoothingEnabled = true; 
 
-  // Load the background image
+  // --- STEP 3: Draw Background ---
   const bg = await getImage(assets.backgrounds[classSelect.value]);
-  // --- NEW 2-Slice Background Draw ---
+  // 2-Slice Background Draw
   const slicePointY = 1000;
-  // Ensure we don't try to slice past the image's actual height
   const topHeight = Math.min(slicePointY, bg.height);
-  const bottomPartHeight = bg.height - topHeight; // e.g., 1080 - 1000 = 80
+  const bottomPartHeight = bg.height - topHeight;
 
-  // 1. Draw the static top part (0-1000px)
-  ctx.drawImage(bg,
-    0, 0, bg.width, topHeight, // Source (top 1000px of image)
-    0, 0, bg.width, topHeight  // Destination (top 1000px of canvas)
-  );
-
-  // 2. Draw the stretched bottom part (1000-1080px)
+  ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
   if (bottomPartHeight > 0) {
-    // The new height for the bottom part is its original height + all stretch pixels
     const newBottomHeight = bottomPartHeight + stretchPixels;
-    ctx.drawImage(bg,
-      0, topHeight, bg.width, bottomPartHeight, // Source (bottom 80px of image)
-      0, topHeight, bg.width, newBottomHeight   // Destination (fills from 1000px to end of canvas)
-    );
+    ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
   }
-  // --- END NEW 2-Slice ---
 
-  // Load remaining assets
-  const [gem, frame] = await Promise.all([
-    getImage(assets.gems[classSelect.value]),
-    getImage(
-      assets[typeSelect.value.toLowerCase()][
-        ["bronze", "silver", "gold", "legendary"].indexOf(
-          raritySelect.value.toLowerCase()
-        )
-      ]
-    )
-  ]);
-
-  // === Masked Main Art ===
+  // --- STEP 4: Draw Main Art ---
   if (uploadedArt) {
-    const s = previewState.main; // Get the state
+    const s = previewState.main;
     const dWidth = uploadedArt.width * s.scale;
     const dHeight = uploadedArt.height * s.scale;
 
+    // Use createImageBitmap for high-quality resize
     const bmp = await createImageBitmap(uploadedArt, 0, 0, uploadedArt.width, uploadedArt.height, {
       resizeWidth: Math.round(dWidth),
       resizeHeight: Math.round(dHeight),
@@ -615,59 +530,116 @@ async function drawCard() {
     ctx.closePath();
     ctx.clip();
     
-    ctx.drawImage(
-      bmp, 
-      MAIN_ART_X + s.tx, 
-      MAIN_ART_Y + s.ty
-    );
+    ctx.drawImage(bmp, MAIN_ART_X + s.tx, MAIN_ART_Y + s.ty);
     
     ctx.restore();
     bmp.close();
   }
 
+  // --- STEP 5: Draw Frame & Stats (under text box) ---
+  const [gem, frame] = await Promise.all([
+    getImage(assets.gems[classSelect.value]),
+    getImage(
+      assets[typeSelect.value.toLowerCase()][
+        ["bronze", "silver", "gold", "legendary"].indexOf(
+          raritySelect.value.toLowerCase()
+        )
+      ]
+    )
+  ]);
   ctx.drawImage(gem, 398, 863);
   ctx.drawImage(frame, 48, 153);
-
-  // --- TEXT DRAWING LOGIC ---
   
-  // --- STEP 1 was moved to the top ---
+  // Draw Name, Trait, Stats
+  ctx.shadowColor = "black";
+  ctx.shadowBlur = 6;
+  ctx.fillStyle = "#efeee9";
+  ctx.font = "56px 'Memento'";
+  ctx.textAlign = "left";
+  const nameText = nameInput.value.trim() || "Unnamed Card";
+  ctx.fillText(nameText, 163, 150);
 
-  // --- STEP 2: Draw the main text box (calculations were already done) ---
+  // Secondary name (on frame)
+  let secondaryFontSize = 42;
+  ctx.font = `${secondaryFontSize}px 'Memento'`;
+  let textWidth = ctx.measureText(nameText).width;
+  const maxWidth = 363;
+  const baseY = 331;
+  const offsetPerStep = -0.75;
+  let shrinkSteps = 0;
+  while (textWidth > maxWidth && secondaryFontSize > 2) {
+    secondaryFontSize -= 2;
+    shrinkSteps++;
+    ctx.font = `${secondaryFontSize}px 'Memento'`;
+    textWidth = ctx.measureText(nameText).width;
+  }
+  const secondaryNameY = baseY + (shrinkSteps * offsetPerStep);
+  ctx.textAlign = "center";
+  ctx.fillText(nameText, 455, secondaryNameY);
+
+  // Trait
+  ctx.font = "33px 'Memento'";
+  ctx.textAlign = "left";
+  const traitText = traitInput.value.trim() || "—";
+  ctx.fillText(traitText, 1306, 147);
+
+  // Numbers (Cost, Atk, Def)
+  const numberSpacing = -5;
+  const numberFont = 'Sv_numbers';
+  const costMaxWidth = 95;
+  const statMaxWidth = 90;
+  const COST_NUDGE = -0.2;
+  const STAT_NUDGE = -0.2;
+
+  drawScaledNumber(costInput.value, 197, 335, 80, costMaxWidth, numberFont, numberSpacing, COST_NUDGE);
+
+  if (typeSelect.value === "Follower") {
+    drawScaledNumber(attackInput.value, 201, 922, 82, statMaxWidth, numberFont, numberSpacing, STAT_NUDGE);
+    drawScaledNumber(defenseInput.value, 642, 917, 82, statMaxWidth, numberFont, numberSpacing, STAT_NUDGE);
+  }
+  ctx.letterSpacing = "0px"; // Reset
+  ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; // Reset
+
+  // --- STEP 6: Draw Main Text Box (Blur + Frame) ---
   const textBoxX = 722;
   const textBoxY = 206;
-  
-  // Calculate the final, stretched dimensions of the box
+  const boxAsset = showBottomBar ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
+  const mainBoxImg = await getImage(boxAsset);
+
   const dynamicBoxWidth = mainBoxImg.width;
-  // We use the pre-calculated stretchPixels
   const dynamicBoxHeight = mainBoxImg.height + stretchPixels; 
 
-  // --- DYNAMIC BLUR LOGIC ---
+  // Dynamic Blur
   const offCanvas = document.createElement("canvas");
   offCanvas.width = dynamicBoxWidth;
   offCanvas.height = dynamicBoxHeight;
   const offCtx = offCanvas.getContext("2d");
   
-// Draw the section of the *main canvas* (which has the stretched bg) onto the off-screen canvas
   offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
-  
   offCtx.filter = "blur(5px)";
   offCtx.drawImage(offCanvas, 0, 0);
-  
-  // Draw the blurred patch onto the *main* canvas
   ctx.drawImage(offCanvas, textBoxX, textBoxY);
-  // --- END BLUR LOGIC ---
-
-  // Draw the stretched box frame on top of the blur
-  // We use the pre-calculated stretchCount
-  drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
   
-  // --- STEP 3: Now, draw all the text blocks on top ---
+  // Draw stretched box frame on top of blur
+  // OPTIMIZATION: We use `stretchPixels` directly to get the count
+  const stretchCount = stretchPixels / 50;
+  drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
+
+  // --- STEP 7: Draw All Text Blocks ---
+  const boxX = 768;
+  const startY = 246;
   let currentY = startY;
+  
   for (const { key, box } of textOrder) {
-    if (!textInputs[key].value.trim()) continue;
-    const blockHeight = await drawTextBlock(key, box, boxX, currentY);
+    const layout = layouts[key]; // Get pre-calculated layout
+    if (!layout) continue;
+    
+    // Pass the layout to the draw function
+    const blockHeight = await drawTextBlock(key, box, currentY, layout);
+    
+    // Draw Crest/Faith art (this logic is fine)
     const isCrest = key === "crest";
-    const isFaith = key === "faith";
+    const isFaith = key ==="faith";
     if (isCrest || isFaith) {
       const iconX = boxX + 120;
       const iconY = currentY + 32;
@@ -692,11 +664,7 @@ async function drawCard() {
         ctx.closePath();
         ctx.clip();
         
-        ctx.drawImage(
-          bmp,
-          iconX + s.tx,
-          iconY + s.ty
-        );
+        ctx.drawImage(bmp, iconX + s.tx, iconY + s.ty);
         ctx.restore();
         
         bmp.close();
@@ -715,65 +683,21 @@ async function drawCard() {
         ctx.restore();
       }
     }
+    // Increment Y position for next block
     currentY += blockHeight - 10;
   }
 
-  // --- REMAINDER OF THE DRAWING LOGIC (NAMES, STATS, ETC) ---
-  ctx.shadowColor = "black";
-  ctx.shadowBlur = 6;
+  // --- STEP 8: Draw Bottom Bar Text (Token, WC, Illustrator) ---
+  ctx.shadowColor = "transparent"; 
+  ctx.shadowBlur = 0;
   ctx.fillStyle = "#efeee9";
-  ctx.font = "56px 'Memento'";
-  ctx.textAlign = "left";
-  const nameText = nameInput.value.trim() || "Unnamed Card";
-  ctx.fillText(nameText, 163, 150);
-
-  let secondaryFontSize = 42;
-  ctx.font = `${secondaryFontSize}px 'Memento'`;
-  let textWidth = ctx.measureText(nameText).width;
-  const maxWidth = 363;
-  const baseY = 331;
-  const offsetPerStep = -0.75;
-  let shrinkSteps = 0;
-  while (textWidth > maxWidth && secondaryFontSize > 2) {
-    secondaryFontSize -= 2;
-    shrinkSteps++;
-    ctx.font = `${secondaryFontSize}px 'Memento'`;
-    textWidth = ctx.measureText(nameText).width;
-  }
-  const secondaryNameY = baseY + (shrinkSteps * offsetPerStep);
-  ctx.textAlign = "center";
-  ctx.fillText(nameText, 455, secondaryNameY);
-
-  ctx.font = "33px 'Memento'";
-  ctx.textAlign = "left";
-  const traitText = traitInput.value.trim() || "—";
-  ctx.fillText(traitText, 1306, 147);
-
-  const numberSpacing = -5;
-  const numberFont = 'Sv_numbers';
-  const costMaxWidth = 95;
-  const statMaxWidth = 90;
-  const COST_NUDGE = -0.2;
-  const STAT_NUDGE = -0.2;
-
-  drawScaledNumber(costInput.value, 197, 335, 80, costMaxWidth, numberFont, numberSpacing, COST_NUDGE);
-
-  if (typeSelect.value === "Follower") {
-    drawScaledNumber(attackInput.value, 201, 922, 82, statMaxWidth, numberFont, numberSpacing, STAT_NUDGE);
-    drawScaledNumber(defenseInput.value, 642, 917, 82, statMaxWidth, numberFont, numberSpacing, STAT_NUDGE);
-  }
-  ctx.letterSpacing = "0px";
-
+  
   if (tokenCheckbox.checked) {
     ctx.font = "28px 'NotoSans'";
     ctx.textAlign = "right";
     ctx.fillText("*This is a token card.", 1788, canvas.height - 55);
   }
-
-  // This logic is now automatically correct because it uses stretchPixels
-  const bottomBarBaseY = 911;
-  const dynamicBottomBarY = bottomBarBaseY + stretchPixels;
-
+  
   if (illustrator) {
     ctx.font = "28px 'NotoSans'";
     ctx.textAlign = "left";
@@ -786,28 +710,18 @@ async function drawCard() {
     ctx.textAlign = "right";
     ctx.fillText(`Word count: ${wordCount}`, 1730, dynamicBottomBarY);
   }
-  ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
 }
 
-// --- Live updates with Debouncing ---
+// --- Live updates with Debouncing (Unchanged, this is good) ---
 let redrawDebounceTimer = null;
 function debouncedDrawCard() {
   clearTimeout(redrawDebounceTimer);
   redrawDebounceTimer = setTimeout(() => {
     safeDrawCard();
-  }, 250); // 250ms delay before redrawing
+  }, 250); // 250ms delay
 }
 
-[
-  nameInput, traitInput, classSelect, raritySelect, costInput, attackInput, defenseInput,
-  tokenCheckbox, wordCountCheckbox, autoDividerCheckbox,
-  ...Object.values(textInputs),
-  document.getElementById("illustratorName"),
-  document.getElementById("crestName"),
-  document.getElementById("faithName")
-].forEach(el => el?.addEventListener("input", debouncedDrawCard));
-
-// --- Prevent overlapping draws ---
+// --- Prevent overlapping draws (Unchanged, this is good) ---
 let isDrawing = false;
 async function safeDrawCard() {
   if (isDrawing) return;
@@ -817,6 +731,7 @@ async function safeDrawCard() {
 
 /***********************
   PREVIEW COLUMN HANDLERS (clamped)
+  (No significant changes here, this part is efficient)
 ***********************/
 const MAIN_MASK_W = 450, MAIN_MASK_H = 560;
 const MAIN_ART_X = 200, MAIN_ART_Y = 350;
@@ -826,15 +741,15 @@ window.ICON_W = ICON_W; window.ICON_H = ICON_H;
 
 const mainPreviewCanvas = document.getElementById("mainPreviewCanvas");
 const mainPreviewCtx = mainPreviewCanvas ? mainPreviewCanvas.getContext("2d") : null;
-if (mainPreviewCtx) mainPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
+if (mainPreviewCtx) mainPreviewCtx.imageSmoothingEnabled = true;
 const mainZoomSlider = document.getElementById("mainZoomSlider");
 const crestPreviewCanvas = document.getElementById("crestPreviewCanvas");
 const crestPreviewCtx = crestPreviewCanvas ? crestPreviewCanvas.getContext("2d") : null;
-if (crestPreviewCtx) crestPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
+if (crestPreviewCtx) crestPreviewCtx.imageSmoothingEnabled = true;
 const crestZoomSlider = document.getElementById("crestZoomSlider");
 const faithPreviewCanvas = document.getElementById("faithPreviewCanvas");
 const faithPreviewCtx = faithPreviewCanvas ? faithPreviewCanvas.getContext("2d") : null;
-if (faithPreviewCtx) faithPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
+if (faithPreviewCtx) faithPreviewCtx.imageSmoothingEnabled = true;
 const faithZoomSlider = document.getElementById("faithZoomSlider");
 const artInput = document.getElementById("artUpload");
 const crestInput = document.getElementById("crestArtUpload");
@@ -938,17 +853,9 @@ function syncMainToGlobals() {
   const s = previewState.main;
   if (!s.img) {
     uploadedArt = null;
-    artW = MAIN_MASK_W;
-    artH = MAIN_MASK_H;
-    artX = MAIN_ART_X;
-    artY = MAIN_ART_Y;
     return;
   }
   uploadedArt = s.img;
-  artW = Math.round(s.img.width * s.scale);
-  artH = Math.round(s.img.height * s.scale);
-  artX = Math.round(MAIN_ART_X + s.tx);
-  artY = Math.round(MAIN_ART_Y + s.ty);
 }
 
 function syncIconToGlobals(which) {
@@ -960,24 +867,10 @@ function syncIconToGlobals(which) {
   }
   if (which === "crest") crestArt = s.img;
   else faithArt = s.img;
-  window.ICON_W = s.maskW;
-  window.ICON_H = s.maskH;
 }
 
-function getIconTransform(which) {
-  const s = previewState[which];
-  if (!s || !s.img) return null;
-  return {
-    img: s.img,
-    scale: s.scale,
-    tx: s.tx,
-    ty: s.ty,
-    width: s.img.width * s.scale,
-    height: s.img.height * s.scale
-  };
-}
 
-function updateAll() {
+function updateAllPreviews() {
   clampPan(previewState.main);
   clampPan(previewState.crest);
   clampPan(previewState.faith);
@@ -986,18 +879,25 @@ function updateAll() {
   syncIconToGlobals("crest");
   syncIconToGlobals("faith");
 
-  //safeDrawCard();
-
+  // This function *only* draws the small previews, not the main card
   drawPreviewCanvas(mainPreviewCtx, mainPreviewCanvas, previewState.main, "rect");
   drawPreviewCanvas(crestPreviewCtx, crestPreviewCanvas, previewState.crest, "circle");
   drawPreviewCanvas(faithPreviewCtx, faithPreviewCanvas, previewState.faith, "circle");
+  
+  // Trigger the main card redraw
+  debouncedDrawCard();
 }
 
 /* ---------- Upload handlers ---------- */
 if (artInput) {
   artInput.addEventListener("change", async (e) => {
     const file = e.target.files && e.target.files[0];
-    if (!file) return;
+    if (!file) {
+      if (mainArtTitle) mainArtTitle.textContent = "Card Art"; // Reset on cancel
+      return;
+    }
+    if (mainArtTitle) mainArtTitle.textContent = file.name; // <-- THIS LINE IS ADDED
+
     try {
       const img = await loadImageFromFile(file);
       previewState.main.img = img;
@@ -1029,10 +929,10 @@ if (crestInput) {
         const max = min * 8; // 800% zoom from fit for icons
         crestZoomSlider.min = min;
         crestZoomSlider.max = max;
-        crestZoomSlider.step = (max - min) / 100; // 100 steps in slider
+        crestZoomSlider.step = (max - min) / 100;
         crestZoomSlider.value = previewState.crest.scale;
       }
-      updateAll();
+      updateAllPreviews();
     } catch (err) {
       console.error("Failed to load crest art:", err);
     }
@@ -1051,10 +951,10 @@ if (faithInput) {
         const max = min * 8; // 800% zoom from fit for icons
         faithZoomSlider.min = min;
         faithZoomSlider.max = max;
-        faithZoomSlider.step = (max - min) / 100; // 100 steps in slider
+        faithZoomSlider.step = (max - min) / 100;
         faithZoomSlider.value = previewState.faith.scale;
       }
-      updateAll();
+      updateAllPreviews();
     } catch (err) {
       console.error("Failed to load faith art:", err);
     }
@@ -1091,12 +991,11 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
     lastX = p.x; lastY = p.y;
     state.tx += dx; state.ty += dy;
     clampPan(state);
-    updateAll();
+    updateAllPreviews(); // This now triggers the main redraw
   });
 
   function stopDrag(e) {
     dragging = false;
-    //if (canvasEl.releasePointerCapture) try { canvasEl.releasePointerCapture(e.pointerId); } catch (err) {}
   }
   canvasEl.addEventListener("pointerup", stopDrag);
   canvasEl.addEventListener("pointerleave", stopDrag);
@@ -1106,19 +1005,14 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
     if (!state.img) return;
     ev.preventDefault();
     
-    // Determine zoom speed
     const zoomIntensity = 0.05;
-    const delta = ev.deltaY > 0 ? -1 : 1; // -1 for zoom out, 1 for zoom in
+    const delta = ev.deltaY > 0 ? -1 : 1;
     const oldScale = state.scale;
     
-    // Get min/max from state and slider
     const minScale = state.minScale;
     const maxScale = sliderEl ? parseFloat(sliderEl.max) : oldScale * 2;
     
-    // Calculate new scale
     let newScale = oldScale * (1 + delta * zoomIntensity);
-    
-    // Clamp to min/max
     newScale = Math.max(minScale, Math.min(maxScale, newScale));
     
     const rect = canvasEl.getBoundingClientRect();
@@ -1131,14 +1025,14 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
     state.ty = cy - imgSpaceY * newScale;
     clampPan(state);
     if (sliderEl) sliderEl.value = state.scale;
-    updateAll();
+    updateAllPreviews();
   }, { passive: false });
 
   // slider
   if (sliderEl) {
     sliderEl.addEventListener("input", (ev) => {
       if (!state.img) return;
-      const newScale = Math.max(state.minScale, parseFloat(ev.target.value)); // Enforce minScale
+      const newScale = Math.max(state.minScale, parseFloat(ev.target.value));
       const oldScale = state.scale;
       const cx = state.maskW / 2, cy = state.maskH / 2;
       const imgSpaceX = (cx - state.tx) / oldScale;
@@ -1147,7 +1041,7 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
       state.tx = cx - imgSpaceX * newScale;
       state.ty = cy - imgSpaceY * newScale;
       clampPan(state);
-      updateAll();
+      updateAllPreviews();
     });
   }
 }
@@ -1156,8 +1050,7 @@ attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
-// --- Text Formatting Toolbar (Bold / Italic / Color) ---
-// --- Toolbar: Bold / Italic / Color (uses ** / _ / <c> tags) ---
+// --- Text Formatting Toolbar (Unchanged) ---
 document.querySelectorAll(".text-toolbar button").forEach((button) => {
   button.addEventListener("click", (e) => {
     e.preventDefault();
@@ -1178,94 +1071,66 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
     else if (format === "color") { openTag = "<c>"; closeTag = "</c>"; }
     else return;
 
-    // If text selected -> wrap (toggle removal if already wrapped exactly)
     if (start !== end) {
       const before = value.slice(0, start);
       const after = value.slice(end);
       const currentlyWrapped = before.endsWith(openTag) && after.startsWith(closeTag);
       if (currentlyWrapped) {
-        // remove wrapping
         const newBefore = before.slice(0, before.length - openTag.length);
         const newAfter = after.slice(closeTag.length);
         textarea.value = newBefore + selected + newAfter;
         textarea.setSelectionRange(newBefore.length, newBefore.length + selected.length);
       } else {
-        // wrap (nesting is allowed)
         textarea.value = before + openTag + selected + closeTag + after;
-        // select the inner text (optional); place caret after wrapped text
         textarea.setSelectionRange(start + openTag.length, end + openTag.length);
       }
-      textarea.focus();
-      textarea.dispatchEvent(new Event("input"));
-      return;
+    } else {
+      const before = value.slice(0, start);
+      const after = value.slice(start);
+      textarea.value = before + openTag + closeTag + after;
+      const caret = before.length + openTag.length;
+      textarea.setSelectionRange(caret, caret);
     }
-
-    // No selection -> insert open+close and position caret between them
-    const before = value.slice(0, start);
-    const after = value.slice(start);
-    textarea.value = before + openTag + closeTag + after;
-    const caret = before.length + openTag.length;
-    textarea.setSelectionRange(caret, caret);
     textarea.focus();
-    textarea.dispatchEvent(new Event("input"));
+    // Manually trigger our debounced draw
+    debouncedDrawCard(); 
   });
 });
 
-
-
-
-
-// initial draw
-document.fonts.ready.then(() => setTimeout(updateAll, 60));
-
-// REPLACE the existing downloadBtn listener with this:
-document.getElementById("downloadBtn").addEventListener("click", async () => { // <-- Made async
-  
-  // Add a "loading" state to the button
+// --- Download & Preview Buttons (Unchanged, they are good) ---
+document.getElementById("downloadBtn").addEventListener("click", async () => {
   const btn = document.getElementById("downloadBtn");
   const originalText = btn.textContent;
   btn.textContent = "Generating...";
   btn.disabled = true;
 
   try {
-    // 1. Run the high-quality draw function ONCE.
-    await drawCard(); 
-    
-    // 2. Continue with the download as normal.
+    await safeDrawCard(); // Run the safe draw
     const canvas = document.getElementById("previewCanvas");
     const link = document.createElement("a");
     link.download = `${(nameInput.value.trim() || "card")}.png`;
-    link.href = canvas.toDataURL("image/png", 1.0); // full quality
+    link.href = canvas.toDataURL("image/png", 1.0);
     link.click();
-    
   } catch (err) {
     console.error("Download failed:", err);
     alert("Error: Could not save image. Try again.");
   } finally {
-    // 3. Restore the button
     btn.textContent = originalText;
     btn.disabled = false;
   }
 });
 
-// ADD THIS ENTIRE NEW BLOCK AT THE END OF THE FILE
-
 document.getElementById("previewBtn").addEventListener("click", async () => {
-  // Add a "loading" state to the button
   const btn = document.getElementById("previewBtn");
   const originalText = btn.textContent;
   btn.textContent = "Generating...";
   btn.disabled = true;
 
   try {
-    // 1. Run the high-quality draw function ONCE.
-    await drawCard(); 
-    
-    // 2. Get the image data from the hidden canvas.
+    await safeDrawCard(); // Run the safe draw
     const canvas = document.getElementById("previewCanvas");
     const dataUrl = canvas.toDataURL("image/png", 1.0);
     
-    // 3. Open a new tab and display the image.
     const previewWindow = window.open("");
     if (previewWindow) {
       previewWindow.document.title = `${(nameInput.value.trim() || "card")}-preview`;
@@ -1275,13 +1140,47 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     } else {
       alert("Pop-up blocked! Please allow pop-ups for this site to use the preview feature.");
     }
-
   } catch (err) {
     console.error("Preview failed:", err);
     alert("Error: Could not generate preview. Try again.");
   } finally {
-    // 4. Restore the button
     btn.textContent = originalText;
     btn.disabled = false;
   }
+});
+
+
+// --- CLEANUP: Moved from index.html ---
+// This code now runs after the whole script is loaded.
+document.addEventListener('DOMContentLoaded', () => {
+  const cardTypeSelect = document.getElementById('cardType');
+  const statExtraFields = document.getElementById('statExtraFields');
+
+  function toggleStatsVisibility() {
+    if (!cardTypeSelect || !statExtraFields) return;
+    const value = cardTypeSelect.value.toLowerCase();
+    statExtraFields.style.visibility = (value === 'follower') ? 'visible' : 'hidden';
+  }
+
+  // Initial setup
+  toggleStatsVisibility();
+  cardTypeSelect.addEventListener('change', toggleStatsVisibility);
+  
+  // Add all input event listeners
+  [
+    nameInput, traitInput, classSelect, raritySelect, costInput, attackInput, defenseInput,
+    tokenCheckbox, wordCountCheckbox, autoDividerCheckbox,
+    illustratorInput, crestNameInput, faithNameInput,
+    ...Object.values(textInputs)
+  ].forEach(el => {
+    if (el) {
+      el.addEventListener("input", debouncedDrawCard);
+    }
+  });
+
+  // initial draw on font load
+  document.fonts.ready.then(() => {
+      // Small delay to ensure fonts are *actually* rendered
+      setTimeout(safeDrawCard, 50); 
+  });
 });
