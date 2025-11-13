@@ -998,6 +998,14 @@ if (artInput) {
   artInput.addEventListener("change", async (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
+
+    // **** MODIFIED BLOCK: Added this to update the title ****
+    const mainArtTitleEl = document.getElementById("mainArtPreviewTitle");
+    if (mainArtTitleEl) {
+      mainArtTitleEl.textContent = file.name;
+    }
+    // **** END MODIFIED BLOCK ****
+
     try {
       const img = await loadImageFromFile(file);
       previewState.main.img = img;
