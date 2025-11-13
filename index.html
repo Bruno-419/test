@@ -63,7 +63,7 @@
   <div class="app-grid">
     <aside class="preview-column" aria-label="Art previews">
       <div class="preview-block">
-        <div class="preview-title" id="mainArtTitle">Card Art</div>
+        <div class="preview-title">Card Art</div>
         <canvas id="mainPreviewCanvas" width="450" height="560" class="preview-canvas rect"></canvas>
         <input id="mainZoomSlider" class="zoom-slider" type="range" min="1" max="5" value="1">
       </div>
@@ -145,39 +145,39 @@
       </section>
 
       <section class="right-panel">
-        <div class="field">
+        <label class="field">
           <div class="text-toolbar">
-            <label class="field-label" for="cardText">Card Text</label>
+            <span class="field-label">Card Text</span>
             <button type="button" data-format="bold">B</button>
             <button type="button" data-format="italic">I</button>
             <button type="button" data-format="color">Gold</button>
           </div>
           <textarea id="cardText"></textarea>
-        </div>
+        </label>
 
-        <div class="field">
+        <label class="field">
           <div class="text-toolbar">
-            <label class="field-label" for="evolveText">Evolve Text</label>
+            <span class="field-label">Evolve Text</span>
             <button type="button" data-format="bold">B</button>
             <button type="button" data-format="italic">I</button>
             <button type="button" data-format="color">Gold</button>
           </div>
           <textarea id="evolveText"></textarea>
-        </div>
+        </label>
 
-        <div class="field">
+        <label class="field">
           <div class="text-toolbar">
-            <label class="field-label" for="superEvolveText">Super-Evolve Text</label>
+            <span class="field-label">Super-Evolve Text</span>
             <button type="button" data-format="bold">B</button>
             <button type="button" data-format="italic">I</button>
             <button type="button" data-format="color">Gold</button>
           </div>
           <textarea id="superEvolveText"></textarea>
-        </div>
+        </label>
 
         <div class="crest-section adorned-crest">
           <div class="crest-inner">
-            <label class="upload-btn small" id="crestUploadBtn"> <!-- No longer needs style="display:none;" -->
+            <label class="upload-btn small" id="crestUploadBtn" style="display:none;">
               Upload Crest Art
               <input type="file" id="crestArtUpload" accept="image/*">
             </label>
@@ -193,20 +193,20 @@
             <input id="crestName" type="text">
           </label>
 
-          <div class="field">
+          <label class="field">
             <div class="text-toolbar">
-              <label class="field-label" for="crestText">Crest Text</label>
+              <span class="field-label">Crest Text</span>
               <button type="button" data-format="bold">B</button>
               <button type="button" data-format="italic">I</button>
               <button type="button" data-format="color">Gold</button>
             </div>
             <textarea id="crestText"></textarea>
-          </div>
+          </label>
         </div>
 
         <div class="faith-section adorned-faith">
           <div class="faith-inner">
-            <label class="upload-btn small" id="faithUploadBtn"> <!-- No longer needs style="display:none;" -->
+            <label class="upload-btn small" id="faithUploadBtn" style="display:none;">
               Upload Faith Art
               <input type="file" id="faithArtUpload" accept="image/*">
             </label>
@@ -222,16 +222,20 @@
             <input id="faithName" type="text">
           </label>
 
-          <div class="field">
+          <label class="field">
             <div class="text-toolbar">
-              <label class="field-label" for="faithText">Faith Text</label>
+              <span class="field-label">Faith Text</span>
               <button type="button" data-format="bold">B</button>
               <button type="button" data-format="italic">I</button>
               <button type="button" data-format="color">Gold</button>
             </div>
             <textarea id="faithText"></textarea>
-          </div>
+          </label>
         </div>
+
+
+
+
       </section>
     </main>
   </div>
@@ -240,11 +244,28 @@
     <canvas id="previewCanvas" width="1920" height="1080"></canvas>
   </section>
 
-  <!-- 
-    OPTIMIZATION: Added 'defer' to ensure script runs after HTML is parsed.
-    Moved inline script logic from bottom of <body> into script.js.
-  -->
-  <script src="script.js" defer></script>
+  <script src="script.js"></script>
+
+  <script>
+    const cardTypeSelect = document.getElementById('cardType');
+    const statExtraFields = document.getElementById('statExtraFields');
+
+    function toggleStatsVisibility() {
+      const value = cardTypeSelect.value.toLowerCase();
+      statExtraFields.style.visibility = (value === 'follower') ? 'visible' : 'hidden';
+    }
+
+    toggleStatsVisibility();
+    cardTypeSelect.addEventListener('change', toggleStatsVisibility);
+  </script>
   
 </body>
 </html>
+
+
+
+
+
+
+
+
