@@ -85,6 +85,8 @@ h1 {
   font-size: 13px;
   color: #cfcfcf;
   margin-bottom: 8px;
+  word-break: break-all;   /* Force breaks on long strings */
+  overflow-wrap: break-word; /* Standard property for word wrapping */
 }
 
 .preview-canvas {
@@ -763,3 +765,4 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   touch-action: none;
 
 }
+
