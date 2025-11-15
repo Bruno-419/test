@@ -155,7 +155,7 @@
           <textarea id="cardText"></textarea>
         </div>
 
-        <div class="field">
+        <div class="field" id="evolveTextField">
           <div class="text-toolbar">
             <label class="field-label" for="evolveText">Evolve Text</label>
             <button type="button" data-format="bold">B</button>
@@ -165,7 +165,7 @@
           <textarea id="evolveText"></textarea>
         </div>
 
-        <div class="field">
+        <div class="field" id="superEvolveTextField">
           <div class="text-toolbar">
             <label class="field-label" for="superEvolveText">Super-Evolve Text</label>
             <button type="button" data-format="bold">B</button>
@@ -249,16 +249,30 @@
   <script>
     const cardTypeSelect = document.getElementById('cardType');
     const statExtraFields = document.getElementById('statExtraFields');
+    const evolveTextField = document.getElementById('evolveTextField');
+    const superEvolveTextField = document.getElementById('superEvolveTextField');
 
-    function toggleStatsVisibility() {
+    function toggleFieldVisibility() {
       const value = cardTypeSelect.value.toLowerCase();
-      statExtraFields.style.visibility = (value === 'follower') ? 'visible' : 'hidden';
+      const isFollower = (value === 'follower');
+
+      // Toggle Attack/Defense fields (uses visibility)
+      statExtraFields.style.visibility = isFollower ? 'visible' : 'hidden';
+
+      // Toggle Evolve/Super-Evolve fields (uses display to reclaim space)
+      evolveTextField.style.display = isFollower ? 'block' : 'none';
+      superEvolveTextField.style.display = isFollower ? 'block' : 'none';
     }
 
-    toggleStatsVisibility();
-    cardTypeSelect.addEventListener('change', toggleStatsVisibility);
+    // Run on page load
+    toggleFieldVisibility();
+    
+    // Run on any change to the dropdown
+    cardTypeSelect.addEventListener('change', toggleFieldVisibility);
   </script>
   
 </body>
 </html>
+
+
 
