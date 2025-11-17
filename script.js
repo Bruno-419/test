@@ -512,11 +512,23 @@ async function drawCard() {
   const boxX = 768;
   const startY = 246;
 
+  // Get the current card type
+  const currentCardType = typeSelect.value.toLowerCase();
+  const isFollower = (currentCardType === 'follower');
+
   // --- STEP 1: Calculate total content height first ---
   let calculatedTotalY = startY;
   for (const { key } of textOrder) {
-      if (!textInputs[key].value.trim()) continue;
-      // This function calculates the height of each text block
+      const textValue = textInputs[key].value.trim();
+      if (!textValue) continue; // Skip if empty
+
+      // NEW: Skip Evolve/Super-Evolve if not a Follower
+      const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
+      if (isEvolveBlock && !isFollower) {
+          continue;
+      }
+
+      // This code only runs if the block is non-empty AND valid for the type
       const blockHeight = await calculateTextBlockHeight(key); 
       calculatedTotalY += blockHeight - 10;
   }
@@ -664,7 +676,16 @@ async function drawCard() {
   // --- STEP 3: Now, draw all the text blocks on top ---
   let currentY = startY;
   for (const { key, box } of textOrder) {
-    if (!textInputs[key].value.trim()) continue;
+    const textValue = textInputs[key].value.trim();
+    if (!textValue) continue; // Skip if empty
+
+    // NEW: Skip Evolve/Super-Evolve if not a Follower
+    const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
+    if (isEvolveBlock && !isFollower) {
+      continue;
+    }
+
+    // This code only runs if the block is non-empty AND valid for the type
     const blockHeight = await drawTextBlock(key, box, boxX, currentY);
     const isCrest = key === "crest";
     const isFaith = key === "faith";
@@ -1294,4 +1315,5 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
