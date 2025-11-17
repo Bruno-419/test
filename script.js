@@ -130,8 +130,29 @@ function loadImage(src) {
 // --- NEW: Word Count Functions ---
 function calculateTotalWordCount() {
   const allText = Object.values(textInputs).map(t => t.value).join(" ");
-  const words = allText.split(/\s+/).filter(w => w.length > 0);
-  return words.length;
+
+  // 1. Split by whitespace first
+  const initialTokens = allText.split(/\s+/);
+
+  let wordCount = 0;
+
+  for (const token of initialTokens) {
+    // 2. Filter out empty strings and the divider
+    if (token.length === 0 || token === "----------") {
+      continue;
+    }
+
+    // 3. Split the token by hyphens and filter out any empty strings
+    // (e.g., "word-" would split into ["word", ""])
+    const hyphenatedParts = token.split('-').filter(p => p.length > 0);
+
+    // 4. Add the number of parts to the total count
+    // "X-cost" becomes ["X", "cost"] (length 2)
+    // "word" becomes ["word"] (length 1)
+    wordCount += hyphenatedParts.length;
+  }
+
+  return wordCount;
 }
 
 function updateLiveWordCount() {
@@ -1349,6 +1370,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
