@@ -134,7 +134,11 @@
 
         <div class="checkbox-group">
           <label class="checkbox-inline"><input type="checkbox" id="tokenCheckbox"> <span>Token card</span></label>
-          <label class="checkbox-inline"><input type="checkbox" id="wordCountCheckbox"> <span>Show word count</span></label>
+          <label class="checkbox-inline">
+            <input type="checkbox" id="wordCountCheckbox"> 
+            <span>Show word count</span>
+            <span id="liveWordCounter" style="display: none; margin-left: 8px; color: var(--muted); font-size: 12px;">(0 words)</span>
+          </label>
           <label class="checkbox-inline"><input type="checkbox" id="autoDividerCheckbox" checked> <span>Auto-dividers</span></label>
         </div>
 
@@ -278,7 +282,6 @@
   
 </body>
 </html>
-
 
 
 
