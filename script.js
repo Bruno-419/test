@@ -1210,6 +1210,7 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
     if (format === "bold") { openTag = "**"; closeTag = "**"; }
     else if (format === "italic") { openTag = "_"; closeTag = "_"; }
     else if (format === "color") { openTag = "<c>"; closeTag = "</c>"; }
+    else if (format === "all") { openTag = "**_<c>"; closeTag = "</c>_**"; }
     else return;
 
     // If text selected -> wrap (toggle removal if already wrapped exactly)
@@ -1319,6 +1320,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
