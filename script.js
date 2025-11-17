@@ -850,8 +850,7 @@ async function drawCard() {
     ctx.fillText(`Illustrator: ${illustrator}`, 790, dynamicBottomBarY);
   }
   if (wordCountCheckbox.checked) {
-    const allText = Object.values(textInputs).map(t => t.value).join(" ");
-    const wordCount = allText.split(/\s+/).filter(w => w.length).length;
+    const wordCount = calculateTotalWordCount();
     ctx.font = "28px 'NotoSans'";
     ctx.textAlign = "right";
     ctx.fillText(`Word count: ${wordCount}`, 1730, dynamicBottomBarY);
@@ -1370,6 +1369,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
