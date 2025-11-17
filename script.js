@@ -790,30 +790,31 @@ async function drawCard() {
 }
 
 // --- Live updates with Debouncing ---
-let redrawDebounceTimer = null;
-function debouncedDrawCard() {
-  clearTimeout(redrawDebounceTimer);
-  redrawDebounceTimer = setTimeout(() => {
-    safeDrawCard();
-  }, 250); // 250ms delay before redrawing
-}
+//let redrawDebounceTimer = null;
+//function debouncedDrawCard() {
+//  clearTimeout(redrawDebounceTimer);
+//  redrawDebounceTimer = setTimeout(() => {
+//    safeDrawCard();
+//  }, 250); // 250ms delay before redrawing
+//}
 
-[
-  nameInput, traitInput, classSelect, raritySelect, costInput, attackInput, defenseInput,
-  tokenCheckbox, wordCountCheckbox, autoDividerCheckbox,
-  ...Object.values(textInputs),
-  document.getElementById("illustratorName"),
-  document.getElementById("crestName"),
-  document.getElementById("faithName")
-].forEach(el => el?.addEventListener("input", debouncedDrawCard));
+//[
+//  nameInput, traitInput, classSelect, raritySelect, costInput, attackInput, defenseInput,
+//  tokenCheckbox, wordCountCheckbox, autoDividerCheckbox,
+//  ...Object.values(textInputs),
+//  document.getElementById("illustratorName"),
+//  document.getElementById("crestName"),
+//  document.getElementById("faithName")
+//].forEach(el => el?.addEventListener("input", debouncedDrawCard));
 
 // --- Prevent overlapping draws ---
-let isDrawing = false;
-async function safeDrawCard() {
-  if (isDrawing) return;
-  isDrawing = true;
-  try { await drawCard(); } catch (err) { console.error("drawCard error:", err); } finally { isDrawing = false; }
-}
+//let isDrawing = false;
+//async function safeDrawCard() {
+//  if (isDrawing) return;
+//  isDrawing = true;
+//  try { await drawCard(); } catch (err) { console.error("drawCard error:", err); } finally { isDrawing = false; }
+//}
+
 
 /***********************
   PREVIEW COLUMN HANDLERS (clamped)
@@ -1293,3 +1294,4 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
