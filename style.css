@@ -215,7 +215,7 @@ input[type="text"], input[type="number"], select, textarea {
   border-radius: 6px;
   font-size: 15px;
 }
-textarea { min-height: 70px; resize: vertical; }
+textarea { min-height: 70px; resize: none; overflow-y: hidden; }
 
 /* small fields row (cost/atk/def) */
 .stat-row {
@@ -765,4 +765,5 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   touch-action: none;
 
 }
+
 
