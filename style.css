@@ -120,15 +120,36 @@ h1 {
 @media (max-width: 980px) {
   .app-grid {
     grid-template-columns: 1fr;
+    gap: 12px; /* MOBILE COMPACT */
   }
+  .layout {
+    gap: 12px; /* MOBILE COMPACT */
+  }
+  .left-panel, 
+  .right-panel {
+    padding: 15px; /* MOBILE COMPACT */
+  }
+
+  /* --- MOBILE COMPACT: Main Preview --- */
   .preview-column {
     width: 100%;
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 12px;
-    padding: 8px;
+    /* remove horizontal scroll behavior */
+    flex-direction: column; 
+    overflow-x: visible;
+    gap: 0;
+    padding: 0;
   }
-  .preview-block { flex: 0 0 auto; }
+  .preview-block {
+    /* Center the block, but don't let it get wider than the canvas */
+    max-width: 450px; 
+    margin: 0 auto;
+  }
+  .preview-canvas {
+    /* Make the canvas element responsive */
+    width: 100%;
+    height: auto;
+  }
+  /* --- END MOBILE COMPACT --- */
 }
 
 /* top buttons */
@@ -503,9 +524,58 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
 }
 
 @media (max-width: 640px) {
+  /* --- MOBILE COMPACT: Header & Body --- */
+  body {
+    padding: 10px;
+  }
+  header {
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: 22px;
+  }
+  .subheader {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+  .field {
+    margin-bottom: 12px;
+  }
+  /* --- END MOBILE COMPACT --- */
+
   .stat-row { flex-direction: column; }
   .top-buttons { flex-direction: column; gap: 8px; }
   .checkbox-inline { gap: 8px; }
+
+  /* --- MOBILE COMPACT: Crest & Faith Sections --- */
+  .adorned-crest .crest-inner,
+  .adorned-faith .faith-inner {
+      flex-direction: column; /* Stack button and preview */
+      align-items: flex-start; /* Align them left */
+      gap: 12px;
+  }
+  
+  .crest-art-container,
+  .faith-art-container {
+      transform: translateX(0); /* Reset horizontal transform */
+      margin-left: 0; /* Reset margin */
+      align-items: flex-start; /* Align slider to the left */
+  }
+
+  .crest-section input[type="text"],
+  .faith-section input[type="text"] {
+      width: 100% !important; /* Full width on mobile */
+  }
+  /* --- END MOBILE COMPACT --- */
+
+  /* --- MOBILE COMPACT: Text Toolbar --- */
+  .text-toolbar button {
+    transform: none; /* Reset transform */
+  }
+  .text-toolbar {
+    flex-wrap: wrap; /* Allow buttons to wrap */
+  }
+  /* --- END MOBILE COMPACT --- */
 }
 
 /* === Make all zoom sliders visually identical === */
@@ -765,5 +835,3 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   touch-action: none;
 
 }
-
-
