@@ -149,6 +149,10 @@ Object.values(textInputs).forEach((textarea) => {
         textarea.selectionStart = textarea.selectionEnd = cursorPos + 10;
       }
     }
+    // --- NEW: Auto-resize logic ---
+    // We run this *after* the auto-divider, so it correctly measures the new content
+    textarea.style.height = 'auto'; // Reset height to shrink
+    textarea.style.height = (textarea.scrollHeight) + 'px'; // Set to full content height
   });
 });
 
@@ -1315,5 +1319,6 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
