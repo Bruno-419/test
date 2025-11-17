@@ -67,6 +67,7 @@ const defenseInput = document.getElementById("defenseValue");
 const tokenCheckbox = document.getElementById("tokenCheckbox");
 const wordCountCheckbox = document.getElementById("wordCountCheckbox");
 const autoDividerCheckbox = document.getElementById("autoDividerCheckbox");
+const liveWordCounter = document.getElementById("liveWordCounter");
 const textInputs = {
   card: document.getElementById("cardText"),
   evolve: document.getElementById("evolveText"),
@@ -126,6 +127,25 @@ function loadImage(src) {
   });
 }
 
+// --- NEW: Word Count Functions ---
+function calculateTotalWordCount() {
+  const allText = Object.values(textInputs).map(t => t.value).join(" ");
+  const words = allText.split(/\s+/).filter(w => w.length > 0);
+  return words.length;
+}
+
+function updateLiveWordCount() {
+  if (!liveWordCounter) return; 
+
+  if (wordCountCheckbox.checked) {
+    const wordCount = calculateTotalWordCount();
+    liveWordCounter.textContent = `(${wordCount} ${wordCount === 1 ? 'word' : 'words'})`;
+    liveWordCounter.style.display = "inline"; 
+  } else {
+    liveWordCounter.style.display = "none"; 
+  }
+}
+
 const imageCache = {};
 async function getImage(src) {
   if (imageCache[src]) return imageCache[src];
@@ -150,12 +170,16 @@ Object.values(textInputs).forEach((textarea) => {
       }
     }
     // --- NEW: Auto-resize logic ---
-    // We run this *after* the auto-divider, so it correctly measures the new content
     textarea.style.height = 'auto'; // Reset height to shrink
     textarea.style.height = (textarea.scrollHeight) + 'px'; // Set to full content height
+    
+    // --- ADDED: Live word count update ---
+    updateLiveWordCount();
   });
 });
 
+// --- ADDED: Listener for the checkbox itself ---
+wordCountCheckbox.addEventListener("change", updateLiveWordCount);
 
 // --- Text highlight keywords ---
 const HIGHLIGHT_KEYWORDS = [
@@ -1251,7 +1275,12 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
 
 
 // initial draw
-document.fonts.ready.then(() => setTimeout(updateAll, 60));
+document.fonts.ready.then(() => {
+  setTimeout(() => {
+    updateAll();
+    updateLiveWordCount(); // <-- ADDED: Call on load
+  }, 60);
+});
 
 // REPLACE the existing downloadBtn listener with this:
 document.getElementById("downloadBtn").addEventListener("click", async () => { // <-- Made async
@@ -1320,7 +1349,6 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
-
 
 
 
