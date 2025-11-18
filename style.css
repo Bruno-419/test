@@ -564,7 +564,7 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
 
   .crest-section input[type="text"],
   .faith-section input[type="text"] {
-      width: 100% !important; /* Full width on mobile */
+      width: 30% !important; /* Full width on mobile */
   }
   /* --- END MOBILE COMPACT --- */
 
@@ -835,3 +835,4 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   touch-action: none;
 
 }
+
