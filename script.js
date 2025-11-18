@@ -890,7 +890,7 @@ async function drawCard() {
 ***********************/
 const MAIN_MASK_W = 450, MAIN_MASK_H = 560;
 const MAIN_ART_X = 200, MAIN_ART_Y = 350;
-const ICON_W = 112, ICON_H = 114;
+const ICON_W = 56, ICON_H = 57;
 let artX = MAIN_ART_X, artY = MAIN_ART_Y, artW = MAIN_MASK_W, artH = MAIN_MASK_H;
 window.ICON_W = ICON_W; window.ICON_H = ICON_H;
 
@@ -1369,6 +1369,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
