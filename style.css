@@ -144,12 +144,7 @@ h1 {
     max-width: 450px; 
     margin: 0 auto;
   }
-
-  /* --- ‼️ CSS FIX #1 ---
-    This rule now *only* targets the main preview canvas,
-    so it won't stretch the small icon canvases anymore.
-  */
-  #mainPreviewCanvas.preview-canvas {
+  .preview-canvas {
     /* Make the canvas element responsive */
     width: 100%;
     height: auto;
@@ -735,18 +730,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   gap: 4px;
   margin-left: +50px; /* moves art & slider closer to left edge */
 }
-
-/* --- ‼️ CSS FIX #2 ---
-  This new rule sets the *display* size of the icon canvases
-  to 56x57, while their *actual* resolution is 112x114.
-  This creates a sharp 2x image.
-*/
-#crestPreviewCanvas,
-#faithPreviewCanvas {
-  width: 56px;
-  height: 57px;
-}
-
 
 /* Optional: keep everything visually balanced */
 .crest-section,
