@@ -54,7 +54,6 @@ const assets = {
 const canvas = document.getElementById("previewCanvas");
 const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = true; 
-// === FIX: Ensure high quality scaling ===
 ctx.imageSmoothingQuality = "high";
 
 const nameInput = document.getElementById("cardName");
@@ -614,10 +613,16 @@ async function drawCard() {
       if (iconImg && (isCrest || isFaith)) {
         const s = previewState[isCrest ? "crest" : "faith"];
         
-        // === FIX: Draw DIRECTLY from source image to preserve resolution ===
-        // Instead of creating a low-res bitmap, we calculate dimensions and let drawImage scale it.
+        // === FIX: Use high-quality bitmap scaling logic for smoother rendering ===
+        // This ensures the browser uses a better downscaling algorithm than standard drawImage
         const dWidth = iconImg.width * s.scale;
         const dHeight = iconImg.height * s.scale;
+
+        const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
+          resizeWidth: Math.round(dWidth),
+          resizeHeight: Math.round(dHeight),
+          resizeQuality: "high"
+        });
 
         ctx.save();
         ctx.beginPath();
@@ -625,15 +630,14 @@ async function drawCard() {
         ctx.closePath();
         ctx.clip();
         
-        // High quality scaling is enabled on the context
+        // Draw the pre-scaled, high-quality bitmap
         ctx.drawImage(
-          iconImg,           // Source: The original full-res image
-          iconX + s.tx,      // Dest X
-          iconY + s.ty,      // Dest Y
-          dWidth,            // Dest Width (scaled)
-          dHeight            // Dest Height (scaled)
+          bmp,
+          iconX + s.tx,
+          iconY + s.ty
         );
         ctx.restore();
+        bmp.close();
         // === END FIX ===
       }
       
