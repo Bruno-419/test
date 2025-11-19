@@ -858,33 +858,6 @@ async function drawCard() {
   ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
 }
 
-// --- Live updates with Debouncing ---
-//let redrawDebounceTimer = null;
-//function debouncedDrawCard() {
-//  clearTimeout(redrawDebounceTimer);
-//  redrawDebounceTimer = setTimeout(() => {
-//    safeDrawCard();
-//  }, 250); // 250ms delay before redrawing
-//}
-
-//[
-//  nameInput, traitInput, classSelect, raritySelect, costInput, attackInput, defenseInput,
-//  tokenCheckbox, wordCountCheckbox, autoDividerCheckbox,
-//  ...Object.values(textInputs),
-//  document.getElementById("illustratorName"),
-//  document.getElementById("crestName"),
-//  document.getElementById("faithName")
-//].forEach(el => el?.addEventListener("input", debouncedDrawCard));
-
-// --- Prevent overlapping draws ---
-//let isDrawing = false;
-//async function safeDrawCard() {
-//  if (isDrawing) return;
-//  isDrawing = true;
-//  try { await drawCard(); } catch (err) { console.error("drawCard error:", err); } finally { isDrawing = false; }
-//}
-
-
 /***********************
   PREVIEW COLUMN HANDLERS (clamped)
 ***********************/
@@ -894,18 +867,32 @@ const ICON_W = 56, ICON_H = 57;
 let artX = MAIN_ART_X, artY = MAIN_ART_Y, artW = MAIN_MASK_W, artH = MAIN_MASK_H;
 window.ICON_W = ICON_W; window.ICON_H = ICON_H;
 
+// --- NEW: Icon Scale Factor (5x resolution) ---
+const ICON_SCALE = 5;
+
 const mainPreviewCanvas = document.getElementById("mainPreviewCanvas");
 const mainPreviewCtx = mainPreviewCanvas ? mainPreviewCanvas.getContext("2d") : null;
 if (mainPreviewCtx) mainPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
 const mainZoomSlider = document.getElementById("mainZoomSlider");
+
 const crestPreviewCanvas = document.getElementById("crestPreviewCanvas");
 const crestPreviewCtx = crestPreviewCanvas ? crestPreviewCanvas.getContext("2d") : null;
-if (crestPreviewCtx) crestPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
+if (crestPreviewCtx) {
+  crestPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
+  // Scale the context so 56x57 drawing operations fill the 280x285 canvas
+  crestPreviewCtx.scale(ICON_SCALE, ICON_SCALE);
+}
 const crestZoomSlider = document.getElementById("crestZoomSlider");
+
 const faithPreviewCanvas = document.getElementById("faithPreviewCanvas");
 const faithPreviewCtx = faithPreviewCanvas ? faithPreviewCanvas.getContext("2d") : null;
-if (faithPreviewCtx) faithPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
+if (faithPreviewCtx) {
+  faithPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
+  // Scale the context so 56x57 drawing operations fill the 280x285 canvas
+  faithPreviewCtx.scale(ICON_SCALE, ICON_SCALE);
+}
 const faithZoomSlider = document.getElementById("faithZoomSlider");
+
 const artInput = document.getElementById("artUpload");
 const crestInput = document.getElementById("crestArtUpload");
 const faithInput = document.getElementById("faithArtUpload");
@@ -960,13 +947,24 @@ function clampPan(s) {
 function drawPreviewCanvas(ctx, canvasEl, s, shape) {
   if (!ctx || !canvasEl) return;
   const { img, scale, tx, ty, maskW, maskH } = s;
+  
+  // We need to clear based on the physical canvas size, not the logical size.
+  // Since we scaled the context, 0,0 to canvasEl.width, canvasEl.height covers way more than needed, which is safe.
   ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+  
   ctx.fillStyle = "rgba(20,20,20,0.95)";
-  ctx.fillRect(0, 0, canvasEl.width, canvasEl.height);
+  ctx.fillRect(0, 0, canvasEl.width, canvasEl.height); // Safe to fill massive rect
+
+  // --- Calculate rendering scale to adjust border thickness ---
+  // If the physical canvas is bigger than the logical mask (high DPI), make border thinner.
+  // Example: Physical=280, Logical=56 -> Scale=5. LineWidth=1/5=0.2.
+  // When drawn at 5x scale, 0.2 * 5 = 1px physical border.
+  const renderScale = canvasEl.width / maskW;
+  const borderThickness = 1 / renderScale;
 
   if (!img) {
     ctx.strokeStyle = "rgba(255,255,255,0.06)";
-    ctx.lineWidth = 1;
+    ctx.lineWidth = borderThickness;
     if (shape === "circle") {
       ctx.beginPath();
       ctx.arc(maskW / 2, maskH / 2, Math.min(maskW, maskH) / 2 - 1, 0, Math.PI * 2);
@@ -994,7 +992,7 @@ function drawPreviewCanvas(ctx, canvasEl, s, shape) {
   ctx.restore();
 
   ctx.strokeStyle = "rgba(255,255,255,0.06)";
-  ctx.lineWidth = 1;
+  ctx.lineWidth = borderThickness;
   if (shape === "circle") {
     ctx.beginPath();
     ctx.arc(maskW / 2, maskH / 2, Math.min(maskW, maskH) / 2 - 1, 0, Math.PI * 2);
@@ -1055,8 +1053,6 @@ function updateAll() {
   syncMainToGlobals();
   syncIconToGlobals("crest");
   syncIconToGlobals("faith");
-
-  //safeDrawCard();
 
   drawPreviewCanvas(mainPreviewCtx, mainPreviewCanvas, previewState.main, "rect");
   drawPreviewCanvas(crestPreviewCtx, crestPreviewCanvas, previewState.crest, "circle");
@@ -1164,8 +1160,19 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
 
   canvasEl.addEventListener("pointermove", (e) => {
     if (!dragging || !state.img) return;
+    
+    // --- FIX FOR HIGH-RES & SCALED CANVAS INTERACTION ---
+    const rect = canvasEl.getBoundingClientRect();
+    // Calculate ratio: Logical Mask Width / CSS Display Width
+    const scaleX = state.maskW / rect.width; 
+
     const p = getEventPos(e, canvasEl);
-    const dx = p.x - lastX, dy = p.y - lastY;
+    
+    // Apply ratio to the delta.
+    // If canvas is displayed 2x larger than logical mask, mouse moves 2px for every 1 logical unit.
+    const dx = (p.x - lastX) * scaleX;
+    const dy = (p.y - lastY) * scaleX; 
+
     lastX = p.x; lastY = p.y;
     state.tx += dx; state.ty += dy;
     clampPan(state);
@@ -1174,7 +1181,6 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
 
   function stopDrag(e) {
     dragging = false;
-    //if (canvasEl.releasePointerCapture) try { canvasEl.releasePointerCapture(e.pointerId); } catch (err) {}
   }
   canvasEl.addEventListener("pointerup", stopDrag);
   canvasEl.addEventListener("pointerleave", stopDrag);
@@ -1186,24 +1192,26 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
     
     // Determine zoom speed
     const zoomIntensity = 0.05;
-    const delta = ev.deltaY > 0 ? -1 : 1; // -1 for zoom out, 1 for zoom in
+    const delta = ev.deltaY > 0 ? -1 : 1; 
     const oldScale = state.scale;
     
-    // Get min/max from state and slider
     const minScale = state.minScale;
     const maxScale = sliderEl ? parseFloat(sliderEl.max) : oldScale * 2;
     
-    // Calculate new scale
     let newScale = oldScale * (1 + delta * zoomIntensity);
-    
-    // Clamp to min/max
     newScale = Math.max(minScale, Math.min(maxScale, newScale));
     
+    // --- FIX FOR HIGH-RES WHEEL ZOOM ---
     const rect = canvasEl.getBoundingClientRect();
-    const cx = ev.clientX - rect.left;
-    const cy = ev.clientY - rect.top;
+    const scaleFactor = state.maskW / rect.width;
+
+    // Convert screen mouse position to logical coordinates
+    const cx = (ev.clientX - rect.left) * scaleFactor;
+    const cy = (ev.clientY - rect.top) * scaleFactor;
+
     const imgSpaceX = (cx - state.tx) / oldScale;
     const imgSpaceY = (cy - state.ty) / oldScale;
+    
     state.scale = newScale;
     state.tx = cx - imgSpaceX * newScale;
     state.ty = cy - imgSpaceY * newScale;
@@ -1234,7 +1242,6 @@ attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
-// --- Text Formatting Toolbar (Bold / Italic / Color) ---
 // --- Toolbar: Bold / Italic / Color (uses ** / _ / <c> tags) ---
 document.querySelectorAll(".text-toolbar button").forEach((button) => {
   button.addEventListener("click", (e) => {
@@ -1257,21 +1264,17 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
     else if (format === "all") { openTag = "**_<c>"; closeTag = "</c>_**"; }
     else return;
 
-    // If text selected -> wrap (toggle removal if already wrapped exactly)
     if (start !== end) {
       const before = value.slice(0, start);
       const after = value.slice(end);
       const currentlyWrapped = before.endsWith(openTag) && after.startsWith(closeTag);
       if (currentlyWrapped) {
-        // remove wrapping
         const newBefore = before.slice(0, before.length - openTag.length);
         const newAfter = after.slice(closeTag.length);
         textarea.value = newBefore + selected + newAfter;
         textarea.setSelectionRange(newBefore.length, newBefore.length + selected.length);
       } else {
-        // wrap (nesting is allowed)
         textarea.value = before + openTag + selected + closeTag + after;
-        // select the inner text (optional); place caret after wrapped text
         textarea.setSelectionRange(start + openTag.length, end + openTag.length);
       }
       textarea.focus();
@@ -1279,7 +1282,6 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
       return;
     }
 
-    // No selection -> insert open+close and position caret between them
     const before = value.slice(0, start);
     const after = value.slice(start);
     textarea.value = before + openTag + closeTag + after;
@@ -1289,10 +1291,6 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
     textarea.dispatchEvent(new Event("input"));
   });
 });
-
-
-
-
 
 // initial draw
 document.fonts.ready.then(() => {
@@ -1332,8 +1330,6 @@ document.getElementById("downloadBtn").addEventListener("click", async () => { /
   }
 });
 
-// ADD THIS ENTIRE NEW BLOCK AT THE END OF THE FILE
-
 document.getElementById("previewBtn").addEventListener("click", async () => {
   // Add a "loading" state to the button
   const btn = document.getElementById("previewBtn");
@@ -1369,10 +1365,3 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
-
-
-
-
-
-
-
