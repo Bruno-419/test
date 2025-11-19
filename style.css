@@ -99,6 +99,9 @@ h1 {
 /* If the canvas should be circular-looking for icon previews */
 .preview-canvas.circle {
   border-radius: 999px;
+  /* === DESKTOP DEFAULT: Force small size === */
+  width: 56px;
+  height: 57px;
 }
 
 /* Slider */
@@ -148,10 +151,12 @@ h1 {
     width: 100%;
     height: auto;
   }
-  /* === FIX: Keep Crest/Faith canvases at their natural small size === */
+  /* === FIX: Allow Crest/Faith to grow on mobile but stay sharp === */
   .preview-canvas.circle {
-    width: auto;
+    /* Allow width to grow to container or max-width */
+    width: 100%;
     height: auto;
+    max-width: 280px; /* Caps at the new high-res limit */
   }
   /* --- END MOBILE COMPACT --- */
 }
