@@ -54,7 +54,6 @@ const assets = {
 const canvas = document.getElementById("previewCanvas");
 const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = true; 
-// === FIX: Ensure high quality scaling ===
 ctx.imageSmoothingQuality = "high";
 
 const nameInput = document.getElementById("cardName");
@@ -614,10 +613,15 @@ async function drawCard() {
       if (iconImg && (isCrest || isFaith)) {
         const s = previewState[isCrest ? "crest" : "faith"];
         
-        // === FIX: Draw DIRECTLY from source image to preserve resolution ===
-        // Instead of creating a low-res bitmap, we calculate dimensions and let drawImage scale it.
-        const dWidth = iconImg.width * s.scale;
-        const dHeight = iconImg.height * s.scale;
+        // === FIX: Calculate drawing dimensions based on 5x scale separation ===
+        // The preview state is now 5x larger (for the 280px preview).
+        // We must scale it down by 5x to fit the 56px slot on the final card.
+        const finalScale = s.scale / ICON_SCALE;
+        const finalTx = s.tx / ICON_SCALE;
+        const finalTy = s.ty / ICON_SCALE;
+        
+        const dWidth = iconImg.width * finalScale;
+        const dHeight = iconImg.height * finalScale;
 
         ctx.save();
         ctx.beginPath();
@@ -628,10 +632,10 @@ async function drawCard() {
         // High quality scaling is enabled on the context
         ctx.drawImage(
           iconImg,           // Source: The original full-res image
-          iconX + s.tx,      // Dest X
-          iconY + s.ty,      // Dest Y
-          dWidth,            // Dest Width (scaled)
-          dHeight            // Dest Height (scaled)
+          iconX + finalTx,   // Dest X (corrected)
+          iconY + finalTy,   // Dest Y (corrected)
+          dWidth,            // Dest Width (corrected)
+          dHeight            // Dest Height (corrected)
         );
         ctx.restore();
         // === END FIX ===
@@ -741,7 +745,7 @@ const crestPreviewCanvas = document.getElementById("crestPreviewCanvas");
 const crestPreviewCtx = crestPreviewCanvas ? crestPreviewCanvas.getContext("2d") : null;
 if (crestPreviewCtx) {
   crestPreviewCtx.imageSmoothingEnabled = true; 
-  crestPreviewCtx.scale(ICON_SCALE, ICON_SCALE);
+  // crestPreviewCtx.scale(ICON_SCALE, ICON_SCALE); // REMOVED scaling to prevent pixelation
 }
 const crestZoomSlider = document.getElementById("crestZoomSlider");
 
@@ -749,7 +753,7 @@ const faithPreviewCanvas = document.getElementById("faithPreviewCanvas");
 const faithPreviewCtx = faithPreviewCanvas ? faithPreviewCanvas.getContext("2d") : null;
 if (faithPreviewCtx) {
   faithPreviewCtx.imageSmoothingEnabled = true; 
-  faithPreviewCtx.scale(ICON_SCALE, ICON_SCALE);
+  // faithPreviewCtx.scale(ICON_SCALE, ICON_SCALE); // REMOVED scaling to prevent pixelation
 }
 const faithZoomSlider = document.getElementById("faithZoomSlider");
 
@@ -757,10 +761,12 @@ const artInput = document.getElementById("artUpload");
 const crestInput = document.getElementById("crestArtUpload");
 const faithInput = document.getElementById("faithArtUpload");
 
+// === UPDATED STATE: Use High-Res 280px Mask Size ===
 const previewState = {
   main: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H, minScale: 1 },
-  crest: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W, maskH: ICON_H, minScale: 1 },
-  faith: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W, maskH: ICON_H, minScale: 1 }
+  // Use ICON_SCALE (5) to set mask size to 280x285
+  crest: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W * ICON_SCALE, maskH: ICON_H * ICON_SCALE, minScale: 1 },
+  faith: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W * ICON_SCALE, maskH: ICON_H * ICON_SCALE, minScale: 1 }
 };
 
 function loadImageFromFile(file) {
