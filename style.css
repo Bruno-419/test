@@ -531,27 +531,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   .top-buttons { flex-direction: column; gap: 8px; }
   .checkbox-inline { gap: 8px; }
 
-  /* --- MOBILE COMPACT: Crest & Faith Sections --- */
-  .adorned-crest .crest-inner,
-  .adorned-faith .faith-inner {
-      flex-direction: column; /* Stack button and preview */
-      align-items: flex-start; /* Align them left */
-      gap: 12px;
-  }
-  
-  .crest-art-container,
-  .faith-art-container {
-      transform: translateX(0); /* Reset horizontal transform */
-      margin-left: 0; /* Reset margin */
-      align-items: flex-start; /* Align slider to the left */
-  }
-
-  .crest-section input[type="text"],
-  .faith-section input[type="text"] {
-      width: 100% !important; /* Full width on mobile */
-  }
-  /* --- END MOBILE COMPACT --- */
-
   /* --- MOBILE COMPACT: Text Toolbar --- */
   .text-toolbar button {
     transform: none; /* Reset transform */
@@ -817,4 +796,22 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
 /* Target the zoom sliders */
 .zoom-slider {
   touch-action: none;
+}
+
+/* === MOBILE ALIGNMENT FIXES (Must remain at the end to override desktop styles) === */
+@media (max-width: 640px) {
+  .crest-art-container,
+  .faith-art-container {
+    width: 100%;                   /* Force full width */
+    margin-left: 0 !important;     /* Reset desktop offset */
+    transform: none !important;    /* Reset desktop shifts */
+    align-items: center !important;/* Center the art horizontally */
+    margin-top: 12px;
+  }
+
+  .adorned-crest .crest-inner,
+  .adorned-faith .faith-inner {
+    flex-direction: column;
+    align-items: flex-start; /* Keep the button left-aligned */
+  }
 }
