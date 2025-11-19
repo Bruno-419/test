@@ -53,7 +53,10 @@ const assets = {
 // --- DOM elements ---
 const canvas = document.getElementById("previewCanvas");
 const ctx = canvas.getContext("2d");
-ctx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
+ctx.imageSmoothingEnabled = true; 
+// === FIX: Ensure high quality scaling ===
+ctx.imageSmoothingQuality = "high";
+
 const nameInput = document.getElementById("cardName");
 const crestNameInput = document.getElementById("crestName");
 const faithNameInput = document.getElementById("faithName");
@@ -86,34 +89,23 @@ let faithArt = null;
 
 /**
  * Draws a number, scaling down the font size to fit a max width.
- * @param {string} text - The number to draw (e.g., "100").
- * @param {number} x - The center x-coordinate.
- * @param {number} y - The baseline y-coordinate.
- * @param {number} maxFontSize - The font size to start at (e.g., 80).
- * @param {number} maxWidth - The maximum pixel width before shrinking.
- * @param {string} fontFace - The font family (e.g., 'Sv_numbers').
- * @param {number} letterSpacing - The letter spacing to apply.
- * @param {number} yNudgeCoefficient - The factor used to calculate the vertical correction (e.g., 0.4).
  */
 function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpacing = 0, yNudgeCoefficient) {
   ctx.textAlign = "center";
-  ctx.letterSpacing = `${letterSpacing}px`; // Apply your letter spacing
+  ctx.letterSpacing = `${letterSpacing}px`;
 
   let fontSize = maxFontSize;
   ctx.font = `${fontSize}px '${fontFace}'`;
   let textWidth = ctx.measureText(text).width;
 
-  // This loop shrinks the font size until the text fits
-  while (textWidth > maxWidth && fontSize > 10) { // 10px is a safe minimum
-    fontSize -= 2; // Shrink by 2px
+  while (textWidth > maxWidth && fontSize > 10) {
+    fontSize -= 2;
     ctx.font = `${fontSize}px '${fontFace}'`;
     textWidth = ctx.measureText(text).width;
   }
 
   const yNudge = (maxFontSize - fontSize) * yNudgeCoefficient;
-
   ctx.fillText(text, x, y + yNudge);
-
   ctx.letterSpacing = "0px";
 }
 
@@ -127,37 +119,23 @@ function loadImage(src) {
   });
 }
 
-// --- NEW: Word Count Functions ---
+// --- Word Count Functions ---
 function calculateTotalWordCount() {
   const allText = Object.values(textInputs).map(t => t.value).join(" ");
-
-  // 1. Split by whitespace first
   const initialTokens = allText.split(/\s+/);
-
   let wordCount = 0;
-
   for (const token of initialTokens) {
-    // 2. Filter out empty strings and the divider
     if (token.length === 0 || token === "----------") {
       continue;
     }
-
-    // 3. Split the token by hyphens and filter out any empty strings
-    // (e.g., "word-" would split into ["word", ""])
     const hyphenatedParts = token.split('-').filter(p => p.length > 0);
-
-    // 4. Add the number of parts to the total count
-    // "X-cost" becomes ["X", "cost"] (length 2)
-    // "word" becomes ["word"] (length 1)
     wordCount += hyphenatedParts.length;
   }
-
   return wordCount;
 }
 
 function updateLiveWordCount() {
   if (!liveWordCounter) return; 
-
   if (wordCountCheckbox.checked) {
     const wordCount = calculateTotalWordCount();
     liveWordCounter.textContent = `(${wordCount} ${wordCount === 1 ? 'word' : 'words'})`;
@@ -178,7 +156,6 @@ async function getImage(src) {
 // --- Auto insert "----------" marker ---
 Object.values(textInputs).forEach((textarea) => {
   textarea.addEventListener("input", () => {
-    // --- MODIFICATION: Only auto-insert if checkbox is checked ---
     if (autoDividerCheckbox.checked) {
       const cursorPos = textarea.selectionStart;
       const value = textarea.value;
@@ -190,16 +167,12 @@ Object.values(textInputs).forEach((textarea) => {
         textarea.selectionStart = textarea.selectionEnd = cursorPos + 10;
       }
     }
-    // --- NEW: Auto-resize logic ---
-    textarea.style.height = 'auto'; // Reset height to shrink
-    textarea.style.height = (textarea.scrollHeight) + 'px'; // Set to full content height
-    
-    // --- ADDED: Live word count update ---
+    textarea.style.height = 'auto';
+    textarea.style.height = (textarea.scrollHeight) + 'px';
     updateLiveWordCount();
   });
 });
 
-// --- ADDED: Listener for the checkbox itself ---
 wordCountCheckbox.addEventListener("change", updateLiveWordCount);
 
 // --- Text highlight keywords ---
@@ -212,7 +185,7 @@ const HIGHLIGHT_KEYWORDS = [
 ];
 const HIGHLIGHT_REGEX = new RegExp(`\\b(${HIGHLIGHT_KEYWORDS.join("|")})\\b`, "g");
 
-// --- drawStretchBox (used by text boxes) ---
+// --- drawStretchBox ---
 function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   const stretchPerBreak = 50;
   const stretchAmount = stretchCount * stretchPerBreak;
@@ -226,9 +199,8 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
     middleHeight = 38;
     bottomHeight = 28;
   } else if (key === "main") {
-    // Slicing points for the main text box
-    topHeight = 60; // The top decorative border
-    bottomHeight = 120; // The bottom area with the gradient/space for illustrator
+    topHeight = 60;
+    bottomHeight = 120;
     middleStartY = topHeight;
     middleHeight = img.height - topHeight - bottomHeight;
   }
@@ -248,22 +220,18 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   return topHeight + middleHeight + bottomHeight + stretchAmount;
 }
 
-// --- NEW function to calculate height without drawing ---
+// --- Calculate Height ---
 async function calculateTextBlockHeight(key, startY) {
   const textValue = textInputs[key].value.trim();
   if (!textValue) return 0;
 
-  // Shared constants for calculation
   const isSpecialBox = (key !== "card");
   const specialLineHeightBefore = 30;
   const specialLineHeightAfter = 20;
-
-  // --- NEW: Add custom heights for the main card box divider ---
-  const cardLineHeightBefore = 30; // Was lineHeight (50)
-  const cardLineHeightAfter = 40;  // Was lineHeight (50)
-  // --- END NEW ---
+  const cardLineHeightBefore = 30;
+  const cardLineHeightAfter = 40;
   
-  const textStartX = 769 + 30; // boxX + 30
+  const textStartX = 769 + 30;
   const wrapLimitX = 1716;
   const lineHeight = 50;
   const baseFont = "33px 'Memento'";
@@ -278,7 +246,6 @@ async function calculateTextBlockHeight(key, startY) {
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
 
-  // Dry Run: Calculate layout and total height
   let totalHeight = lineHeight;
   let currentX = textStartX;
   let dryStyle = { bold: false, italic: false, isKeyword: false };
@@ -298,9 +265,7 @@ async function calculateTextBlockHeight(key, startY) {
     if (["<c>", "</c>"].includes(token)) continue;
 
     if (token === "\n") {
-      // --- MODIFIED: Use cardLineHeightAfter for main box ---
       totalHeight += dryLastTokenWasDivider ? (isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter) : lineHeight;
-      // --- END MODIFICATION ---
       currentX = textStartX;
       dryLastTokenWasDivider = false;
       continue;
@@ -308,9 +273,7 @@ async function calculateTextBlockHeight(key, startY) {
     
     if (token.trim() === "----------") {
       if (currentX > textStartX) {
-        // --- MODIFIED: Use cardLineHeightBefore for main box ---
         totalHeight += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
-        // --- END MODIFICATION ---
       }
       currentX = textStartX;
       dryLastTokenWasDivider = true;
@@ -332,7 +295,6 @@ async function calculateTextBlockHeight(key, startY) {
     if (dryStyle.italic) currentX += 3;
   }
   
-  // Calculate the height of the box itself
   const boxImg = assets.boxes[key === "card" ? null : key] ? await getImage(assets.boxes[key]) : null;
   const stretchCount = Math.max(0, (totalHeight / lineHeight) - 1);
   let boxHeight = 0;
@@ -344,7 +306,7 @@ async function calculateTextBlockHeight(key, startY) {
       boxHeight = topHeight + middleHeight + bottomHeight + stretchAmount;
   }
 
-  return Math.max(boxHeight, totalHeight + 40); // Return the greater of the two heights
+  return Math.max(boxHeight, totalHeight + 40);
 }
 
 // --- drawTextBlock ---
@@ -352,19 +314,14 @@ async function drawTextBlock(key, box, x, startY) {
   const textValue = textInputs[key].value.trim();
   if (!textValue) return 0;
 
-  // --- MODIFICATION: Define shared constants here ---
   const isSpecialBox = (key !== "card");
-  const specialLineHeightBefore = 30; // Space *before* divider
-  const specialLineHeightAfter = 20;  // Space *after* divider
-  const specialDividerYOffset = 25;   // Nudge divider up
+  const specialLineHeightBefore = 30;
+  const specialLineHeightAfter = 20;
+  const specialDividerYOffset = 25;
+  const cardLineHeightBefore = 30;
+  const cardLineHeightAfter = 40;
+  const cardDividerYOffset = 15;
 
-  // --- NEW: Add constants for the main card box ---
-  const cardLineHeightBefore = 30; // Was 50 (lineHeight)
-  const cardLineHeightAfter = 40;  // Was 50 (lineHeight)
-  const cardDividerYOffset = 15;   // Was 10
-  // --- END NEW ---
-
-  // --- Common setup ---
   ctx.shadowColor = "transparent";
   ctx.shadowBlur = 0;
   const textStartX = x + 30;
@@ -372,7 +329,6 @@ async function drawTextBlock(key, box, x, startY) {
   const lineHeight = 50;
   const baseFont = "33px 'Memento'";
 
-  // --- Pre-process text to wrap keywords in special tags for easier tokenizing ---
   let processedText = textValue.replace(HIGHLIGHT_REGEX, "<K>$&</K>");
   if (key === "evolve" && processedText.startsWith("Evolve")) {
     processedText = processedText.replace(/^Evolve/, "<K>Evolve</K>");
@@ -381,12 +337,10 @@ async function drawTextBlock(key, box, x, startY) {
     processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
   }
 
-  // --- Tokenizer that understands all formatting markers ---
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
 
-  // --- Dry Run: Calculate layout and total height ---
-  let totalHeight = lineHeight; // Start with one line
+  let totalHeight = lineHeight;
   let currentX = textStartX;
   let dryStyle = { bold: false, italic: false, isKeyword: false };
   let dryLastTokenWasDivider = false;
@@ -398,17 +352,14 @@ async function drawTextBlock(key, box, x, startY) {
   };
 
   for (const token of allTokens) {
-    // Update style state for measurement
     if (token === "**") { dryStyle.bold = !dryStyle.bold; continue; }
     if (token === "_") { dryStyle.italic = !dryStyle.italic; continue; }
     if (token === "<K>") { dryStyle.isKeyword = true; continue; }
     if (token === "</K>") { dryStyle.isKeyword = false; continue; }
     if (["<c>", "</c>"].includes(token)) continue;
 
-    // Handle explicit line breaks
     if (token === "\n") {
       if (dryLastTokenWasDivider) {
-        // --- MODIFIED: Use cardLineHeightAfter for main box ---
         totalHeight += isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter;
       } else {
         totalHeight += lineHeight;
@@ -418,10 +369,8 @@ async function drawTextBlock(key, box, x, startY) {
       continue;
     }
     
-    // Handle dividers
     if (token.trim() === "----------") {
-      if (currentX > textStartX) { // Only add a line if not at the start
-        // --- MODIFIED: Use cardLineHeightBefore for main box ---
+      if (currentX > textStartX) {
         totalHeight += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
       }
       currentX = textStartX;
@@ -429,26 +378,18 @@ async function drawTextBlock(key, box, x, startY) {
       continue;
     }
     
-    dryLastTokenWasDivider = false; // Reset on any other token
-
-    // Measure token and check for wrapping
+    dryLastTokenWasDivider = false;
     setDryFont();
     const tokenWidth = ctx.measureText(token).width;
-    
     if (currentX > textStartX && currentX + tokenWidth > wrapLimitX && token.trim() !== "") {
       totalHeight += lineHeight;
       currentX = textStartX;
     }
-
-    // Don't add width for leading spaces on a new line
     if (currentX === textStartX && token.trim() === "") continue;
-
     currentX += tokenWidth;
-    if (dryStyle.italic) currentX += 3; // Add extra space for italic slant
+    if (dryStyle.italic) currentX += 3;
   }
-  // --- End of Dry Run ---
 
-  // --- Draw the stretchable box based on the calculated line count ---
   const boxImg = box ? await getImage(assets.boxes[box]) : null;
   const stretchCount = Math.max(0, (totalHeight / lineHeight) - 1);
 
@@ -456,7 +397,6 @@ async function drawTextBlock(key, box, x, startY) {
     ? drawStretchBox(boxImg, x, startY, stretchCount, key)
     : 0;
 
-  // --- Wet Run: Actually draw the text onto the canvas ---
   ctx.textAlign = "left";
   ctx.shadowColor = "black";
   ctx.shadowBlur = 4;
@@ -478,7 +418,6 @@ async function drawTextBlock(key, box, x, startY) {
   );
 
   for (const token of allTokens) {
-    // Update style state
     if (token === "**") { wetStyle.bold = !wetStyle.bold; continue; }
     if (token === "_") { wetStyle.italic = !wetStyle.italic; continue; }
     if (token === "<c>") { wetStyle.color = "#f3d87d"; continue; }
@@ -486,57 +425,35 @@ async function drawTextBlock(key, box, x, startY) {
     if (token === "<K>") { wetStyle.isKeyword = true; continue; }
     if (token === "</K>") { wetStyle.isKeyword = false; continue; }
     
-    // --- MODIFICATION: Updated \n handler ---
-    // Handle line breaks
     if (token === "\n") {
       if (lastTokenWasDivider) {
-        // This is the \n *after* a divider
-        textY += isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter; // MODIFIED
+        textY += isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter;
       } else {
-        // This is a normal \n
         textY += lineHeight;
       }
       xPos = textStartX;
-      lastTokenWasDivider = false; // Reset flag
+      lastTokenWasDivider = false;
       continue;
     }
-    // --- END MODIFICATION ---
 
-    // --- MODIFICATION: Updated "----------" handler ---
-    // Handle divider
     if (token.trim() === "----------") {
-      // 1. Handle line break *before* divider (if not at start of line)
       if (xPos > textStartX) {
-        textY += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore; // MODIFIED
+        textY += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
       }
-      
-      // 2. Draw the divider (nudged up)
-      const yOffset = isSpecialBox ? specialDividerYOffset : cardDividerYOffset; // MODIFIED
+      const yOffset = isSpecialBox ? specialDividerYOffset : cardDividerYOffset;
       ctx.drawImage(dividerToUse, x, textY - yOffset);
-      
-      // 3. Reset X position and set flag
       xPos = textStartX;
-      lastTokenWasDivider = true; // Set flag
+      lastTokenWasDivider = true;
       continue;
     }
-    // --- END MODIFICATION ---
-    
-    // --- MODIFICATION: Reset flag on any other token ---
     lastTokenWasDivider = false;
-    // --- END MODIFICATION ---
-
     setWetStyle();
     const tokenWidth = ctx.measureText(token).width;
-
-    // Check for wrapping
     if (xPos > textStartX && xPos + tokenWidth > wrapLimitX && token.trim() !== "") {
       textY += lineHeight;
       xPos = textStartX;
     }
-    
-    // Don't draw leading spaces on a new line
     if (xPos === textStartX && token.trim() === "") continue;
-
     ctx.fillText(token, xPos, textY);
     xPos += tokenWidth;
     if (wetStyle.italic) xPos += 0;
@@ -548,9 +465,6 @@ async function drawTextBlock(key, box, x, startY) {
 
 // --- drawCard ---
 async function drawCard() {
-  // --- PRE-CALCULATION STEP (MOVED FROM BELOW) ---
-  // We must calculate the final height *before* drawing anything.
-
   const textOrder = [
     { key: "card", box: null },
     { key: "evolve", box: "evolve" },
@@ -561,28 +475,22 @@ async function drawCard() {
   const boxX = 768;
   const startY = 246;
 
-  // Get the current card type
   const currentCardType = typeSelect.value.toLowerCase();
   const isFollower = (currentCardType === 'follower');
 
-  // --- STEP 1: Calculate total content height first ---
   let calculatedTotalY = startY;
   for (const { key } of textOrder) {
       const textValue = textInputs[key].value.trim();
-      if (!textValue) continue; // Skip if empty
+      if (!textValue) continue; 
 
-      // NEW: Skip Evolve/Super-Evolve if not a Follower
       const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
       if (isEvolveBlock && !isFollower) {
           continue;
       }
-
-      // This code only runs if the block is non-empty AND valid for the type
       const blockHeight = await calculateTextBlockHeight(key); 
       calculatedTotalY += blockHeight - 10;
   }
 
-  // --- STEP 2 (PARTIAL): Calculate stretch amount ---
   const illustrator = document.getElementById("illustratorName").value.trim();
   const showBottomBar = wordCountCheckbox.checked || illustrator;
 
@@ -590,63 +498,41 @@ async function drawCard() {
   const bottomBarStretchThreshold = 825;
   const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
   
-  // This is the crucial value: how many extra pixels we need
   const stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
   const stretchCount = stretchPixels / 50;
   const boxAsset = showBottomBar ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
   
-  // We need to load the main box image to get its base height for the blur logic
   const mainBoxImg = await getImage(boxAsset);
   
-  // --- NEW: CANVAS RESIZING LOGIC ---
-  const baseHeight = 1080; // Your canvas's default height
-  const baseWidth = 1920;  // Your canvas's default width
+  const baseHeight = 1080; 
+  const baseWidth = 1920;  
   const newHeight = baseHeight + stretchPixels;
 
-  // Only resize if necessary. This avoids clearing the canvas if the size is the same.
   if (canvas.height !== newHeight) {
     canvas.height = newHeight;
   }
-  // (Optional) If you ever needed to stretch width, you'd do it here too.
   if (canvas.width !== baseWidth) {
     canvas.width = baseWidth;
   }
 
-  // --- REGULAR DRAWING START ---
-  
-  // Clear the (potentially larger) canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // !! IMPORTANT: Resizing the canvas resets all context properties.
-  // We must re-apply image smoothing.
-  ctx.imageSmoothingEnabled = true; 
+  ctx.imageSmoothingEnabled = true;
+  // === FIX: Set quality again after resize ===
+  ctx.imageSmoothingQuality = "high";
 
-  // Load the background image
   const bg = await getImage(assets.backgrounds[classSelect.value]);
-  // --- NEW 2-Slice Background Draw ---
   const slicePointY = 1000;
-  // Ensure we don't try to slice past the image's actual height
   const topHeight = Math.min(slicePointY, bg.height);
-  const bottomPartHeight = bg.height - topHeight; // e.g., 1080 - 1000 = 80
+  const bottomPartHeight = bg.height - topHeight;
 
-  // 1. Draw the static top part (0-1000px)
-  ctx.drawImage(bg,
-    0, 0, bg.width, topHeight, // Source (top 1000px of image)
-    0, 0, bg.width, topHeight  // Destination (top 1000px of canvas)
-  );
+  ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
 
-  // 2. Draw the stretched bottom part (1000-1080px)
   if (bottomPartHeight > 0) {
-    // The new height for the bottom part is its original height + all stretch pixels
     const newBottomHeight = bottomPartHeight + stretchPixels;
-    ctx.drawImage(bg,
-      0, topHeight, bg.width, bottomPartHeight, // Source (bottom 80px of image)
-      0, topHeight, bg.width, newBottomHeight   // Destination (fills from 1000px to end of canvas)
-    );
+    ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
   }
-  // --- END NEW 2-Slice ---
 
-  // Load remaining assets
   const [gem, frame] = await Promise.all([
     getImage(assets.gems[classSelect.value]),
     getImage(
@@ -660,7 +546,7 @@ async function drawCard() {
 
   // === Masked Main Art ===
   if (uploadedArt) {
-    const s = previewState.main; // Get the state
+    const s = previewState.main;
     const dWidth = uploadedArt.width * s.scale;
     const dHeight = uploadedArt.height * s.scale;
 
@@ -676,11 +562,7 @@ async function drawCard() {
     ctx.closePath();
     ctx.clip();
     
-    ctx.drawImage(
-      bmp, 
-      MAIN_ART_X + s.tx, 
-      MAIN_ART_Y + s.ty
-    );
+    ctx.drawImage(bmp, MAIN_ART_X + s.tx, MAIN_ART_Y + s.ty);
     
     ctx.restore();
     bmp.close();
@@ -689,52 +571,36 @@ async function drawCard() {
   ctx.drawImage(gem, 398, 863);
   ctx.drawImage(frame, 48, 153);
 
-  // --- TEXT DRAWING LOGIC ---
-  
-  // --- STEP 1 was moved to the top ---
-
-  // --- STEP 2: Draw the main text box (calculations were already done) ---
   const textBoxX = 722;
   const textBoxY = 206;
   
-  // Calculate the final, stretched dimensions of the box
   const dynamicBoxWidth = mainBoxImg.width;
-  // We use the pre-calculated stretchPixels
   const dynamicBoxHeight = mainBoxImg.height + stretchPixels; 
 
-  // --- DYNAMIC BLUR LOGIC ---
   const offCanvas = document.createElement("canvas");
   offCanvas.width = dynamicBoxWidth;
   offCanvas.height = dynamicBoxHeight;
   const offCtx = offCanvas.getContext("2d");
   
-// Draw the section of the *main canvas* (which has the stretched bg) onto the off-screen canvas
   offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
   
   offCtx.filter = "blur(5px)";
   offCtx.drawImage(offCanvas, 0, 0);
   
-  // Draw the blurred patch onto the *main* canvas
   ctx.drawImage(offCanvas, textBoxX, textBoxY);
-  // --- END BLUR LOGIC ---
 
-  // Draw the stretched box frame on top of the blur
-  // We use the pre-calculated stretchCount
   drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
   
-  // --- STEP 3: Now, draw all the text blocks on top ---
   let currentY = startY;
   for (const { key, box } of textOrder) {
     const textValue = textInputs[key].value.trim();
-    if (!textValue) continue; // Skip if empty
+    if (!textValue) continue; 
 
-    // NEW: Skip Evolve/Super-Evolve if not a Follower
     const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
     if (isEvolveBlock && !isFollower) {
       continue;
     }
 
-    // This code only runs if the block is non-empty AND valid for the type
     const blockHeight = await drawTextBlock(key, box, boxX, currentY);
     const isCrest = key === "crest";
     const isFaith = key === "faith";
@@ -747,29 +613,28 @@ async function drawCard() {
 
       if (iconImg && (isCrest || isFaith)) {
         const s = previewState[isCrest ? "crest" : "faith"];
+        
+        // === FIX: Draw DIRECTLY from source image to preserve resolution ===
+        // Instead of creating a low-res bitmap, we calculate dimensions and let drawImage scale it.
         const dWidth = iconImg.width * s.scale;
         const dHeight = iconImg.height * s.scale;
 
-        const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
-          resizeWidth: Math.round(dWidth),
-          resizeHeight: Math.round(dHeight),
-          resizeQuality: "high"
-        });
-  
         ctx.save();
         ctx.beginPath();
         ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
         ctx.closePath();
         ctx.clip();
         
+        // High quality scaling is enabled on the context
         ctx.drawImage(
-          bmp,
-          iconX + s.tx,
-          iconY + s.ty
+          iconImg,           // Source: The original full-res image
+          iconX + s.tx,      // Dest X
+          iconY + s.ty,      // Dest Y
+          dWidth,            // Dest Width (scaled)
+          dHeight            // Dest Height (scaled)
         );
         ctx.restore();
-        
-        bmp.close();
+        // === END FIX ===
       }
       
       const defaultName = isCrest ? "Crest" : "Faith";
@@ -788,7 +653,6 @@ async function drawCard() {
     currentY += blockHeight - 10;
   }
 
-  // --- REMAINDER OF THE DRAWING LOGIC (NAMES, STATS, ETC) ---
   ctx.shadowColor = "black";
   ctx.shadowBlur = 6;
   ctx.fillStyle = "#efeee9";
@@ -840,7 +704,6 @@ async function drawCard() {
     ctx.fillText("*This is a token card.", 1788, canvas.height - 55);
   }
 
-  // This logic is now automatically correct because it uses stretchPixels
   const bottomBarBaseY = 911;
   const dynamicBottomBarY = bottomBarBaseY + stretchPixels;
 
@@ -867,19 +730,17 @@ const ICON_W = 56, ICON_H = 57;
 let artX = MAIN_ART_X, artY = MAIN_ART_Y, artW = MAIN_MASK_W, artH = MAIN_MASK_H;
 window.ICON_W = ICON_W; window.ICON_H = ICON_H;
 
-// --- NEW: Icon Scale Factor (5x resolution) ---
 const ICON_SCALE = 5;
 
 const mainPreviewCanvas = document.getElementById("mainPreviewCanvas");
 const mainPreviewCtx = mainPreviewCanvas ? mainPreviewCanvas.getContext("2d") : null;
-if (mainPreviewCtx) mainPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
+if (mainPreviewCtx) mainPreviewCtx.imageSmoothingEnabled = true;
 const mainZoomSlider = document.getElementById("mainZoomSlider");
 
 const crestPreviewCanvas = document.getElementById("crestPreviewCanvas");
 const crestPreviewCtx = crestPreviewCanvas ? crestPreviewCanvas.getContext("2d") : null;
 if (crestPreviewCtx) {
-  crestPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
-  // Scale the context so 56x57 drawing operations fill the 280x285 canvas
+  crestPreviewCtx.imageSmoothingEnabled = true; 
   crestPreviewCtx.scale(ICON_SCALE, ICON_SCALE);
 }
 const crestZoomSlider = document.getElementById("crestZoomSlider");
@@ -887,8 +748,7 @@ const crestZoomSlider = document.getElementById("crestZoomSlider");
 const faithPreviewCanvas = document.getElementById("faithPreviewCanvas");
 const faithPreviewCtx = faithPreviewCanvas ? faithPreviewCanvas.getContext("2d") : null;
 if (faithPreviewCtx) {
-  faithPreviewCtx.imageSmoothingEnabled = true; // <-- ADD THIS LINE
-  // Scale the context so 56x57 drawing operations fill the 280x285 canvas
+  faithPreviewCtx.imageSmoothingEnabled = true; 
   faithPreviewCtx.scale(ICON_SCALE, ICON_SCALE);
 }
 const faithZoomSlider = document.getElementById("faithZoomSlider");
@@ -916,12 +776,11 @@ function loadImageFromFile(file) {
 function fitImageToMask(img, s) {
   const scale = Math.max(s.maskW / img.width, s.maskH / img.height);
   s.scale = scale;
-  s.minScale = scale; // <-- Store the minimum scale
+  s.minScale = scale; 
   s.tx = (s.maskW - img.width * scale) / 2;
   s.ty = (s.maskH - img.height * scale) / 2;
 }
 
-// clamp pan so that the image always covers the mask (or is centered if smaller)
 function clampPan(s) {
   if (!s.img) return;
   const imgW = s.img.width * s.scale;
@@ -948,17 +807,10 @@ function drawPreviewCanvas(ctx, canvasEl, s, shape) {
   if (!ctx || !canvasEl) return;
   const { img, scale, tx, ty, maskW, maskH } = s;
   
-  // We need to clear based on the physical canvas size, not the logical size.
-  // Since we scaled the context, 0,0 to canvasEl.width, canvasEl.height covers way more than needed, which is safe.
   ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-  
   ctx.fillStyle = "rgba(20,20,20,0.95)";
-  ctx.fillRect(0, 0, canvasEl.width, canvasEl.height); // Safe to fill massive rect
+  ctx.fillRect(0, 0, canvasEl.width, canvasEl.height); 
 
-  // --- Calculate rendering scale to adjust border thickness ---
-  // If the physical canvas is bigger than the logical mask (high DPI), make border thinner.
-  // Example: Physical=280, Logical=56 -> Scale=5. LineWidth=1/5=0.2.
-  // When drawn at 5x scale, 0.2 * 5 = 1px physical border.
   const renderScale = canvasEl.width / maskW;
   const borderThickness = 1 / renderScale;
 
@@ -1032,19 +884,6 @@ function syncIconToGlobals(which) {
   window.ICON_H = s.maskH;
 }
 
-function getIconTransform(which) {
-  const s = previewState[which];
-  if (!s || !s.img) return null;
-  return {
-    img: s.img,
-    scale: s.scale,
-    tx: s.tx,
-    ty: s.ty,
-    width: s.img.width * s.scale,
-    height: s.img.height * s.scale
-  };
-}
-
 function updateAll() {
   clampPan(previewState.main);
   clampPan(previewState.crest);
@@ -1064,24 +903,20 @@ if (artInput) {
   artInput.addEventListener("change", async (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-
-    // **** MODIFIED BLOCK: Added this to update the title ****
     const mainArtTitleEl = document.getElementById("mainArtPreviewTitle");
     if (mainArtTitleEl) {
       mainArtTitleEl.textContent = file.name;
     }
-    // **** END MODIFIED BLOCK ****
-
     try {
       const img = await loadImageFromFile(file);
       previewState.main.img = img;
       fitImageToMask(img, previewState.main);
       if (mainZoomSlider) {
         const min = previewState.main.minScale;
-        const max = min * 5; // 500% zoom from fit
+        const max = min * 5; 
         mainZoomSlider.min = min;
         mainZoomSlider.max = max;
-        mainZoomSlider.step = (max - min) / 100; // 100 steps in slider
+        mainZoomSlider.step = (max - min) / 100;
         mainZoomSlider.value = previewState.main.scale;
       }
       updateAll();
@@ -1100,10 +935,10 @@ if (crestInput) {
       fitImageToMask(img, previewState.crest);
       if (crestZoomSlider) {
         const min = previewState.crest.minScale;
-        const max = min * 8; // 800% zoom from fit for icons
+        const max = min * 8; 
         crestZoomSlider.min = min;
         crestZoomSlider.max = max;
-        crestZoomSlider.step = (max - min) / 100; // 100 steps in slider
+        crestZoomSlider.step = (max - min) / 100;
         crestZoomSlider.value = previewState.crest.scale;
       }
       updateAll();
@@ -1122,10 +957,10 @@ if (faithInput) {
       fitImageToMask(img, previewState.faith);
       if (faithZoomSlider) {
         const min = previewState.faith.minScale;
-        const max = min * 8; // 800% zoom from fit for icons
+        const max = min * 8; 
         faithZoomSlider.min = min;
         faithZoomSlider.max = max;
-        faithZoomSlider.step = (max - min) / 100; // 100 steps in slider
+        faithZoomSlider.step = (max - min) / 100;
         faithZoomSlider.value = previewState.faith.scale;
       }
       updateAll();
@@ -1161,15 +996,10 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   canvasEl.addEventListener("pointermove", (e) => {
     if (!dragging || !state.img) return;
     
-    // --- FIX FOR HIGH-RES & SCALED CANVAS INTERACTION ---
     const rect = canvasEl.getBoundingClientRect();
-    // Calculate ratio: Logical Mask Width / CSS Display Width
     const scaleX = state.maskW / rect.width; 
 
     const p = getEventPos(e, canvasEl);
-    
-    // Apply ratio to the delta.
-    // If canvas is displayed 2x larger than logical mask, mouse moves 2px for every 1 logical unit.
     const dx = (p.x - lastX) * scaleX;
     const dy = (p.y - lastY) * scaleX; 
 
@@ -1185,12 +1015,10 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   canvasEl.addEventListener("pointerup", stopDrag);
   canvasEl.addEventListener("pointerleave", stopDrag);
 
-  // wheel zoom
   canvasEl.addEventListener("wheel", (ev) => {
     if (!state.img) return;
     ev.preventDefault();
     
-    // Determine zoom speed
     const zoomIntensity = 0.05;
     const delta = ev.deltaY > 0 ? -1 : 1; 
     const oldScale = state.scale;
@@ -1201,11 +1029,9 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
     let newScale = oldScale * (1 + delta * zoomIntensity);
     newScale = Math.max(minScale, Math.min(maxScale, newScale));
     
-    // --- FIX FOR HIGH-RES WHEEL ZOOM ---
     const rect = canvasEl.getBoundingClientRect();
     const scaleFactor = state.maskW / rect.width;
 
-    // Convert screen mouse position to logical coordinates
     const cx = (ev.clientX - rect.left) * scaleFactor;
     const cy = (ev.clientY - rect.top) * scaleFactor;
 
@@ -1220,11 +1046,10 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
     updateAll();
   }, { passive: false });
 
-  // slider
   if (sliderEl) {
     sliderEl.addEventListener("input", (ev) => {
       if (!state.img) return;
-      const newScale = Math.max(state.minScale, parseFloat(ev.target.value)); // Enforce minScale
+      const newScale = Math.max(state.minScale, parseFloat(ev.target.value)); 
       const oldScale = state.scale;
       const cx = state.maskW / 2, cy = state.maskH / 2;
       const imgSpaceX = (cx - state.tx) / oldScale;
@@ -1242,7 +1067,6 @@ attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
-// --- Toolbar: Bold / Italic / Color (uses ** / _ / <c> tags) ---
 document.querySelectorAll(".text-toolbar button").forEach((button) => {
   button.addEventListener("click", (e) => {
     e.preventDefault();
@@ -1292,60 +1116,49 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
   });
 });
 
-// initial draw
 document.fonts.ready.then(() => {
   setTimeout(() => {
     updateAll();
-    updateLiveWordCount(); // <-- ADDED: Call on load
+    updateLiveWordCount(); 
   }, 60);
 });
 
-// REPLACE the existing downloadBtn listener with this:
-document.getElementById("downloadBtn").addEventListener("click", async () => { // <-- Made async
-  
-  // Add a "loading" state to the button
+document.getElementById("downloadBtn").addEventListener("click", async () => { 
   const btn = document.getElementById("downloadBtn");
   const originalText = btn.textContent;
   btn.textContent = "Generating...";
   btn.disabled = true;
 
   try {
-    // 1. Run the high-quality draw function ONCE.
     await drawCard(); 
     
-    // 2. Continue with the download as normal.
     const canvas = document.getElementById("previewCanvas");
     const link = document.createElement("a");
     link.download = `${(nameInput.value.trim() || "card")}.png`;
-    link.href = canvas.toDataURL("image/png", 1.0); // full quality
+    link.href = canvas.toDataURL("image/png", 1.0); 
     link.click();
     
   } catch (err) {
     console.error("Download failed:", err);
     alert("Error: Could not save image. Try again.");
   } finally {
-    // 3. Restore the button
     btn.textContent = originalText;
     btn.disabled = false;
   }
 });
 
 document.getElementById("previewBtn").addEventListener("click", async () => {
-  // Add a "loading" state to the button
   const btn = document.getElementById("previewBtn");
   const originalText = btn.textContent;
   btn.textContent = "Generating...";
   btn.disabled = true;
 
   try {
-    // 1. Run the high-quality draw function ONCE.
     await drawCard(); 
     
-    // 2. Get the image data from the hidden canvas.
     const canvas = document.getElementById("previewCanvas");
     const dataUrl = canvas.toDataURL("image/png", 1.0);
     
-    // 3. Open a new tab and display the image.
     const previewWindow = window.open("");
     if (previewWindow) {
       previewWindow.document.title = `${(nameInput.value.trim() || "card")}-preview`;
@@ -1360,7 +1173,6 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     console.error("Preview failed:", err);
     alert("Error: Could not generate preview. Try again.");
   } finally {
-    // 4. Restore the button
     btn.textContent = originalText;
     btn.disabled = false;
   }
