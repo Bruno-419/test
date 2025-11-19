@@ -118,6 +118,42 @@ function loadImage(src) {
   });
 }
 
+// --- NEW: Sharpening Helper Function ---
+// Applies a convolution filter to sharpen the image data on a canvas context
+function applySharpen(ctx, w, h, amount) {
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const data = imgData.data;
+  const copy = new Uint8ClampedArray(data); // Copy for reference
+
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+       const i = (y * w + x) * 4;
+       
+       // Neighbors for convolution
+       const up = ((y - 1) * w + x) * 4;
+       const down = ((y + 1) * w + x) * 4;
+       const left = (y * w + (x - 1)) * 4;
+       const right = (y * w + (x + 1)) * 4;
+
+       // Simple Sharpen Kernel Logic:
+       // pixel = pixel + amount * (4 * pixel - up - down - left - right)
+       // This adds the "edges" back into the image to crisp it up.
+       
+       for (let c = 0; c < 3; c++) { // RGB channels
+         const edge = 4 * copy[i + c] 
+                      - copy[up + c] 
+                      - copy[down + c] 
+                      - copy[left + c] 
+                      - copy[right + c];
+         
+         data[i + c] = copy[i + c] + amount * edge;
+       }
+       // Alpha channel (data[i+3]) is left alone
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
 // --- Word Count Functions ---
 function calculateTotalWordCount() {
   const allText = Object.values(textInputs).map(t => t.value).join(" ");
@@ -613,32 +649,45 @@ async function drawCard() {
       if (iconImg && (isCrest || isFaith)) {
         const s = previewState[isCrest ? "crest" : "faith"];
         
-        // === FIX: Use high-quality bitmap scaling logic for smoother rendering ===
-        // This ensures the browser uses a better downscaling algorithm than standard drawImage
+        // 1. Calculate dimensions
         const dWidth = iconImg.width * s.scale;
         const dHeight = iconImg.height * s.scale;
 
+        // 2. Create high-quality bitmap (as before)
         const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
           resizeWidth: Math.round(dWidth),
           resizeHeight: Math.round(dHeight),
           resizeQuality: "high"
         });
 
+        // 3. Create a temporary offscreen canvas to apply the sharpening filter
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = Math.round(dWidth);
+        tempCanvas.height = Math.round(dHeight);
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Draw the bitmap to the temp canvas
+        tempCtx.drawImage(bmp, 0, 0);
+        
+        // 4. Apply Manual Sharpening
+        // Strength of 0.15 is "slightly less blurry" without being over-fried.
+        applySharpen(tempCtx, tempCanvas.width, tempCanvas.height, 0.15);
+
+        // 5. Draw the sharpened result to the main canvas
         ctx.save();
         ctx.beginPath();
         ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
         ctx.closePath();
         ctx.clip();
         
-        // Draw the pre-scaled, high-quality bitmap
-        ctx.drawImage(
-          bmp,
-          iconX + s.tx,
-          iconY + s.ty
-        );
+        // Draw from temp canvas (which accounts for s.tx/ty shifts in the draw call)
+        // Wait, s.tx/ty shifts the *position* of the image relative to the circle mask.
+        // The bitmap contains the *whole* scaled image.
+        // So we draw the temp canvas at the offset location.
+        ctx.drawImage(tempCanvas, iconX + s.tx, iconY + s.ty);
+        
         ctx.restore();
         bmp.close();
-        // === END FIX ===
       }
       
       const defaultName = isCrest ? "Crest" : "Faith";
