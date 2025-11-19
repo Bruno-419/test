@@ -671,7 +671,7 @@ async function drawCard() {
         
         // 4. Apply Manual Sharpening
         // Strength of 0.15 is "slightly less blurry" without being over-fried.
-        applySharpen(tempCtx, tempCanvas.width, tempCanvas.height, 0.4);
+        applySharpen(tempCtx, tempCanvas.width, tempCanvas.height, 0.5);
 
         // 5. Draw the sharpened result to the main canvas
         ctx.save();
@@ -1230,4 +1230,5 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
