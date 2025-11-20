@@ -4,21 +4,21 @@ const assets = {
     "assets/follower/follower_bronze.png",
     "assets/follower/follower_silver.png",
     "assets/follower/follower_gold.png",
-    "assets/follower/follower_legendary.png"
+    "assets/follower/follower_legendary.png",
     "assets/follower/follower_signature.png"
   ],
   spell: [
     "assets/spell/spell_bronze.png",
     "assets/spell/spell_silver.png",
     "assets/spell/spell_gold.png",
-    "assets/spell/spell_legendary.png"
+    "assets/spell/spell_legendary.png",
     "assets/spell/spell_signature.png"
   ],
   amulet: [
     "assets/amulet/amulet_bronze.png",
     "assets/amulet/amulet_silver.png",
     "assets/amulet/amulet_gold.png",
-    "assets/amulet/amulet_legendary.png"
+    "assets/amulet/amulet_legendary.png",
     "assets/amulet/amulet_signature.png"
   ],
   backgrounds: {
@@ -1233,6 +1233,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
