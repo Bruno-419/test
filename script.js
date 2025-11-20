@@ -517,62 +517,78 @@ async function drawCard() {
 
   const currentCardType = typeSelect.value.toLowerCase();
   const isFollower = (currentCardType === 'follower');
+  const saveCardOnly = saveCardOnlyCheckbox.checked; // Check status
 
-  let calculatedTotalY = startY;
-  for (const { key } of textOrder) {
-      const textValue = textInputs[key].value.trim();
-      if (!textValue) continue; 
+  // 1. Calculate Height / Stretch
+  // If Saving Card Only, we enforce 0 stretch (fixed height)
+  let stretchPixels = 0;
+  
+  if (!saveCardOnly) {
+      let calculatedTotalY = startY;
+      for (const { key } of textOrder) {
+          const textValue = textInputs[key].value.trim();
+          if (!textValue) continue; 
 
-      const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
-      if (isEvolveBlock && !isFollower) {
-          continue;
+          const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
+          if (isEvolveBlock && !isFollower) {
+              continue;
+          }
+          const blockHeight = await calculateTextBlockHeight(key); 
+          calculatedTotalY += blockHeight - 10;
       }
-      const blockHeight = await calculateTextBlockHeight(key); 
-      calculatedTotalY += blockHeight - 10;
+
+      const illustrator = document.getElementById("illustratorName").value.trim();
+      const showBottomBar = wordCountCheckbox.checked || illustrator;
+
+      const defaultStretchThreshold = 900;
+      const bottomBarStretchThreshold = 825;
+      const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
+      
+      stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
   }
 
-  const illustrator = document.getElementById("illustratorName").value.trim();
-  const showBottomBar = wordCountCheckbox.checked || illustrator;
-
-  const defaultStretchThreshold = 900;
-  const bottomBarStretchThreshold = 825;
-  const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
-  
-  const stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
   const stretchCount = stretchPixels / 50;
-  const boxAsset = showBottomBar ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
+  const boxAsset = (wordCountCheckbox.checked || document.getElementById("illustratorName").value.trim()) ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
   
   const mainBoxImg = await getImage(boxAsset);
   
+  // 2. Set Canvas Dimensions
   const baseHeight = 1080; 
-  const baseWidth = 1920;  
-  const newHeight = baseHeight + stretchPixels;
+  const baseWidth = 1920;
+  
+  // If Save Card Only: Crop width to 722 (Start of text box) and keep base height
+  const newWidth = saveCardOnly ? 722 : baseWidth;
+  const newHeight = saveCardOnly ? baseHeight : (baseHeight + stretchPixels);
 
   if (canvas.height !== newHeight) {
     canvas.height = newHeight;
   }
-  if (canvas.width !== baseWidth) {
-    canvas.width = baseWidth;
+  if (canvas.width !== newWidth) {
+    canvas.width = newWidth;
   }
 
+  // 3. Clear Canvas (Important for transparency)
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   ctx.imageSmoothingEnabled = true;
-  // === FIX: Set quality again after resize ===
   ctx.imageSmoothingQuality = "high";
 
-  const bg = await getImage(assets.backgrounds[classSelect.value]);
-  const slicePointY = 1000;
-  const topHeight = Math.min(slicePointY, bg.height);
-  const bottomPartHeight = bg.height - topHeight;
+  // 4. Draw Background (SKIP if Save Card Only)
+  if (!saveCardOnly) {
+      const bg = await getImage(assets.backgrounds[classSelect.value]);
+      const slicePointY = 1000;
+      const topHeight = Math.min(slicePointY, bg.height);
+      const bottomPartHeight = bg.height - topHeight;
 
-  ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
+      ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
 
-  if (bottomPartHeight > 0) {
-    const newBottomHeight = bottomPartHeight + stretchPixels;
-    ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
+      if (bottomPartHeight > 0) {
+        const newBottomHeight = bottomPartHeight + stretchPixels;
+        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
+      }
   }
 
+  // Load Assets
   const [gem, frame] = await Promise.all([
     getImage(assets.gems[classSelect.value]),
     getImage(
@@ -584,7 +600,7 @@ async function drawCard() {
     )
   ]);
 
-  // === Masked Main Art ===
+  // 5. Masked Main Art
   if (uploadedArt) {
     const s = previewState.main;
     const dWidth = uploadedArt.width * s.scale;
@@ -607,31 +623,12 @@ async function drawCard() {
     ctx.restore();
     bmp.close();
   }
-  
-  // 1. DRAW BACKGROUND (Only if "Save card only" is FALSE)
-  if (!saveCardOnlyCheckbox.checked) {
-    const bg = await getImage(assets.backgrounds[classSelect.value]);
-    const slicePointY = 1000;
-    const topHeight = Math.min(slicePointY, bg.height);
-    const bottomPartHeight = bg.height - topHeight;
-
-    // Draw background behind everything (using globalCompositeOperation would be complex, 
-    // so we just draw it if enabled. If disabled, the canvas remains transparent/cleared).
-    ctx.globalCompositeOperation = 'destination-over';
-    ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
-
-    if (bottomPartHeight > 0) {
-      const newBottomHeight = bottomPartHeight + stretchPixels;
-      ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
-    }
-    ctx.globalCompositeOperation = 'source-over';
-  }
 
   ctx.drawImage(gem, 398, 863);
   ctx.drawImage(frame, 48, 153);
 
-  // 2. DRAW TEXT BOX & TEXT (Only if "Save card only" is FALSE)
-  if (!saveCardOnlyCheckbox.checked) {
+  // 6. Text Box & Text (SKIP if Save Card Only)
+  if (!saveCardOnly) {
       const textBoxX = 722;
       const textBoxY = 206;
       
@@ -643,8 +640,6 @@ async function drawCard() {
       offCanvas.height = dynamicBoxHeight;
       const offCtx = offCanvas.getContext("2d");
       
-      // Note: We need to capture the background for the blur effect. 
-      // If we are in "Card Only" mode, this block is skipped anyway.
       offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
       
       offCtx.filter = "blur(5px)";
@@ -666,7 +661,7 @@ async function drawCard() {
 
         const blockHeight = await drawTextBlock(key, box, boxX, currentY);
         
-        // Draw Crest/Faith Icons
+        // Draw Icons (Crest/Faith)
         const isCrest = key === "crest";
         const isFaith = key === "faith";
         if (isCrest || isFaith) {
@@ -676,7 +671,7 @@ async function drawCard() {
           const nameField = document.getElementById(isCrest ? "crestName" : "faithName");
           const nameValue = nameField ? nameField.value.trim() : "";
 
-          if (iconImg && (isCrest || isFaith)) {
+          if (iconImg) {
             const s = previewState[isCrest ? "crest" : "faith"];
             const dWidth = iconImg.width * s.scale;
             const dHeight = iconImg.height * s.scale;
@@ -686,7 +681,6 @@ async function drawCard() {
               resizeHeight: Math.round(dHeight),
               resizeQuality: "high"
             });
-
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = Math.round(dWidth);
             tempCanvas.height = Math.round(dHeight);
@@ -721,7 +715,7 @@ async function drawCard() {
       }
   }
 
-  // 3. DRAW CARD STATS (Always draw these)
+  // 7. Stats, Name, Footer (Stats/Name always drawn, Footer skipped if SaveOnly)
   ctx.shadowColor = "black";
   ctx.shadowBlur = 6;
   ctx.fillStyle = "#efeee9";
@@ -767,8 +761,8 @@ async function drawCard() {
   }
   ctx.letterSpacing = "0px";
 
-  // 4. FOOTER ELEMENTS (Hide if "Save card only")
-  if (!saveCardOnlyCheckbox.checked) {
+  // Footer Elements (Skip if Save Card Only)
+  if (!saveCardOnly) {
       if (tokenCheckbox.checked) {
         ctx.font = "28px 'NotoSans'";
         ctx.textAlign = "right";
@@ -778,6 +772,7 @@ async function drawCard() {
       const bottomBarBaseY = 911;
       const dynamicBottomBarY = bottomBarBaseY + stretchPixels;
 
+      const illustrator = document.getElementById("illustratorName").value.trim();
       if (illustrator) {
         ctx.font = "28px 'NotoSans'";
         ctx.textAlign = "left";
@@ -1249,6 +1244,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
