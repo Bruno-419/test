@@ -576,7 +576,7 @@ async function drawCard() {
   // If saving card only, shift the context UP so the card (which starts at Y=153) hits the top (Y=0)
   ctx.save();
   if (saveCardOnly) {
-    ctx.translate(0, -153);
+    ctx.translate(-48, -153);
   }
 
   // 4. Draw Background (SKIP if Save Card Only)
@@ -1260,6 +1260,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
