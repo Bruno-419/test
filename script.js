@@ -520,7 +520,6 @@ async function drawCard() {
   const saveCardOnly = saveCardOnlyCheckbox.checked; // Check status
 
   // 1. Calculate Height / Stretch
-  // If Saving Card Only, we enforce 0 stretch (fixed height)
   let stretchPixels = 0;
   
   if (!saveCardOnly) {
@@ -556,8 +555,8 @@ async function drawCard() {
   const baseHeight = 1080; 
   const baseWidth = 1920;
   
-  // If Save Card Only: Crop width to 722 (Start of text box) and keep base height
-  const newWidth = saveCardOnly ? 722 : baseWidth;
+  // If Save Card Only: Width 750 (balanced margins), Height 1080
+  const newWidth = saveCardOnly ? 750 : baseWidth;
   const newHeight = saveCardOnly ? baseHeight : (baseHeight + stretchPixels);
 
   if (canvas.height !== newHeight) {
@@ -567,11 +566,19 @@ async function drawCard() {
     canvas.width = newWidth;
   }
 
-  // 3. Clear Canvas (Important for transparency)
+  // 3. Clear Canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
+
+  // === Apply Centering Shift for Card Only Mode ===
+  ctx.save(); 
+  if (saveCardOnly) {
+    // Shift Right by 14px (Centers horizontally in 750px)
+    // Shift Up by 38px (Centers vertically in 1080px - balances top/bottom margins)
+    ctx.translate(14, -38); 
+  }
 
   // 4. Draw Background (SKIP if Save Card Only)
   if (!saveCardOnly) {
@@ -715,14 +722,18 @@ async function drawCard() {
       }
   }
 
-  // 7. Stats, Name, Footer (Stats/Name always drawn, Footer skipped if SaveOnly)
+  // 7. Stats, Name
   ctx.shadowColor = "black";
   ctx.shadowBlur = 6;
   ctx.fillStyle = "#efeee9";
   ctx.font = "56px 'Memento'";
   ctx.textAlign = "left";
   const nameText = nameInput.value.trim() || "Unnamed Card";
-  ctx.fillText(nameText, 163, 150);
+
+  // Only draw the floating header name if NOT in "Card Only" mode
+  if (!saveCardOnly) {
+    ctx.fillText(nameText, 163, 150);
+  }
 
   let secondaryFontSize = 42;
   ctx.font = `${secondaryFontSize}px 'Memento'`;
@@ -739,6 +750,8 @@ async function drawCard() {
   }
   const secondaryNameY = baseY + (shrinkSteps * offsetPerStep);
   ctx.textAlign = "center";
+  
+  // This is the name inside the card banner (always drawn)
   ctx.fillText(nameText, 455, secondaryNameY);
 
   ctx.font = "33px 'Memento'";
@@ -785,6 +798,10 @@ async function drawCard() {
         ctx.fillText(`Word count: ${wordCount}`, 1730, dynamicBottomBarY);
       }
   }
+  
+  // Restore context (removes translation)
+  ctx.restore();
+  
   ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
 }
 
@@ -1244,6 +1261,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
