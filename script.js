@@ -72,6 +72,7 @@ const defenseInput = document.getElementById("defenseValue");
 const tokenCheckbox = document.getElementById("tokenCheckbox");
 const wordCountCheckbox = document.getElementById("wordCountCheckbox");
 const autoDividerCheckbox = document.getElementById("autoDividerCheckbox");
+const saveCardOnlyCheckbox = document.getElementById("saveCardOnlyCheckbox");
 const liveWordCounter = document.getElementById("liveWordCounter");
 const textInputs = {
   card: document.getElementById("cardText"),
@@ -212,6 +213,7 @@ Object.values(textInputs).forEach((textarea) => {
 });
 
 wordCountCheckbox.addEventListener("change", updateLiveWordCount);
+saveCardOnlyCheckbox.addEventListener("change", () => drawCard());
 
 // --- Text highlight keywords ---
 const HIGHLIGHT_KEYWORDS = [
@@ -605,110 +607,121 @@ async function drawCard() {
     ctx.restore();
     bmp.close();
   }
+  
+  // 1. DRAW BACKGROUND (Only if "Save card only" is FALSE)
+  if (!saveCardOnlyCheckbox.checked) {
+    const bg = await getImage(assets.backgrounds[classSelect.value]);
+    const slicePointY = 1000;
+    const topHeight = Math.min(slicePointY, bg.height);
+    const bottomPartHeight = bg.height - topHeight;
+
+    // Draw background behind everything (using globalCompositeOperation would be complex, 
+    // so we just draw it if enabled. If disabled, the canvas remains transparent/cleared).
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
+
+    if (bottomPartHeight > 0) {
+      const newBottomHeight = bottomPartHeight + stretchPixels;
+      ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
 
   ctx.drawImage(gem, 398, 863);
   ctx.drawImage(frame, 48, 153);
 
-  const textBoxX = 722;
-  const textBoxY = 206;
-  
-  const dynamicBoxWidth = mainBoxImg.width;
-  const dynamicBoxHeight = mainBoxImg.height + stretchPixels; 
-
-  const offCanvas = document.createElement("canvas");
-  offCanvas.width = dynamicBoxWidth;
-  offCanvas.height = dynamicBoxHeight;
-  const offCtx = offCanvas.getContext("2d");
-  
-  offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
-  
-  offCtx.filter = "blur(5px)";
-  offCtx.drawImage(offCanvas, 0, 0);
-  
-  ctx.drawImage(offCanvas, textBoxX, textBoxY);
-
-  drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
-  
-  let currentY = startY;
-  for (const { key, box } of textOrder) {
-    const textValue = textInputs[key].value.trim();
-    if (!textValue) continue; 
-
-    const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
-    if (isEvolveBlock && !isFollower) {
-      continue;
-    }
-
-    const blockHeight = await drawTextBlock(key, box, boxX, currentY);
-    const isCrest = key === "crest";
-    const isFaith = key === "faith";
-    if (isCrest || isFaith) {
-      const iconX = boxX + 120;
-      const iconY = currentY + 32;
-      const iconImg = isCrest ? crestArt : faithArt;
-      const nameField = document.getElementById(isCrest ? "crestName" : "faithName");
-      const nameValue = nameField ? nameField.value.trim() : "";
-
-      if (iconImg && (isCrest || isFaith)) {
-        const s = previewState[isCrest ? "crest" : "faith"];
-        
-        // 1. Calculate dimensions
-        const dWidth = iconImg.width * s.scale;
-        const dHeight = iconImg.height * s.scale;
-
-        // 2. Create high-quality bitmap (as before)
-        const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
-          resizeWidth: Math.round(dWidth),
-          resizeHeight: Math.round(dHeight),
-          resizeQuality: "high"
-        });
-
-        // 3. Create a temporary offscreen canvas to apply the sharpening filter
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = Math.round(dWidth);
-        tempCanvas.height = Math.round(dHeight);
-        const tempCtx = tempCanvas.getContext('2d');
-        
-        // Draw the bitmap to the temp canvas
-        tempCtx.drawImage(bmp, 0, 0);
-        
-        // 4. Apply Manual Sharpening
-        // Strength of 0.15 is "slightly less blurry" without being over-fried.
-        applySharpen(tempCtx, tempCanvas.width, tempCanvas.height, 0.25);
-
-        // 5. Draw the sharpened result to the main canvas
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.clip();
-        
-        // Draw from temp canvas (which accounts for s.tx/ty shifts in the draw call)
-        // Wait, s.tx/ty shifts the *position* of the image relative to the circle mask.
-        // The bitmap contains the *whole* scaled image.
-        // So we draw the temp canvas at the offset location.
-        ctx.drawImage(tempCanvas, iconX + s.tx, iconY + s.ty);
-        
-        ctx.restore();
-        bmp.close();
-      }
+  // 2. DRAW TEXT BOX & TEXT (Only if "Save card only" is FALSE)
+  if (!saveCardOnlyCheckbox.checked) {
+      const textBoxX = 722;
+      const textBoxY = 206;
       
-      const defaultName = isCrest ? "Crest" : "Faith";
-      const displayName = nameValue || defaultName;
-      if (displayName) {
-        ctx.save();
-        ctx.font = "33px 'Memento'";
-        ctx.fillStyle = "#f3d87d";
-        ctx.textAlign = "left";
-        ctx.shadowColor = "black";
-        ctx.shadowBlur = 4;
-        ctx.fillText(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10);
-        ctx.restore();
+      const dynamicBoxWidth = mainBoxImg.width;
+      const dynamicBoxHeight = mainBoxImg.height + stretchPixels; 
+
+      const offCanvas = document.createElement("canvas");
+      offCanvas.width = dynamicBoxWidth;
+      offCanvas.height = dynamicBoxHeight;
+      const offCtx = offCanvas.getContext("2d");
+      
+      // Note: We need to capture the background for the blur effect. 
+      // If we are in "Card Only" mode, this block is skipped anyway.
+      offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
+      
+      offCtx.filter = "blur(5px)";
+      offCtx.drawImage(offCanvas, 0, 0);
+      
+      ctx.drawImage(offCanvas, textBoxX, textBoxY);
+
+      drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
+      
+      let currentY = startY;
+      for (const { key, box } of textOrder) {
+        const textValue = textInputs[key].value.trim();
+        if (!textValue) continue; 
+
+        const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
+        if (isEvolveBlock && !isFollower) {
+          continue;
+        }
+
+        const blockHeight = await drawTextBlock(key, box, boxX, currentY);
+        
+        // Draw Crest/Faith Icons
+        const isCrest = key === "crest";
+        const isFaith = key === "faith";
+        if (isCrest || isFaith) {
+          const iconX = boxX + 120;
+          const iconY = currentY + 32;
+          const iconImg = isCrest ? crestArt : faithArt;
+          const nameField = document.getElementById(isCrest ? "crestName" : "faithName");
+          const nameValue = nameField ? nameField.value.trim() : "";
+
+          if (iconImg && (isCrest || isFaith)) {
+            const s = previewState[isCrest ? "crest" : "faith"];
+            const dWidth = iconImg.width * s.scale;
+            const dHeight = iconImg.height * s.scale;
+
+            const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
+              resizeWidth: Math.round(dWidth),
+              resizeHeight: Math.round(dHeight),
+              resizeQuality: "high"
+            });
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = Math.round(dWidth);
+            tempCanvas.height = Math.round(dHeight);
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(bmp, 0, 0);
+            applySharpen(tempCtx, tempCanvas.width, tempCanvas.height, 0.25);
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(tempCanvas, iconX + s.tx, iconY + s.ty);
+            ctx.restore();
+            bmp.close();
+          }
+          
+          const defaultName = isCrest ? "Crest" : "Faith";
+          const displayName = nameValue || defaultName;
+          if (displayName) {
+            ctx.save();
+            ctx.font = "33px 'Memento'";
+            ctx.fillStyle = "#f3d87d";
+            ctx.textAlign = "left";
+            ctx.shadowColor = "black";
+            ctx.shadowBlur = 4;
+            ctx.fillText(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10);
+            ctx.restore();
+          }
+        }
+        currentY += blockHeight - 10;
       }
-    }
-    currentY += blockHeight - 10;
   }
 
+  // 3. DRAW CARD STATS (Always draw these)
   ctx.shadowColor = "black";
   ctx.shadowBlur = 6;
   ctx.fillStyle = "#efeee9";
@@ -754,25 +767,28 @@ async function drawCard() {
   }
   ctx.letterSpacing = "0px";
 
-  if (tokenCheckbox.checked) {
-    ctx.font = "28px 'NotoSans'";
-    ctx.textAlign = "right";
-    ctx.fillText("*This is a token card.", 1788, canvas.height - 55);
-  }
+  // 4. FOOTER ELEMENTS (Hide if "Save card only")
+  if (!saveCardOnlyCheckbox.checked) {
+      if (tokenCheckbox.checked) {
+        ctx.font = "28px 'NotoSans'";
+        ctx.textAlign = "right";
+        ctx.fillText("*This is a token card.", 1788, canvas.height - 55);
+      }
 
-  const bottomBarBaseY = 911;
-  const dynamicBottomBarY = bottomBarBaseY + stretchPixels;
+      const bottomBarBaseY = 911;
+      const dynamicBottomBarY = bottomBarBaseY + stretchPixels;
 
-  if (illustrator) {
-    ctx.font = "28px 'NotoSans'";
-    ctx.textAlign = "left";
-    ctx.fillText(`Illustrator: ${illustrator}`, 790, dynamicBottomBarY);
-  }
-  if (wordCountCheckbox.checked) {
-    const wordCount = calculateTotalWordCount();
-    ctx.font = "28px 'NotoSans'";
-    ctx.textAlign = "right";
-    ctx.fillText(`Word count: ${wordCount}`, 1730, dynamicBottomBarY);
+      if (illustrator) {
+        ctx.font = "28px 'NotoSans'";
+        ctx.textAlign = "left";
+        ctx.fillText(`Illustrator: ${illustrator}`, 790, dynamicBottomBarY);
+      }
+      if (wordCountCheckbox.checked) {
+        const wordCount = calculateTotalWordCount();
+        ctx.font = "28px 'NotoSans'";
+        ctx.textAlign = "right";
+        ctx.fillText(`Word count: ${wordCount}`, 1730, dynamicBottomBarY);
+      }
   }
   ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
 }
@@ -1233,6 +1249,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
