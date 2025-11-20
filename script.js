@@ -1206,13 +1206,28 @@ document.fonts.ready.then(() => {
   }, 60);
 });
 
+// --- Button Event Listeners (Updated with Font Loading) ---
+
 document.getElementById("downloadBtn").addEventListener("click", async () => { 
   const btn = document.getElementById("downloadBtn");
   const originalText = btn.textContent;
-  btn.textContent = "Generating...";
+  
+  // Visual feedback that we are waiting for fonts/assets
+  btn.textContent = "Loading assets...";
   btn.disabled = true;
 
   try {
+    // === FIX: Force wait for fonts to load before drawing ===
+    // This ensures the Canvas has access to the .ttf files
+    await document.fonts.ready;
+    await Promise.all([
+        document.fonts.load("60px 'Memento'"),
+        document.fonts.load("60px 'Sv_numbers'"),
+        document.fonts.load("30px 'NotoSans'")
+    ]);
+
+    btn.textContent = "Generating...";
+    
     await drawCard(); 
     
     const canvas = document.getElementById("previewCanvas");
@@ -1233,10 +1248,22 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
 document.getElementById("previewBtn").addEventListener("click", async () => {
   const btn = document.getElementById("previewBtn");
   const originalText = btn.textContent;
-  btn.textContent = "Generating...";
+  
+  // Visual feedback
+  btn.textContent = "Loading assets...";
   btn.disabled = true;
 
   try {
+    // === FIX: Force wait for fonts to load before drawing ===
+    await document.fonts.ready;
+    await Promise.all([
+        document.fonts.load("60px 'Memento'"),
+        document.fonts.load("60px 'Sv_numbers'"),
+        document.fonts.load("30px 'NotoSans'")
+    ]);
+
+    btn.textContent = "Generating...";
+
     await drawCard(); 
     
     const canvas = document.getElementById("previewCanvas");
