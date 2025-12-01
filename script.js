@@ -494,7 +494,20 @@ async function drawTextBlock(key, box, x, startY) {
       xPos = textStartX;
     }
     if (xPos === textStartX && token.trim() === "") continue;
-    ctx.fillText(token, xPos, textY);
+    
+    // --- CHANGED CODE START ---
+    let drawX = xPos;
+    
+    // Manual kerning fix: The number "1" often renders with too much left/right spacing.
+    // This shifts the "1" to the left and pulls the cursor back so the next character is closer.
+    if (token === "1") {
+      const nudge = 4; // Adjust this value (pixels) if it's still too far/close
+      drawX -= nudge;
+      xPos -= nudge;
+    }
+    
+    ctx.fillText(token, drawX, textY);
+    // --- CHANGED CODE END ---
     xPos += tokenWidth;
     if (wetStyle.italic) xPos += 0;
   }
@@ -1287,6 +1300,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
