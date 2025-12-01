@@ -91,75 +91,25 @@ let crestArt = null;
 let faithArt = null;
 
 /**
- * Draws a number with manual kerning to handle the narrow "1" digit.
+ * Draws a number, scaling down the font size to fit a max width.
  */
-function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, unusedLetterSpacing, yNudgeCoefficient) {
-  // 1. Define custom spacing rules (The "Kerning Map")
-  // Returns the spacing adjustment in pixels between prevChar and currChar
-  const getKerning = (prev, curr) => {
-    if (!prev) return 0;
-    
-    // If we have "1" followed by "1" (like in 11, 1011)
-    // We want them VERY tight because 1 is thin.
-    if (prev === '1' && curr === '1') return -7;
+function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpacing = 0, yNudgeCoefficient) {
+  ctx.textAlign = "center";
+  ctx.letterSpacing = `${letterSpacing}px`;
 
-    // If we have "1" followed by any other number (like 10, 12)
-    // We need space so the 1 doesn't hit the wide number.
-    if (prev === '1') return -10;
-
-    // If we have a wide number followed by "1" (like 01, 21)
-    // We can pull them slightly closer.
-    if (curr === '1') return -4;
-
-    // Default spacing for wide numbers (00, 22, 55, etc)
-    return -5;
-  };
-
-  // 2. Helper to measure total width using our custom rules
-  const measureCustomWidth = (str, fontS) => {
-    ctx.font = `${fontS}px '${fontFace}'`;
-    let width = 0;
-    for (let i = 0; i < str.length; i++) {
-      width += ctx.measureText(str[i]).width;
-      if (i > 0) width += getKerning(str[i-1], str[i]);
-    }
-    return width;
-  };
-
-  // 3. Scale down font if text is too wide
   let fontSize = maxFontSize;
-  let currentWidth = measureCustomWidth(text, fontSize);
-  
-  while (currentWidth > maxWidth && fontSize > 10) {
-    fontSize -= 2;
-    currentWidth = measureCustomWidth(text, fontSize);
-  }
-
-  // 4. Calculate starting X position to simulate "Center" alignment
-  // (Since we are drawing manually, we must draw left-aligned from this start point)
-  let cursorX = x - (currentWidth / 2);
-
-  // 5. Draw loop
-  ctx.textAlign = "left"; // Reset to left for manual placement
-  ctx.letterSpacing = "0px"; // Ensure browser doesn't interfere
   ctx.font = `${fontSize}px '${fontFace}'`;
-  
-  const yNudge = (maxFontSize - fontSize) * yNudgeCoefficient;
-  const drawY = y + yNudge;
+  let textWidth = ctx.measureText(text).width;
 
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    
-    // Apply spacing based on previous character
-    if (i > 0) {
-      cursorX += getKerning(text[i-1], char);
-    }
-
-    ctx.fillText(char, cursorX, drawY);
-    
-    // Move cursor forward by the width of the character we just drew
-    cursorX += ctx.measureText(char).width;
+  while (textWidth > maxWidth && fontSize > 10) {
+    fontSize -= 2;
+    ctx.font = `${fontSize}px '${fontFace}'`;
+    textWidth = ctx.measureText(text).width;
   }
+
+  const yNudge = (maxFontSize - fontSize) * yNudgeCoefficient;
+  ctx.fillText(text, x, y + yNudge);
+  ctx.letterSpacing = "0px";
 }
 
 // --- Helpers ---
@@ -808,43 +758,18 @@ async function drawCard() {
   ctx.textAlign = "center";
   ctx.fillText(nameText, 455, secondaryNameY);
 
-  // --- EDITED: Conditional spacing for the number '1' ---
+  const numberSpacing = -5;
   const numberFont = 'Sv_numbers';
   const costMaxWidth = 95;
   const statMaxWidth = 90;
   const COST_NUDGE = -0.2;
   const STAT_NUDGE = -0.2;
 
-  // Helper: If the number contains "1", use less aggressive spacing (-2)
-  // Otherwise, use the tight spacing (-5)
-  const getSpacing = (val) => (val.toString().includes("1") ? -2 : -5);
-
-  drawScaledNumber(
-    costInput.value, 
-    197, 335, 80, 
-    costMaxWidth, 
-    numberFont, 
-    getSpacing(costInput.value), // Use dynamic spacing
-    COST_NUDGE
-  );
+  drawScaledNumber(costInput.value, 197, 335, 80, costMaxWidth, numberFont, numberSpacing, COST_NUDGE);
 
   if (typeSelect.value === "Follower") {
-    drawScaledNumber(
-      attackInput.value, 
-      201, 922, 82, 
-      statMaxWidth, 
-      numberFont, 
-      getSpacing(attackInput.value), // Use dynamic spacing
-      STAT_NUDGE
-    );
-    drawScaledNumber(
-      defenseInput.value, 
-      642, 917, 82, 
-      statMaxWidth, 
-      numberFont, 
-      getSpacing(defenseInput.value), // Use dynamic spacing
-      STAT_NUDGE
-    );
+    drawScaledNumber(attackInput.value, 201, 922, 82, statMaxWidth, numberFont, numberSpacing, STAT_NUDGE);
+    drawScaledNumber(defenseInput.value, 642, 917, 82, statMaxWidth, numberFont, numberSpacing, STAT_NUDGE);
   }
   ctx.letterSpacing = "0px";
 
@@ -1362,10 +1287,6 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
-
-
-
-
 
 
 
