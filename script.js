@@ -105,7 +105,7 @@ function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, unusedLet
 
     // If we have "1" followed by any other number (like 10, 12)
     // We need space so the 1 doesn't hit the wide number.
-    if (prev === '1') return -4;
+    if (prev === '1') return -10;
 
     // If we have a wide number followed by "1" (like 01, 21)
     // We can pull them slightly closer.
@@ -1362,6 +1362,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
