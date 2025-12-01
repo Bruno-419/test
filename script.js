@@ -758,18 +758,43 @@ async function drawCard() {
   ctx.textAlign = "center";
   ctx.fillText(nameText, 455, secondaryNameY);
 
-  const numberSpacing = -5;
+  // --- EDITED: Conditional spacing for the number '1' ---
   const numberFont = 'Sv_numbers';
   const costMaxWidth = 95;
   const statMaxWidth = 90;
   const COST_NUDGE = -0.2;
   const STAT_NUDGE = -0.2;
 
-  drawScaledNumber(costInput.value, 197, 335, 80, costMaxWidth, numberFont, numberSpacing, COST_NUDGE);
+  // Helper: If the number contains "1", use less aggressive spacing (-2)
+  // Otherwise, use the tight spacing (-5)
+  const getSpacing = (val) => (val.toString().includes("1") ? -2 : -5);
+
+  drawScaledNumber(
+    costInput.value, 
+    197, 335, 80, 
+    costMaxWidth, 
+    numberFont, 
+    getSpacing(costInput.value), // Use dynamic spacing
+    COST_NUDGE
+  );
 
   if (typeSelect.value === "Follower") {
-    drawScaledNumber(attackInput.value, 201, 922, 82, statMaxWidth, numberFont, numberSpacing, STAT_NUDGE);
-    drawScaledNumber(defenseInput.value, 642, 917, 82, statMaxWidth, numberFont, numberSpacing, STAT_NUDGE);
+    drawScaledNumber(
+      attackInput.value, 
+      201, 922, 82, 
+      statMaxWidth, 
+      numberFont, 
+      getSpacing(attackInput.value), // Use dynamic spacing
+      STAT_NUDGE
+    );
+    drawScaledNumber(
+      defenseInput.value, 
+      642, 917, 82, 
+      statMaxWidth, 
+      numberFont, 
+      getSpacing(defenseInput.value), // Use dynamic spacing
+      STAT_NUDGE
+    );
   }
   ctx.letterSpacing = "0px";
 
@@ -1287,6 +1312,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
