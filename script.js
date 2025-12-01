@@ -767,7 +767,7 @@ async function drawCard() {
 
   // Helper: If the number contains "1", use less aggressive spacing (-2)
   // Otherwise, use the tight spacing (-5)
-  const getSpacing = (val) => (val.toString().includes("1") ? -2 : -5);
+  const getSpacing = (val) => (val.toString().includes("1") ? 2 : -5);
 
   drawScaledNumber(
     costInput.value, 
@@ -1312,6 +1312,7 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
 
 
