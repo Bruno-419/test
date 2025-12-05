@@ -1289,6 +1289,26 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
 });
 
 
+// --- Navigation Carousel Logic ---
+function navigateTo(page) {
+  const track = document.getElementById("app-carousel");
+  
+  // 0% = Left Page (Balance)
+  // -33.3333% = Center Page (Home)
+  // -66.6666% = Right Page (Workshop)
+  
+  if (page === 'balance') {
+    track.style.transform = "translateX(0%)";
+  } else if (page === 'home') {
+    track.style.transform = "translateX(-33.3333%)";
+  } else if (page === 'workshop') {
+    track.style.transform = "translateX(-66.6666%)";
+  }
+  
+  // Optional: Scroll to top of viewport when switching
+  const viewport = document.getElementById("app-viewport");
+  if (viewport) viewport.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 
 
