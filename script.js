@@ -112,6 +112,48 @@ function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpa
   ctx.letterSpacing = "0px";
 }
 
+
+// =========================================
+// --- WORKSHOP & STORAGE HELPERS ---
+// =========================================
+
+const STORAGE_KEY = 'sv_workshop_cards';
+
+// Helper: Get saved cards from local storage
+function getSavedCards() {
+  const data = localStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+// Helper: Save the array of cards to local storage
+function saveCardsToStorage(cards) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+    } catch (e) {
+        console.error("Storage failed. LocalStorage might be full.", e);
+        alert("Failed to save to Workshop. Your browser storage might be full.");
+    }
+}
+
+// Helper: Format text for the details panel (simple bolding of keywords)
+// We reuse the HIGHLIGHT_REGEX regex defined earlier in the script
+function formatDetailsText(text) {
+  if (!text) return "";
+  // Replace keywords with styled spans
+  let formatted = text.replace(HIGHLIGHT_REGEX, '<span class="details-keyword">$1</span>');
+  // Replace the divider markers with horizontal rules
+  formatted = formatted.replace(/----------/g, '<hr class="details-divider" style="margin: 10px 0; opacity: 0.2;">');
+  // Handle custom colors <c>...</c>
+  formatted = formatted.replace(/<c>(.*?)<\/c>/g, '<span style="color: #f3d87d;">$1</span>');
+  // Handle Markdown bold **...**
+  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+   // Handle Markdown italic _..._
+  formatted = formatted.replace(/_(.*?)_/g, '<i>$1</i>');
+  
+  return formatted;
+}
+
+
 // --- Helpers ---
 function loadImage(src) {
   return new Promise((res, rej) => {
@@ -1208,37 +1250,69 @@ document.fonts.ready.then(() => {
 
 // --- Button Event Listeners (Updated with Font Loading) ---
 
+// --- Updated Download Button Listener ---
 document.getElementById("downloadBtn").addEventListener("click", async () => { 
   const btn = document.getElementById("downloadBtn");
   const originalText = btn.textContent;
-  
-  // Visual feedback that we are waiting for fonts/assets
-  btn.textContent = "Loading assets...";
+  btn.textContent = "Processing...";
   btn.disabled = true;
 
   try {
-    // === FIX: Force wait for fonts to load before drawing ===
-    // This ensures the Canvas has access to the .ttf files
     await document.fonts.ready;
+    // Ensure fonts used in canvas are loaded
     await Promise.all([
         document.fonts.load("60px 'Memento'"),
         document.fonts.load("60px 'Sv_numbers'"),
         document.fonts.load("30px 'NotoSans'")
     ]);
 
-    btn.textContent = "Generating...";
-    
+    // 1. Draw the card to the canvas
     await drawCard(); 
-    
+
     const canvas = document.getElementById("previewCanvas");
+    const dataUrl = canvas.toDataURL("image/png", 0.8); // slightly compress for storage
+
+    // 2. Gather all card data for the workshop
+    const newCardData = {
+        id: Date.now(), // Unique ID used for finding the card later
+        image: dataUrl,
+        name: nameInput.value.trim() || "Unnamed Card",
+        trait: traitInput.value.trim() || "-",
+        class: classSelect.value,
+        type: typeSelect.value,
+        rarity: raritySelect.value,
+        cost: costInput.value,
+        attack: attackInput.value,
+        defense: defenseInput.value,
+        // Store original raw text values
+        textRaw: {
+            card: textInputs.card.value,
+            evolve: textInputs.evolve.value,
+            superEvolve: textInputs.superEvolve.value,
+            crest: textInputs.crest.value,
+            faith: textInputs.faith.value
+        },
+        illustrator: document.getElementById("illustratorName").value.trim()
+    };
+
+    // 3. Save to LocalStorage
+    const currentCards = getSavedCards();
+    // Add new card to the *beginning* of the array so newest shows first
+    currentCards.unshift(newCardData); 
+    saveCardsToStorage(currentCards);
+
+    // 4. Re-render workshop grid immediately to show the new card
+    renderWorkshopGrid();
+
+    // 5. Trigger actual download
     const link = document.createElement("a");
-    link.download = `${(nameInput.value.trim() || "card")}.png`;
-    link.href = canvas.toDataURL("image/png", 1.0); 
+    link.download = `${newCardData.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
+    link.href = dataUrl; 
     link.click();
     
   } catch (err) {
-    console.error("Download failed:", err);
-    alert("Error: Could not save image. Try again.");
+    console.error("Download/Save failed:", err);
+    alert("Error: Could not process card. See console.");
   } finally {
     btn.textContent = originalText;
     btn.disabled = false;
@@ -1313,6 +1387,136 @@ function navigateTo(page) {
 
 
 
+// =========================================
+// --- WORKSHOP UI LOGIC ---
+// =========================================
+
+const workshopGrid = document.getElementById('workshopGrid');
+const emptyMsg = document.getElementById('emptyWorkshopMsg');
+const detailsPlaceholder = document.getElementById('detailsPlaceholder');
+const detailsContent = document.getElementById('detailsContent');
+
+// Elements in the details panel to populate
+const detailElements = {
+    name: document.getElementById('detailName'),
+    trait: document.getElementById('detailTraitValue'),
+    class: document.getElementById('detailClassValue'),
+    image: document.getElementById('detailMainImage'),
+    cost: document.getElementById('detailCost'),
+    statsRow: document.getElementById('detailStatsRow'),
+    atk: document.getElementById('detailAtk'),
+    def: document.getElementById('detailDef'),
+    textBlock: document.getElementById('detailCardTextBlock'),
+    evolveSection: document.getElementById('detailEvolveSection'),
+    evolveText: document.getElementById('detailEvolveTextBlock'),
+    superEvolveSection: document.getElementById('detailSuperEvolveSection'),
+    superEvolveText: document.getElementById('detailSuperEvolveTextBlock')
+};
+
+
+// Function to fetch data and build the thumbnail grid
+function renderWorkshopGrid() {
+  const cards = getSavedCards();
+  
+  // Clear existing thumbnails (keep the empty message element)
+  const existingThumbnails = workshopGrid.querySelectorAll('.grid-thumbnail');
+  existingThumbnails.forEach(el => el.remove());
+
+  if (cards.length === 0) {
+    emptyMsg.style.display = 'block';
+    resetDetailsPanel();
+    return;
+  }
+
+  emptyMsg.style.display = 'none';
+
+  cards.forEach(cardObj => {
+      const img = document.createElement('img');
+      img.src = cardObj.image;
+      img.alt = cardObj.name;
+      img.className = 'grid-thumbnail';
+      img.dataset.id = cardObj.id; // Store ID for click handler
+
+      img.addEventListener('click', () => {
+          // Remove active class from others
+          document.querySelectorAll('.grid-thumbnail').forEach(t => t.classList.remove('active'));
+          // Add active class to clicked
+          img.classList.add('active');
+          // Show details
+          populate WorkshopDetails(cardObj);
+      });
+
+      workshopGrid.appendChild(img);
+  });
+}
+
+// Function to populate the right-hand details panel
+function populateWorkshopDetails(card) {
+    // Hide placeholder, show content
+    detailsPlaceholder.style.display = 'none';
+    detailsContent.style.display = 'block';
+
+    // Basic Info
+    detailElements.name.textContent = card.name;
+    detailElements.trait.textContent = card.trait;
+    detailElements.class.textContent = card.class;
+    detailElements.image.src = card.image;
+    detailElements.cost.textContent = card.cost;
+
+    // Stats (Only show Atk/Def for followers)
+    if (card.type.toLowerCase() === 'follower') {
+        detailElements.statsRow.style.display = 'flex';
+        detailElements.atk.textContent = card.attack;
+        detailElements.def.textContent = card.defense;
+    } else {
+        detailElements.statsRow.style.display = 'none';
+    }
+
+    // Main Text
+    detailElements.textBlock.innerHTML = formatDetailsText(card.textRaw.card);
+    
+    // Evolve Text (Only show if present and is follower)
+    if (card.type.toLowerCase() === 'follower' && card.textRaw.evolve.trim()) {
+        detailElements.evolveSection.style.display = 'block';
+        detailElements.evolveText.innerHTML = formatDetailsText(card.textRaw.evolve);
+    } else {
+        detailElements.evolveSection.style.display = 'none';
+    }
+
+    // Super-Evolve Text
+    if (card.type.toLowerCase() === 'follower' && card.textRaw.superEvolve.trim()) {
+        detailElements.superEvolveSection.style.display = 'block';
+        detailElements.superEvolveText.innerHTML = formatDetailsText(card.textRaw.superEvolve);
+    } else {
+        detailElements.superEvolveSection.style.display = 'none';
+    }
+    
+    // Note: Crest/Faith text is currently not shown in the reference image UI format, 
+    // so it is omitted here to keep the UI clean, although the data is saved.
+}
+
+// Reset details panel to placeholder state
+function resetDetailsPanel() {
+    detailsPlaceholder.style.display = 'block';
+    detailsContent.style.display = 'none';
+     document.querySelectorAll('.grid-thumbnail').forEach(t => t.classList.remove('active'));
+}
+
+
+// Event Listener for Clearing Workshop
+document.getElementById('clearWorkshopBtn').addEventListener('click', () => {
+    if (confirm("Are you sure you want to delete all saved cards? This cannot be undone.")) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderWorkshopGrid();
+    }
+});
+
+
+// Initial Render on Page Load
+// Wait for fonts just in case, though less critical here than drawing
+document.fonts.ready.then(() => {
+    renderWorkshopGrid();
+});
 
 
 
