@@ -272,15 +272,65 @@
       </section>
 
       <section class="app-page" id="page-workshop">
-        <div class="page-content">
-          <header>
+        <div class="page-content" style="max-width: 1600px;"> <header>
             <h1>Workshop</h1>
-            <button class="nav-btn nav-left" onclick="navigateTo('home')">&larr; Back to Generator</button>
+            <div class="workshop-nav-container">
+                 <button class="nav-btn nav-left" onclick="navigateTo('home')">&larr; Back to Generator</button>
+                 <button id="clearWorkshopBtn" class="nav-btn" style="background: #8B0000;">Clear Workshop</button>
+            </div>
           </header>
-          <div class="placeholder-content">
-            <p>Workshop tools coming soon...</p>
-          </div>
-        </div>
+          
+          <div class="workshop-container">
+            
+            <div class="workshop-grid-wrapper">
+                <div id="workshopGrid" class="workshop-grid">
+                    <p id="emptyWorkshopMsg" class="muted" style="grid-column: 1 / -1; text-align: center;">No cards saved yet. Download a card to see it here.</p>
+                </div>
+            </div>
+
+            <div class="workshop-details-panel" id="workshopDetailsPanel">
+                <div id="detailsPlaceholder" class="muted">Select a card to view details.</div>
+                
+                <div id="detailsContent" style="display: none;">
+                    <div class="details-header-info">
+                        <span id="detailTraitLabel">Trait: <span id="detailTraitValue">-</span></span>
+                        <span id="detailClassLabel">Class: <span id="detailClassValue">Neutral</span></span>
+                    </div>
+
+                    <div class="details-main-section">
+                        <div class="details-image-container">
+                            <div id="detailCost" class="stat-badge cost-badge">0</div>
+                            <img id="detailMainImage" src="" alt="Card Image">
+                            <div id="detailStatsRow" class="stats-row-badges">
+                                <div id="detailAtk" class="stat-badge atk-badge">0</div>
+                                <div id="detailDef" class="stat-badge def-badge">0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="details-text-info">
+                             <h2 id="detailName">Card Name</h2>
+                             <hr class="details-divider">
+                             
+                             <div class="details-text-block" id="detailCardTextBlock">
+                                 </div>
+
+                             <div id="detailEvolveSection" style="display:none;">
+                                 <hr class="details-divider">
+                                 <h3 class="evolve-header">Evolve</h3>
+                                 <div class="details-text-block" id="detailEvolveTextBlock"></div>
+                             </div>
+
+                             <div id="detailSuperEvolveSection" style="display:none;">
+                                 <hr class="details-divider">
+                                 <h3 class="super-evolve-header">Super-Evolve</h3>
+                                 <div class="details-text-block" id="detailSuperEvolveTextBlock"></div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+          </div> </div>
       </section>
 
     </div>
@@ -331,6 +381,7 @@
   </script>
 </body>
 </html>
+
 
 
 
