@@ -39,213 +39,251 @@
   </style>
 </head>
 <body>
-  <header>
-    <h1>Shadowverse: Worlds Beyond Card Generator</h1>
-    <p class="subheader">
-      V1.6.2 — May not work on all browsers, probably works in Chrome/Firefox.
-      Enable JavaScript or this website will explode!
-    </p>
+  <div id="app-viewport">
+    
+    <div id="app-carousel">
 
-    <p class="subheader">
-      This site is not official or in affiliation with Cygames.
-    </p>
+      <section class="app-page" id="page-balance">
+        <div class="page-content">
+          <header>
+            <h1>Balance Adjustments</h1>
+            <button class="nav-btn nav-right" onclick="navigateTo('home')">Back to Generator &rarr;</button>
+          </header>
+          <div class="placeholder-content">
+            <p>Balance adjustment tools coming soon...</p>
+          </div>
+        </div>
+      </section>
 
-    <div class="top-buttons">
-      <label class="upload-btn">
-        Upload Art
-        <input type="file" id="artUpload" accept="image/*">
-      </label>
-      <button id="previewBtn" type="button">Preview</button>
-      <button id="downloadBtn" type="button">Download</button>
+      <section class="app-page" id="page-home">
+        <button class="nav-btn nav-top-left" onclick="navigateTo('balance')">&larr; Balance Adjustments</button>
+        <button class="nav-btn nav-top-right" onclick="navigateTo('workshop')">Workshop &rarr;</button>
+
+        <div class="page-content">
+          <header>
+            <h1>Shadowverse: Worlds Beyond Card Generator</h1>
+            <p class="subheader">
+              V1.6.2 — May not work on all browsers, probably works in Chrome/Firefox.
+              Enable JavaScript or this website will explode!
+            </p>
+
+            <p class="subheader">
+              This site is not official or in affiliation with Cygames.
+            </p>
+
+            <div class="top-buttons">
+              <label class="upload-btn">
+                Upload Art
+                <input type="file" id="artUpload" accept="image/*">
+              </label>
+              <button id="previewBtn" type="button">Preview</button>
+              <button id="downloadBtn" type="button">Download</button>
+            </div>
+          </header>
+
+          <div class="app-grid">
+            <aside class="preview-column" aria-label="Art previews">
+              <div class="preview-block">
+                <div class="preview-title" id="mainArtPreviewTitle">Card Art</div>
+                <canvas id="mainPreviewCanvas" width="450" height="560" class="preview-canvas rect"></canvas>
+                <input id="mainZoomSlider" class="zoom-slider" type="range" min="1" max="5" value="1">
+              </div>
+            </aside>
+
+            <main class="layout">
+              <section class="left-panel">
+                <label class="field">
+                  <span class="field-label">Name</span>
+                  <input id="cardName" type="text">
+                </label>
+
+                <label class="field">
+                  <span class="field-label">Trait</span>
+                  <input id="cardTrait" type="text">
+                </label>
+
+                <label class="field">
+                  <span class="field-label">Class</span>
+                  <select id="cardClass">
+                    <option>Neutral</option>
+                    <option>Forestcraft</option>
+                    <option>Swordcraft</option>
+                    <option>Runecraft</option>
+                    <option>Dragoncraft</option>
+                    <option>Abysscraft</option>
+                    <option>Havencraft</option>
+                    <option>Portalcraft</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span class="field-label">Type</span>
+                  <select id="cardType">
+                    <option>Follower</option>
+                    <option>Spell</option>
+                    <option>Amulet</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span class="field-label">Rarity</span>
+                  <select id="cardRarity">
+                    <option>Signature</option>
+                    <option selected>Legendary</option>
+                    <option>Gold</option>
+                    <option>Silver</option>
+                    <option>Bronze</option>
+                  </select>
+                </label>
+
+                <div class="stat-row">
+                  <label class="field small-field">
+                    <span class="field-label">Cost</span>
+                    <input type="number" id="costValue" min="0" value="1">
+                  </label>
+
+                  <div id="statExtraFields" style="visibility: visible;">
+                    <label class="field small-field">
+                      <span class="field-label">Attack</span>
+                      <input type="number" id="attackValue" min="0" value="1">
+                    </label>
+                    <label class="field small-field">
+                      <span class="field-label">Defense</span>
+                      <input type="number" id="defenseValue" min="0" value="1">
+                    </label>
+                  </div>
+                </div>
+
+                <div class="checkbox-group">
+                  <label class="checkbox-inline"><input type="checkbox" id="tokenCheckbox"> <span>Token card</span></label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" id="wordCountCheckbox"> 
+                    <span>Show word count</span>
+                    <span id="liveWordCounter" style="display: none; margin-left: 8px; color: var(--muted); font-size: 12px;">(0 words)</span>
+                  </label>
+                  <label class="checkbox-inline"><input type="checkbox" id="autoDividerCheckbox" checked> <span>Auto-dividers</span></label>
+                  <label class="checkbox-inline"><input type="checkbox" id="saveCardOnlyCheckbox"> <span>Save card image only</span></label>
+                </div>
+
+                <label class="field">
+                  <span class="field-label">Illustrator</span>
+                  <input id="illustratorName" type="text">
+                </label>
+              </section>
+
+              <section class="right-panel">
+                <div class="field">
+                  <div class="text-toolbar">
+                    <label class="field-label" for="cardText">Card Text</label>
+                    <button type="button" data-format="bold">B</button>
+                    <button type="button" data-format="italic">I</button>
+                    <button type="button" data-format="color">Gold</button>
+                    <button type="button" data-format="all">All</button>
+                  </div>
+                  <textarea id="cardText"></textarea>
+                </div>
+
+                <div class="field" id="evolveTextField">
+                  <div class="text-toolbar">
+                    <label class="field-label" for="evolveText">Evolve Text</label>
+                    <button type="button" data-format="bold">B</button>
+                    <button type="button" data-format="italic">I</button>
+                    <button type="button" data-format="color">Gold</button>
+                    <button type="button" data-format="all">All</button>
+                  </div>
+                  <textarea id="evolveText"></textarea>
+                </div>
+
+                <div class="field" id="superEvolveTextField">
+                  <div class="text-toolbar">
+                    <label class="field-label" for="superEvolveText">Super-Evolve Text</label>
+                    <button type="button" data-format="bold">B</button>
+                    <button type="button" data-format="italic">I</button>
+                    <button type="button" data-format="color">Gold</button>
+                    <button type="button" data-format="all">All</button>
+                  </div>
+                  <textarea id="superEvolveText"></textarea>
+                </div>
+
+                <div class="crest-section adorned-crest">
+                  <div class="crest-inner">
+                    <label class="upload-btn small" id="crestUploadBtn" style="display:none;">
+                      Upload Crest Art
+                      <input type="file" id="crestArtUpload" accept="image/*">
+                    </label>
+
+                    <div class="crest-art-container">
+                      <canvas id="crestPreviewCanvas" width="280" height="285" class="preview-canvas circle"></canvas>
+                      <input id="crestZoomSlider" class="zoom-slider" type="range" min="1" max="8" value="1">
+                    </div>
+                  </div>
+
+                  <label class="field">
+                    <span class="field-label">Crest Name</span>
+                    <input id="crestName" type="text">
+                  </label>
+
+                  <div class="field">
+                    <div class="text-toolbar">
+                      <label class="field-label" for="crestText">Crest Text</label>
+                      <button type="button" data-format="bold">B</button>
+                      <button type="button" data-format="italic">I</button>
+                      <button type="button" data-format="color">Gold</button>
+                      <button type="button" data-format="all">All</button>
+                    </div>
+                    <textarea id="crestText"></textarea>
+                  </div>
+                </div>
+
+                <div class="faith-section adorned-faith">
+                  <div class="faith-inner">
+                    <label class="upload-btn small" id="faithUploadBtn" style="display:none;">
+                      Upload Faith Art
+                      <input type="file" id="faithArtUpload" accept="image/*">
+                    </label>
+
+                    <div class="faith-art-container">
+                      <canvas id="faithPreviewCanvas" width="280" height="285" class="preview-canvas circle"></canvas>
+                      <input id="faithZoomSlider" class="zoom-slider" type="range" min="1" max="8" value="1">
+                    </div>
+                  </div>
+
+                  <label class="field">
+                    <span class="field-label">Faith Name</span>
+                    <input id="faithName" type="text">
+                  </label>
+
+                  <div class="field">
+                    <div class="text-toolbar">
+                      <label class="field-label" for="faithText">Faith Text</label>
+                      <button type="button" data-format="bold">B</button>
+                      <button type="button" data-format="italic">I</button>
+                      <button type="button" data-format="color">Gold</button>
+                      <button type="button" data-format="all">All</button>
+                    </div>
+                    <textarea id="faithText"></textarea>
+                  </div>
+                </div>
+
+              </section>
+            </main>
+          </div>
+        </div>
+      </section>
+
+      <section class="app-page" id="page-workshop">
+        <div class="page-content">
+          <header>
+            <h1>Workshop</h1>
+            <button class="nav-btn nav-left" onclick="navigateTo('home')">&larr; Back to Generator</button>
+          </header>
+          <div class="placeholder-content">
+            <p>Workshop tools coming soon...</p>
+          </div>
+        </div>
+      </section>
+
     </div>
-  </header>
-
-  <div class="app-grid">
-    <aside class="preview-column" aria-label="Art previews">
-      <div class="preview-block">
-        <div class="preview-title" id="mainArtPreviewTitle">Card Art</div>
-        <canvas id="mainPreviewCanvas" width="450" height="560" class="preview-canvas rect"></canvas>
-        <input id="mainZoomSlider" class="zoom-slider" type="range" min="1" max="5" value="1">
-      </div>
-    </aside>
-
-    <main class="layout">
-      <section class="left-panel">
-        <label class="field">
-          <span class="field-label">Name</span>
-          <input id="cardName" type="text">
-        </label>
-
-        <label class="field">
-          <span class="field-label">Trait</span>
-          <input id="cardTrait" type="text">
-        </label>
-
-        <label class="field">
-          <span class="field-label">Class</span>
-          <select id="cardClass">
-            <option>Neutral</option>
-            <option>Forestcraft</option>
-            <option>Swordcraft</option>
-            <option>Runecraft</option>
-            <option>Dragoncraft</option>
-            <option>Abysscraft</option>
-            <option>Havencraft</option>
-            <option>Portalcraft</option>
-          </select>
-        </label>
-
-        <label class="field">
-          <span class="field-label">Type</span>
-          <select id="cardType">
-            <option>Follower</option>
-            <option>Spell</option>
-            <option>Amulet</option>
-          </select>
-        </label>
-
-        <label class="field">
-          <span class="field-label">Rarity</span>
-          <select id="cardRarity">
-            <option>Signature</option>
-            <option selected>Legendary</option>
-            <option>Gold</option>
-            <option>Silver</option>
-            <option>Bronze</option>
-          </select>
-        </label>
-
-        <div class="stat-row">
-          <label class="field small-field">
-            <span class="field-label">Cost</span>
-            <input type="number" id="costValue" min="0" value="1">
-          </label>
-
-          <div id="statExtraFields" style="visibility: visible;">
-            <label class="field small-field">
-              <span class="field-label">Attack</span>
-              <input type="number" id="attackValue" min="0" value="1">
-            </label>
-            <label class="field small-field">
-              <span class="field-label">Defense</span>
-              <input type="number" id="defenseValue" min="0" value="1">
-            </label>
-          </div>
-        </div>
-
-        <div class="checkbox-group">
-          <label class="checkbox-inline"><input type="checkbox" id="tokenCheckbox"> <span>Token card</span></label>
-          <label class="checkbox-inline">
-            <input type="checkbox" id="wordCountCheckbox"> 
-            <span>Show word count</span>
-            <span id="liveWordCounter" style="display: none; margin-left: 8px; color: var(--muted); font-size: 12px;">(0 words)</span>
-          </label>
-          <label class="checkbox-inline"><input type="checkbox" id="autoDividerCheckbox" checked> <span>Auto-dividers</span></label>
-          <label class="checkbox-inline"><input type="checkbox" id="saveCardOnlyCheckbox"> <span>Save card image only</span></label>
-        </div>
-
-        <label class="field">
-          <span class="field-label">Illustrator</span>
-          <input id="illustratorName" type="text">
-        </label>
-      </section>
-
-      <section class="right-panel">
-        <div class="field">
-          <div class="text-toolbar">
-            <label class="field-label" for="cardText">Card Text</label>
-            <button type="button" data-format="bold">B</button>
-            <button type="button" data-format="italic">I</button>
-            <button type="button" data-format="color">Gold</button>
-            <button type="button" data-format="all">All</button>
-          </div>
-          <textarea id="cardText"></textarea>
-        </div>
-
-        <div class="field" id="evolveTextField">
-          <div class="text-toolbar">
-            <label class="field-label" for="evolveText">Evolve Text</label>
-            <button type="button" data-format="bold">B</button>
-            <button type="button" data-format="italic">I</button>
-            <button type="button" data-format="color">Gold</button>
-            <button type="button" data-format="all">All</button>
-          </div>
-          <textarea id="evolveText"></textarea>
-        </div>
-
-        <div class="field" id="superEvolveTextField">
-          <div class="text-toolbar">
-            <label class="field-label" for="superEvolveText">Super-Evolve Text</label>
-            <button type="button" data-format="bold">B</button>
-            <button type="button" data-format="italic">I</button>
-            <button type="button" data-format="color">Gold</button>
-            <button type="button" data-format="all">All</button>
-          </div>
-          <textarea id="superEvolveText"></textarea>
-        </div>
-
-        <div class="crest-section adorned-crest">
-          <div class="crest-inner">
-            <label class="upload-btn small" id="crestUploadBtn" style="display:none;">
-              Upload Crest Art
-              <input type="file" id="crestArtUpload" accept="image/*">
-            </label>
-
-            <div class="crest-art-container">
-              <canvas id="crestPreviewCanvas" width="280" height="285" class="preview-canvas circle"></canvas>
-              <input id="crestZoomSlider" class="zoom-slider" type="range" min="1" max="8" value="1">
-            </div>
-          </div>
-
-          <label class="field">
-            <span class="field-label">Crest Name</span>
-            <input id="crestName" type="text">
-          </label>
-
-          <div class="field">
-            <div class="text-toolbar">
-              <label class="field-label" for="crestText">Crest Text</label>
-              <button type="button" data-format="bold">B</button>
-              <button type="button" data-format="italic">I</button>
-              <button type="button" data-format="color">Gold</button>
-              <button type="button" data-format="all">All</button>
-            </div>
-            <textarea id="crestText"></textarea>
-          </div>
-        </div>
-
-        <div class="faith-section adorned-faith">
-          <div class="faith-inner">
-            <label class="upload-btn small" id="faithUploadBtn" style="display:none;">
-              Upload Faith Art
-              <input type="file" id="faithArtUpload" accept="image/*">
-            </label>
-
-            <div class="faith-art-container">
-              <canvas id="faithPreviewCanvas" width="280" height="285" class="preview-canvas circle"></canvas>
-              <input id="faithZoomSlider" class="zoom-slider" type="range" min="1" max="8" value="1">
-            </div>
-          </div>
-
-          <label class="field">
-            <span class="field-label">Faith Name</span>
-            <input id="faithName" type="text">
-          </label>
-
-          <div class="field">
-            <div class="text-toolbar">
-              <label class="field-label" for="faithText">Faith Text</label>
-              <button type="button" data-format="bold">B</button>
-              <button type="button" data-format="italic">I</button>
-              <button type="button" data-format="color">Gold</button>
-              <button type="button" data-format="all">All</button>
-            </div>
-            <textarea id="faithText"></textarea>
-          </div>
-        </div>
-
-      </section>
-    </main>
   </div>
 
   <section class="canvas-container" style="display: none;">
@@ -253,7 +291,6 @@
   </section>
 
   <script src="script.js"></script>
-
   <script>
     const cardTypeSelect = document.getElementById('cardType');
     const cardRaritySelect = document.getElementById('cardRarity');
@@ -265,16 +302,10 @@
       const typeValue = cardTypeSelect.value.toLowerCase();
       const isFollower = (typeValue === 'follower');
       const isAmulet = (typeValue === 'amulet');
-
-      // 1. Toggle Attack/Defense fields
       statExtraFields.style.visibility = isFollower ? 'visible' : 'hidden';
-
-      // 2. Toggle Evolve/Super-Evolve fields
       evolveTextField.style.display = isFollower ? 'block' : 'none';
       superEvolveTextField.style.display = isFollower ? 'block' : 'none';
 
-      // 3. Handle Signature Rarity Logic
-      // Find the "Signature" option within the rarity dropdown
       let signatureOption = null;
       for (const option of cardRaritySelect.options) {
         if (option.value === "Signature") {
@@ -285,29 +316,22 @@
 
       if (signatureOption) {
         if (isAmulet) {
-          // If Amulet, disable Signature
           signatureOption.disabled = true;
-          
-          // If Signature was currently selected, switch to something safe (e.g., Legendary)
           if (cardRaritySelect.value === "Signature") {
             cardRaritySelect.value = "Legendary";
           }
         } else {
-          // If Follower or Spell, enable Signature
           signatureOption.disabled = false;
         }
       }
     }
 
-    // Run on page load
     toggleFieldVisibility();
-    
-    // Run on any change to the dropdown
     cardTypeSelect.addEventListener('change', toggleFieldVisibility);
   </script>
-  
 </body>
 </html>
+
 
 
 
