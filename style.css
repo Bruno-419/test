@@ -956,3 +956,246 @@ body {
     text-align: center;
   }
 }
+
+
+/* --------------------------
+   Workshop Page Styles
+   -------------------------- */
+
+.workshop-nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Main container for the two-column layout */
+.workshop-container {
+    display: grid;
+    /* Left column auto-fills thumbnails, Right column fixed width like reference */
+    grid-template-columns: 1fr 650px; 
+    gap: 30px;
+    align-items: start;
+    height: calc(100vh - 180px); /* Fit within viewport */
+}
+
+/* --- Left Column: Grid --- */
+.workshop-grid-wrapper {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+    /* Custom scrollbar styling for aesthetics */
+    scrollbar-width: thin;
+    scrollbar-color: #444 #1a1a1a;
+}
+
+.workshop-grid {
+    display: grid;
+    /* Adaptive columns based on thumbnail size */
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+.grid-thumbnail {
+    width: 100%;
+    aspect-ratio: 450 / 585; /* Approximate card aspect ratio */
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    background: #0b0b0b;
+}
+
+.grid-thumbnail:hover {
+    transform: scale(1.05);
+    border-color: #aaa;
+}
+
+.grid-thumbnail.active {
+    border-color: #2aa48a; /* Highlight selected card */
+    box-shadow: 0 0 15px rgba(42, 164, 138, 0.4);
+}
+
+
+/* --- Right Column: Details Panel (Mimicking Reference) --- */
+.workshop-details-panel {
+    background: #131313; /* Darker background like reference */
+    border: 1px solid #2f2f2f;
+    border-radius: 4px; /* Sharper corners */
+    padding: 25px;
+    height: 100%;
+    overflow-y: auto;
+    color: #e0e0e0;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+#detailsPlaceholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+}
+
+/* Header Info (Trait / Class) */
+.details-header-info {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 25px;
+    font-family: 'NotoSans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.details-header-info span span {
+    color: #fff;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+/* Main Section Layout */
+.details-main-section {
+    display: flex;
+    gap: 25px;
+}
+
+/* Image Container & Stat Badges */
+.details-image-container {
+    position: relative;
+    flex: 0 0 280px; /* Fixed width for the card image block */
+}
+
+#detailMainImage {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+/* Stat Badges (Cost, Atk, Def) */
+.stat-badge {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    /* Using the Sv_numbers font for authentic look */
+    font-family: 'Sv_numbers';
+    font-size: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    z-index: 5;
+    /* Background images for badges (using CSS gradients to simulate gems) */
+}
+
+.cost-badge {
+    top: 10px;
+    left: 10px;
+    background: radial-gradient(circle at 30% 30%, #4cd964, #228b22);
+    border: 2px solid #1a5c1a;
+    border-radius: 50%;
+}
+
+.stats-row-badges {
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 15px;
+}
+
+.atk-badge {
+    background: radial-gradient(circle at 30% 30%, #3498db, #1f618d);
+    border: 2px solid #154360;
+    border-top-left-radius: 4px;
+    border-bottom-right-radius: 12px;
+}
+
+.def-badge {
+    background: radial-gradient(circle at 30% 30%, #e74c3c, #922b21);
+    border: 2px solid #641e16;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 12px;
+}
+
+
+/* Text Info Section */
+.details-text-info {
+    flex: 1;
+    font-family: 'NotoSans', sans-serif;
+}
+
+#detailName {
+    font-family: 'Memento', serif;
+    font-size: 32px;
+    color: #f3d87d; /* Gold color */
+    margin: 0 0 15px 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.details-divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.3), rgba(255,255,255,0));
+    margin: 20px 0;
+}
+
+.details-text-block {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #d0d0d0;
+    white-space: pre-wrap; /* Preserve line breaks */
+}
+
+/* Headers for Evolve/Super-Evolve blocks */
+.evolve-header, .super-evolve-header {
+    font-family: 'Memento', serif;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+.evolve-header { color: #d6a629; }
+.super-evolve-header { color: #8229d6; }
+
+/* Keyword highlighting in details panel */
+.details-keyword {
+    color: #f3d87d;
+    font-weight: bold;
+}
+
+/* Responsive adjustments for Workshop */
+@media (max-width: 1200px) {
+    .workshop-container {
+        grid-template-columns: 1fr; /* Stack columns on smaller screens */
+        height: auto;
+    }
+    .workshop-grid-wrapper,
+    .workshop-details-panel {
+        height: 600px; /* Fixed height when stacked */
+    }
+    .details-main-section {
+        flex-direction: column;
+        align-items: center;
+    }
+    .details-text-info {
+        text-align: center;
+    }
+}
+@media (max-width: 640px) {
+    .workshop-nav-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .workshop-nav-container button {
+        width: 100%;
+    }
+}
