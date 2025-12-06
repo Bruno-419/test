@@ -123,7 +123,6 @@ function loadImage(src) {
 }
 
 // --- NEW: Sharpening Helper Function ---
-// Applies a convolution filter to sharpen the image data on a canvas context
 function applySharpen(ctx, w, h, amount) {
   const imgData = ctx.getImageData(0, 0, w, h);
   const data = imgData.data;
@@ -139,10 +138,6 @@ function applySharpen(ctx, w, h, amount) {
        const left = (y * w + (x - 1)) * 4;
        const right = (y * w + (x + 1)) * 4;
 
-       // Simple Sharpen Kernel Logic:
-       // pixel = pixel + amount * (4 * pixel - up - down - left - right)
-       // This adds the "edges" back into the image to crisp it up.
-       
        for (let c = 0; c < 3; c++) { // RGB channels
          const edge = 4 * copy[i + c] 
                       - copy[up + c] 
@@ -152,7 +147,6 @@ function applySharpen(ctx, w, h, amount) {
          
          data[i + c] = copy[i + c] + amount * edge;
        }
-       // Alpha channel (data[i+3]) is left alone
     }
   }
   ctx.putImageData(imgData, 0, 0);
@@ -1424,18 +1418,30 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     ]);
 
     // 1. Capture Data for Workshop
-    // We strictly want the "Card Only" version (no background) for the workshop
     const wasChecked = saveCardOnlyCheckbox.checked;
     
     // Force "Save Card Only" mode ON to generate the workshop thumbnail
     saveCardOnlyCheckbox.checked = true;
     await drawCard();
-    const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); // Slightly compressed for storage
     
-    // Collect Metadata (Excluding stats as requested for the pop-up view, 
-    // but we can store them if we ever change our mind. 
-    // For now, adhering to the "pop-up excluding cost/atk/def" display requirement,
-    // but storing the rest is necessary).
+    // --- COMPRESSION STEP ---
+    // Instead of saving the huge full-res canvas, we create a small thumbnail
+    const thumbCanvas = document.createElement("canvas");
+    // 350px width is enough for the grid and decent for the modal
+    const thumbW = 350; 
+    const scaleFactor = thumbW / canvas.width;
+    const thumbH = canvas.height * scaleFactor;
+    
+    thumbCanvas.width = thumbW;
+    thumbCanvas.height = thumbH;
+    
+    // Draw scaled down version
+    thumbCanvas.getContext("2d").drawImage(canvas, 0, 0, thumbW, thumbH);
+    
+    // Export as JPEG (smaller than PNG) at 80% quality
+    const workshopImageBase64 = thumbCanvas.toDataURL("image/jpeg", 0.8);
+    
+    // Collect Metadata
     const cardMetadata = {
       id: Date.now(),
       image: workshopImageBase64,
@@ -1458,7 +1464,14 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
       }
     };
 
-    saveToWorkshop(cardMetadata);
+    // --- PROTECTED SAVE ---
+    // If local storage is full, this will fail, but we catch it so the file download still happens.
+    try {
+      saveToWorkshop(cardMetadata);
+    } catch (storageError) {
+      console.warn("Workshop save failed (Local Storage probably full):", storageError);
+      // Optional: alert("History full! Card downloaded but not saved to Workshop.");
+    }
 
     // 2. Prepare Actual Download
     // If the user DID NOT have "Save Card Only" checked originally, we must restore the full card
