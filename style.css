@@ -956,3 +956,170 @@ body {
     text-align: center;
   }
 }
+
+/* --------------------------
+   Workshop Grid
+   -------------------------- */
+.workshop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.workshop-card {
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.workshop-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  border-color: #555;
+}
+
+.workshop-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.workshop-card .card-name {
+  padding: 10px;
+  font-size: 14px;
+  text-align: center;
+  color: #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+}
+
+.placeholder-text {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #666;
+  margin-top: 40px;
+}
+
+/* --------------------------
+   Workshop Modal
+   -------------------------- */
+.workshop-modal-content {
+  width: 1000px;
+  max-width: 95%;
+  text-align: left; /* Override center alignment from generic modal */
+  padding: 0;
+  overflow: hidden;
+}
+
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  color: #aaa;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
+}
+.close-modal:hover { color: #fff; }
+
+.modal-body {
+  display: flex;
+  flex-direction: row;
+}
+
+.modal-image-col {
+  width: 40%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #333;
+}
+.modal-image-col img {
+  width: 100%;
+  height: auto;
+  border: none;
+  border-radius: 0;
+}
+
+.modal-info-col {
+  width: 60%;
+  padding: 30px;
+  max-height: 80vh; /* Allow scrolling if text is long */
+  overflow-y: auto;
+}
+
+.modal-info-col h2 {
+  margin-top: 0;
+  font-family: 'Memento', serif;
+  font-size: 32px;
+  color: #fff;
+  border-bottom: 1px solid #333;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.meta-tag {
+  background: #333;
+  color: #ddd;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  border: 1px solid #444;
+}
+
+.modal-text-section {
+  background: #151515;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 15px;
+}
+
+.info-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 6px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.modal-text-section p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #eee;
+  white-space: pre-wrap; /* Preserve line breaks */
+}
+
+.modal-footer {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #333;
+  font-size: 14px;
+  color: #bbb;
+}
+
+@media (max-width: 768px) {
+  .modal-body { flex-direction: column; }
+  .modal-image-col, .modal-info-col { width: 100%; }
+  .modal-image-col { height: 300px; }
+  .modal-image-col img { height: 100%; width: auto; }
+}
