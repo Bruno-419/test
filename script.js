@@ -1206,45 +1206,6 @@ document.fonts.ready.then(() => {
   }, 60);
 });
 
-// --- Button Event Listeners (Updated with Font Loading) ---
-
-document.getElementById("downloadBtn").addEventListener("click", async () => { 
-  const btn = document.getElementById("downloadBtn");
-  const originalText = btn.textContent;
-  
-  // Visual feedback that we are waiting for fonts/assets
-  btn.textContent = "Loading assets...";
-  btn.disabled = true;
-
-  try {
-    // === FIX: Force wait for fonts to load before drawing ===
-    // This ensures the Canvas has access to the .ttf files
-    await document.fonts.ready;
-    await Promise.all([
-        document.fonts.load("60px 'Memento'"),
-        document.fonts.load("60px 'Sv_numbers'"),
-        document.fonts.load("30px 'NotoSans'")
-    ]);
-
-    btn.textContent = "Generating...";
-    
-    await drawCard(); 
-    
-    const canvas = document.getElementById("previewCanvas");
-    const link = document.createElement("a");
-    link.download = `${(nameInput.value.trim() || "card")}.png`;
-    link.href = canvas.toDataURL("image/png", 1.0); 
-    link.click();
-    
-  } catch (err) {
-    console.error("Download failed:", err);
-    alert("Error: Could not save image. Try again.");
-  } finally {
-    btn.textContent = originalText;
-    btn.disabled = false;
-  }
-});
-
 document.getElementById("previewBtn").addEventListener("click", async () => {
   const btn = document.getElementById("previewBtn");
   const originalText = btn.textContent;
@@ -1311,10 +1272,214 @@ function navigateTo(page) {
 }
 
 
+// --- WORKSHOP LOGIC ---
+
+// 1. Storage Helper
+function getWorkshopData() {
+  const data = localStorage.getItem("sv_workshop_data");
+  return data ? JSON.parse(data) : [];
+}
+
+function saveToWorkshop(cardData) {
+  const currentData = getWorkshopData();
+  // Add new card to the beginning
+  currentData.unshift(cardData);
+  // Optional: Limit history to last 50 cards to save space
+  if (currentData.length > 50) currentData.pop();
+  localStorage.setItem("sv_workshop_data", JSON.stringify(currentData));
+  renderWorkshop();
+}
+
+function clearWorkshop() {
+  if(confirm("Are you sure you want to clear your card history?")) {
+    localStorage.removeItem("sv_workshop_data");
+    renderWorkshop();
+  }
+}
+
+// 2. Render Helper
+function renderWorkshop() {
+  const grid = document.getElementById("workshopGrid");
+  if (!grid) return;
+  
+  const data = getWorkshopData();
+  grid.innerHTML = ""; // Clear current
+
+  if (data.length === 0) {
+    grid.innerHTML = '<p class="placeholder-text">No cards generated yet. Create and download a card to see it here!</p>';
+    return;
+  }
+
+  data.forEach((card, index) => {
+    const cardEl = document.createElement("div");
+    cardEl.className = "workshop-card";
+    cardEl.onclick = () => openWorkshopModal(index);
+
+    const img = document.createElement("img");
+    img.src = card.image;
+    img.loading = "lazy";
+
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "card-name";
+    nameDiv.textContent = card.name || "Unnamed Card";
+
+    cardEl.appendChild(img);
+    cardEl.appendChild(nameDiv);
+    grid.appendChild(cardEl);
+  });
+}
+
+// 3. Modal Logic
+const workshopModal = document.getElementById("workshopModal");
+
+function openWorkshopModal(index) {
+  const data = getWorkshopData();
+  const card = data[index];
+  if (!card) return;
+
+  // Populate Fields
+  document.getElementById("modalCardImage").src = card.image;
+  document.getElementById("modalCardName").textContent = card.name;
+  document.getElementById("modalCardClass").textContent = card.class;
+  document.getElementById("modalCardType").textContent = card.type;
+  document.getElementById("modalCardRarity").textContent = card.rarity;
+  document.getElementById("modalCardTrait").textContent = card.trait || "-";
+  document.getElementById("modalIllustrator").textContent = card.illustrator || "Unknown";
+
+  // Text handling
+  document.getElementById("modalCardText").textContent = card.text.card;
+  
+  // Toggle Sections based on Type
+  const isFollower = card.type === "Follower";
+  
+  const evolveSection = document.getElementById("modalEvolveSection");
+  if (isFollower && card.text.evolve) {
+    evolveSection.style.display = "block";
+    document.getElementById("modalEvolveText").textContent = card.text.evolve;
+  } else {
+    evolveSection.style.display = "none";
+  }
+
+  const superEvolveSection = document.getElementById("modalSuperEvolveSection");
+  if (isFollower && card.text.superEvolve) {
+    superEvolveSection.style.display = "block";
+    document.getElementById("modalSuperEvolveText").textContent = card.text.superEvolve;
+  } else {
+    superEvolveSection.style.display = "none";
+  }
+
+  // Crest/Faith
+  const crestSection = document.getElementById("modalCrestSection");
+  if (card.text.crest || card.names.crest) {
+    crestSection.style.display = "block";
+    document.getElementById("modalCrestName").textContent = card.names.crest || "Crest";
+    document.getElementById("modalCrestText").textContent = card.text.crest;
+  } else {
+    crestSection.style.display = "none";
+  }
+
+  const faithSection = document.getElementById("modalFaithSection");
+  if (card.text.faith || card.names.faith) {
+    faithSection.style.display = "block";
+    document.getElementById("modalFaithName").textContent = card.names.faith || "Faith";
+    document.getElementById("modalFaithText").textContent = card.text.faith;
+  } else {
+    faithSection.style.display = "none";
+  }
+
+  // Show Modal
+  workshopModal.style.display = "block";
+}
+
+function closeWorkshopModal() {
+  workshopModal.style.display = "none";
+}
+
+// Close modal if clicking outside content
+window.addEventListener("click", (e) => {
+  if (e.target === workshopModal) {
+    closeWorkshopModal();
+  }
+});
+
+// Initialize Workshop on load
+document.addEventListener("DOMContentLoaded", renderWorkshop);
 
 
+// --- UPDATED DOWNLOAD HANDLER ---
 
+document.getElementById("downloadBtn").addEventListener("click", async () => { 
+  const btn = document.getElementById("downloadBtn");
+  const originalText = btn.textContent;
+  
+  btn.textContent = "Processing...";
+  btn.disabled = true;
 
+  try {
+    await document.fonts.ready;
+    await Promise.all([
+        document.fonts.load("60px 'Memento'"),
+        document.fonts.load("60px 'Sv_numbers'"),
+        document.fonts.load("30px 'NotoSans'")
+    ]);
 
+    // 1. Capture Data for Workshop
+    // We strictly want the "Card Only" version (no background) for the workshop
+    const wasChecked = saveCardOnlyCheckbox.checked;
+    
+    // Force "Save Card Only" mode ON to generate the workshop thumbnail
+    saveCardOnlyCheckbox.checked = true;
+    await drawCard();
+    const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); // Slightly compressed for storage
+    
+    // Collect Metadata (Excluding stats as requested for the pop-up view, 
+    // but we can store them if we ever change our mind. 
+    // For now, adhering to the "pop-up excluding cost/atk/def" display requirement,
+    // but storing the rest is necessary).
+    const cardMetadata = {
+      id: Date.now(),
+      image: workshopImageBase64,
+      name: nameInput.value.trim() || "Unnamed Card",
+      trait: traitInput.value.trim(),
+      class: classSelect.value,
+      type: typeSelect.value,
+      rarity: raritySelect.value,
+      illustrator: document.getElementById("illustratorName").value.trim(),
+      names: {
+        crest: document.getElementById("crestName").value.trim(),
+        faith: document.getElementById("faithName").value.trim()
+      },
+      text: {
+        card: textInputs.card.value.trim(),
+        evolve: textInputs.evolve.value.trim(),
+        superEvolve: textInputs.superEvolve.value.trim(),
+        crest: textInputs.crest.value.trim(),
+        faith: textInputs.faith.value.trim()
+      }
+    };
 
+    saveToWorkshop(cardMetadata);
 
+    // 2. Prepare Actual Download
+    // If the user DID NOT have "Save Card Only" checked originally, we must restore the full card
+    if (!wasChecked) {
+      saveCardOnlyCheckbox.checked = false;
+      await drawCard(); // Redraw full version
+    }
+    // If they DID have it checked, we are already in the correct state.
+
+    // 3. Trigger Download
+    const downloadLink = document.createElement("a");
+    downloadLink.download = `${(nameInput.value.trim() || "card")}.png`;
+    downloadLink.href = canvas.toDataURL("image/png", 1.0); 
+    downloadLink.click();
+    
+  } catch (err) {
+    console.error("Download failed:", err);
+    alert("Error: Could not save image. Try again.");
+  } finally {
+    // Restore state just in case
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+});
