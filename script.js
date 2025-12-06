@@ -90,70 +90,6 @@ let uploadedArt = null;
 let crestArt = null;
 let faithArt = null;
 
-/**
- * Draws a number, scaling down the font size to fit a max width.
- */
-function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpacing = 0, yNudgeCoefficient) {
-  ctx.textAlign = "center";
-  ctx.letterSpacing = `${letterSpacing}px`;
-
-  let fontSize = maxFontSize;
-  ctx.font = `${fontSize}px '${fontFace}'`;
-  let textWidth = ctx.measureText(text).width;
-
-  while (textWidth > maxWidth && fontSize > 10) {
-    fontSize -= 2;
-    ctx.font = `${fontSize}px '${fontFace}'`;
-    textWidth = ctx.measureText(text).width;
-  }
-
-  const yNudge = (maxFontSize - fontSize) * yNudgeCoefficient;
-  ctx.fillText(text, x, y + yNudge);
-  ctx.letterSpacing = "0px";
-}
-
-
-// =========================================
-// --- WORKSHOP & STORAGE HELPERS ---
-// =========================================
-
-const STORAGE_KEY = 'sv_workshop_cards';
-
-// Helper: Get saved cards from local storage
-function getSavedCards() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
-}
-
-// Helper: Save the array of cards to local storage
-function saveCardsToStorage(cards) {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-    } catch (e) {
-        console.error("Storage failed. LocalStorage might be full.", e);
-        alert("Failed to save to Workshop. Your browser storage might be full.");
-    }
-}
-
-// Helper: Format text for the details panel (simple bolding of keywords)
-// We reuse the HIGHLIGHT_REGEX regex defined earlier in the script
-function formatDetailsText(text) {
-  if (!text) return "";
-  // Replace keywords with styled spans
-  let formatted = text.replace(HIGHLIGHT_REGEX, '<span class="details-keyword">$1</span>');
-  // Replace the divider markers with horizontal rules
-  formatted = formatted.replace(/----------/g, '<hr class="details-divider" style="margin: 10px 0; opacity: 0.2;">');
-  // Handle custom colors <c>...</c>
-  formatted = formatted.replace(/<c>(.*?)<\/c>/g, '<span style="color: #f3d87d;">$1</span>');
-  // Handle Markdown bold **...**
-  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-   // Handle Markdown italic _..._
-  formatted = formatted.replace(/_(.*?)_/g, '<i>$1</i>');
-  
-  return formatted;
-}
-
-
 // --- Helpers ---
 function loadImage(src) {
   return new Promise((res, rej) => {
@@ -164,51 +100,50 @@ function loadImage(src) {
   });
 }
 
-// --- NEW: Sharpening Helper Function ---
-// Applies a convolution filter to sharpen the image data on a canvas context
 function applySharpen(ctx, w, h, amount) {
   const imgData = ctx.getImageData(0, 0, w, h);
   const data = imgData.data;
-  const copy = new Uint8ClampedArray(data); // Copy for reference
+  const copy = new Uint8ClampedArray(data); 
 
   for (let y = 1; y < h - 1; y++) {
     for (let x = 1; x < w - 1; x++) {
        const i = (y * w + x) * 4;
-       
-       // Neighbors for convolution
        const up = ((y - 1) * w + x) * 4;
        const down = ((y + 1) * w + x) * 4;
        const left = (y * w + (x - 1)) * 4;
        const right = (y * w + (x + 1)) * 4;
 
-       // Simple Sharpen Kernel Logic:
-       // pixel = pixel + amount * (4 * pixel - up - down - left - right)
-       // This adds the "edges" back into the image to crisp it up.
-       
-       for (let c = 0; c < 3; c++) { // RGB channels
-         const edge = 4 * copy[i + c] 
-                      - copy[up + c] 
-                      - copy[down + c] 
-                      - copy[left + c] 
-                      - copy[right + c];
-         
+       for (let c = 0; c < 3; c++) { 
+         const edge = 4 * copy[i + c] - copy[up + c] - copy[down + c] - copy[left + c] - copy[right + c];
          data[i + c] = copy[i + c] + amount * edge;
        }
-       // Alpha channel (data[i+3]) is left alone
     }
   }
   ctx.putImageData(imgData, 0, 0);
 }
 
-// --- Word Count Functions ---
+function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpacing = 0, yNudgeCoefficient) {
+  ctx.textAlign = "center";
+  ctx.letterSpacing = `${letterSpacing}px`;
+  let fontSize = maxFontSize;
+  ctx.font = `${fontSize}px '${fontFace}'`;
+  let textWidth = ctx.measureText(text).width;
+  while (textWidth > maxWidth && fontSize > 10) {
+    fontSize -= 2;
+    ctx.font = `${fontSize}px '${fontFace}'`;
+    textWidth = ctx.measureText(text).width;
+  }
+  const yNudge = (maxFontSize - fontSize) * yNudgeCoefficient;
+  ctx.fillText(text, x, y + yNudge);
+  ctx.letterSpacing = "0px";
+}
+
 function calculateTotalWordCount() {
   const allText = Object.values(textInputs).map(t => t.value).join(" ");
   const initialTokens = allText.split(/\s+/);
   let wordCount = 0;
   for (const token of initialTokens) {
-    if (token.length === 0 || token === "----------") {
-      continue;
-    }
+    if (token.length === 0 || token === "----------") continue;
     const hyphenatedParts = token.split('-').filter(p => p.length > 0);
     wordCount += hyphenatedParts.length;
   }
@@ -234,7 +169,6 @@ async function getImage(src) {
   return img;
 }
 
-// --- Auto insert "----------" marker ---
 Object.values(textInputs).forEach((textarea) => {
   textarea.addEventListener("input", () => {
     if (autoDividerCheckbox.checked) {
@@ -257,7 +191,6 @@ Object.values(textInputs).forEach((textarea) => {
 wordCountCheckbox.addEventListener("change", updateLiveWordCount);
 saveCardOnlyCheckbox.addEventListener("change", () => drawCard());
 
-// --- Text highlight keywords ---
 const HIGHLIGHT_KEYWORDS = [
   "Fanfare","Last Words","Engage","Strike","Storm","Ambush","Bane","Drain","Ward","Rush","Overflow",
   "On Spellboost","Clash","Mode","Intimidate","Aura","Barrier","Fuse","Fused","Necromancy","Combo",
@@ -267,69 +200,38 @@ const HIGHLIGHT_KEYWORDS = [
 ];
 const HIGHLIGHT_REGEX = new RegExp(`\\b(${HIGHLIGHT_KEYWORDS.join("|")})\\b`, "g");
 
-// --- drawStretchBox ---
 function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   const stretchPerBreak = 50;
   const stretchAmount = stretchCount * stretchPerBreak;
   let topHeight = 40, bottomHeight = 40;
   let middleStartY = topHeight;
   let middleHeight = img.height - topHeight - bottomHeight;
-
   if (key === "crest" || key === "faith") {
-    topHeight = 107;
-    middleStartY = 107;
-    middleHeight = 38;
-    bottomHeight = 28;
+    topHeight = 107; middleStartY = 107; middleHeight = 38; bottomHeight = 28;
   } else if (key === "main") {
-    topHeight = 60;
-    bottomHeight = 120;
-    middleStartY = topHeight;
-    middleHeight = img.height - topHeight - bottomHeight;
+    topHeight = 60; bottomHeight = 120; middleStartY = topHeight; middleHeight = img.height - topHeight - bottomHeight;
   }
-
   ctx.drawImage(img, 0, 0, img.width, topHeight, x, y, img.width, topHeight);
-  ctx.drawImage(
-    img,
-    0, middleStartY, img.width, middleHeight,
-    x, y + middleStartY, img.width, middleHeight + stretchAmount
-  );
-  ctx.drawImage(
-    img,
-    0, img.height - bottomHeight, img.width, bottomHeight,
-    x, y + middleStartY + middleHeight + stretchAmount,
-    img.width, bottomHeight
-  );
+  ctx.drawImage(img, 0, middleStartY, img.width, middleHeight, x, y + middleStartY, img.width, middleHeight + stretchAmount);
+  ctx.drawImage(img, 0, img.height - bottomHeight, img.width, bottomHeight, x, y + middleStartY + middleHeight + stretchAmount, img.width, bottomHeight);
   return topHeight + middleHeight + bottomHeight + stretchAmount;
 }
 
-// --- Calculate Height ---
-async function calculateTextBlockHeight(key, startY) {
+async function calculateTextBlockHeight(key) {
   const textValue = textInputs[key].value.trim();
   if (!textValue) return 0;
-
   const isSpecialBox = (key !== "card");
-  const specialLineHeightBefore = 30;
-  const specialLineHeightAfter = 20;
-  const cardLineHeightBefore = 30;
-  const cardLineHeightAfter = 40;
-  
-  const textStartX = 769 + 30;
-  const wrapLimitX = 1716;
-  const lineHeight = 50;
-  const baseFont = "33px 'Memento'";
+  const specialLineHeightBefore = 30, specialLineHeightAfter = 20;
+  const cardLineHeightBefore = 30, cardLineHeightAfter = 40;
+  const textStartX = 769 + 30, wrapLimitX = 1716, lineHeight = 50, baseFont = "33px 'Memento'";
   
   let processedText = textValue.replace(HIGHLIGHT_REGEX, "<K>$&</K>");
-  if (key === "evolve" && processedText.startsWith("Evolve")) {
-    processedText = processedText.replace(/^Evolve/, "<K>Evolve</K>");
-  }
-  if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) {
-    processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
-  }
+  if (key === "evolve" && processedText.startsWith("Evolve")) processedText = processedText.replace(/^Evolve/, "<K>Evolve</K>");
+  if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
+  
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
-
-  let totalHeight = lineHeight;
-  let currentX = textStartX;
+  let totalHeight = lineHeight, currentX = textStartX;
   let dryStyle = { bold: false, italic: false, isKeyword: false };
   let dryLastTokenWasDivider = false;
 
@@ -345,85 +247,55 @@ async function calculateTextBlockHeight(key, startY) {
     if (token === "<K>") { dryStyle.isKeyword = true; continue; }
     if (token === "</K>") { dryStyle.isKeyword = false; continue; }
     if (["<c>", "</c>"].includes(token)) continue;
-
     if (token === "\n") {
       totalHeight += dryLastTokenWasDivider ? (isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter) : lineHeight;
-      currentX = textStartX;
-      dryLastTokenWasDivider = false;
-      continue;
+      currentX = textStartX; dryLastTokenWasDivider = false; continue;
     }
-    
     if (token.trim() === "----------") {
-      if (currentX > textStartX) {
-        totalHeight += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
-      }
-      currentX = textStartX;
-      dryLastTokenWasDivider = true;
-      continue;
+      if (currentX > textStartX) totalHeight += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
+      currentX = textStartX; dryLastTokenWasDivider = true; continue;
     }
-    
     dryLastTokenWasDivider = false;
-
     setDryFont();
     const tokenWidth = ctx.measureText(token).width;
-    
     if (currentX > textStartX && currentX + tokenWidth > wrapLimitX && token.trim() !== "") {
-      totalHeight += lineHeight;
-      currentX = textStartX;
+      totalHeight += lineHeight; currentX = textStartX;
     }
-
     if (currentX === textStartX && token.trim() === "") continue;
     currentX += tokenWidth;
     if (dryStyle.italic) currentX += 3;
   }
   
   const boxImg = assets.boxes[key === "card" ? null : key] ? await getImage(assets.boxes[key]) : null;
-  const stretchCount = Math.max(0, (totalHeight / lineHeight) - 1);
   let boxHeight = 0;
   if (boxImg) {
       const topHeight = (key === "crest" || key === "faith") ? 107 : 40;
       const bottomHeight = (key === "crest" || key === "faith") ? 28 : 40;
       const middleHeight = boxImg.height - topHeight - bottomHeight;
-      const stretchAmount = stretchCount * 50;
+      const stretchAmount = Math.max(0, (totalHeight / lineHeight) - 1) * 50;
       boxHeight = topHeight + middleHeight + bottomHeight + stretchAmount;
   }
-
   return Math.max(boxHeight, totalHeight + 40);
 }
 
-// --- drawTextBlock ---
 async function drawTextBlock(key, box, x, startY) {
   const textValue = textInputs[key].value.trim();
   if (!textValue) return 0;
-
   const isSpecialBox = (key !== "card");
-  const specialLineHeightBefore = 30;
-  const specialLineHeightAfter = 20;
-  const specialDividerYOffset = 25;
-  const cardLineHeightBefore = 30;
-  const cardLineHeightAfter = 40;
-  const cardDividerYOffset = 15;
-
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
-  const textStartX = x + 30;
-  const wrapLimitX = 1716;
-  const lineHeight = 50;
-  const baseFont = "33px 'Memento'";
-
+  const specialLineHeightBefore = 30, specialLineHeightAfter = 20, specialDividerYOffset = 25;
+  const cardLineHeightBefore = 30, cardLineHeightAfter = 40, cardDividerYOffset = 15;
+  
+  ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
+  const textStartX = x + 30, wrapLimitX = 1716, lineHeight = 50, baseFont = "33px 'Memento'";
+  
   let processedText = textValue.replace(HIGHLIGHT_REGEX, "<K>$&</K>");
-  if (key === "evolve" && processedText.startsWith("Evolve")) {
-    processedText = processedText.replace(/^Evolve/, "<K>Evolve</K>");
-  }
-  if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) {
-    processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
-  }
+  if (key === "evolve" && processedText.startsWith("Evolve")) processedText = processedText.replace(/^Evolve/, "<K>Evolve</K>");
+  if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
 
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
 
-  let totalHeight = lineHeight;
-  let currentX = textStartX;
+  let totalHeight = lineHeight, currentX = textStartX;
   let dryStyle = { bold: false, italic: false, isKeyword: false };
   let dryLastTokenWasDivider = false;
 
@@ -439,33 +311,19 @@ async function drawTextBlock(key, box, x, startY) {
     if (token === "<K>") { dryStyle.isKeyword = true; continue; }
     if (token === "</K>") { dryStyle.isKeyword = false; continue; }
     if (["<c>", "</c>"].includes(token)) continue;
-
     if (token === "\n") {
-      if (dryLastTokenWasDivider) {
-        totalHeight += isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter;
-      } else {
-        totalHeight += lineHeight;
-      }
-      currentX = textStartX;
-      dryLastTokenWasDivider = false;
-      continue;
+      totalHeight += dryLastTokenWasDivider ? (isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter) : lineHeight;
+      currentX = textStartX; dryLastTokenWasDivider = false; continue;
     }
-    
     if (token.trim() === "----------") {
-      if (currentX > textStartX) {
-        totalHeight += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
-      }
-      currentX = textStartX;
-      dryLastTokenWasDivider = true;
-      continue;
+      if (currentX > textStartX) totalHeight += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
+      currentX = textStartX; dryLastTokenWasDivider = true; continue;
     }
-    
     dryLastTokenWasDivider = false;
     setDryFont();
     const tokenWidth = ctx.measureText(token).width;
     if (currentX > textStartX && currentX + tokenWidth > wrapLimitX && token.trim() !== "") {
-      totalHeight += lineHeight;
-      currentX = textStartX;
+      totalHeight += lineHeight; currentX = textStartX;
     }
     if (currentX === textStartX && token.trim() === "") continue;
     currentX += tokenWidth;
@@ -474,15 +332,9 @@ async function drawTextBlock(key, box, x, startY) {
 
   const boxImg = box ? await getImage(assets.boxes[box]) : null;
   const stretchCount = Math.max(0, (totalHeight / lineHeight) - 1);
+  const boxHeight = boxImg ? drawStretchBox(boxImg, x, startY, stretchCount, key) : 0;
 
-  const boxHeight = boxImg
-    ? drawStretchBox(boxImg, x, startY, stretchCount, key)
-    : 0;
-
-  ctx.textAlign = "left";
-  ctx.shadowColor = "black";
-  ctx.shadowBlur = 4;
-
+  ctx.textAlign = "left"; ctx.shadowColor = "black"; ctx.shadowBlur = 4;
   let xPos = textStartX;
   let textY = startY + 50 + (key === "crest" || key === "faith" ? 90 : 0);
   let wetStyle = { bold: false, italic: false, color: null, isKeyword: false };
@@ -495,9 +347,7 @@ async function drawTextBlock(key, box, x, startY) {
     ctx.fillStyle = wetStyle.color || (wetStyle.isKeyword ? "#f3d87d" : "#efeee9");
   };
 
-  const dividerToUse = await getImage(
-    assets.boxes[key === "card" ? "divider" : "small_divider"]
-  );
+  const dividerToUse = await getImage(assets.boxes[key === "card" ? "divider" : "small_divider"]);
 
   for (const token of allTokens) {
     if (token === "**") { wetStyle.bold = !wetStyle.bold; continue; }
@@ -506,168 +356,92 @@ async function drawTextBlock(key, box, x, startY) {
     if (token === "</c>") { wetStyle.color = null; continue; }
     if (token === "<K>") { wetStyle.isKeyword = true; continue; }
     if (token === "</K>") { wetStyle.isKeyword = false; continue; }
-    
     if (token === "\n") {
-      if (lastTokenWasDivider) {
-        textY += isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter;
-      } else {
-        textY += lineHeight;
-      }
-      xPos = textStartX;
-      lastTokenWasDivider = false;
-      continue;
+      textY += lastTokenWasDivider ? (isSpecialBox ? specialLineHeightAfter : cardLineHeightAfter) : lineHeight;
+      xPos = textStartX; lastTokenWasDivider = false; continue;
     }
-
     if (token.trim() === "----------") {
-      if (xPos > textStartX) {
-        textY += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
-      }
+      if (xPos > textStartX) textY += isSpecialBox ? specialLineHeightBefore : cardLineHeightBefore;
       const yOffset = isSpecialBox ? specialDividerYOffset : cardDividerYOffset;
       ctx.drawImage(dividerToUse, x, textY - yOffset);
-      xPos = textStartX;
-      lastTokenWasDivider = true;
-      continue;
+      xPos = textStartX; lastTokenWasDivider = true; continue;
     }
     lastTokenWasDivider = false;
     setWetStyle();
     const tokenWidth = ctx.measureText(token).width;
     if (xPos > textStartX && xPos + tokenWidth > wrapLimitX && token.trim() !== "") {
-      textY += lineHeight;
-      xPos = textStartX;
+      textY += lineHeight; xPos = textStartX;
     }
     if (xPos === textStartX && token.trim() === "") continue;
     ctx.fillText(token, xPos, textY);
     xPos += tokenWidth;
-    if (wetStyle.italic) xPos += 0;
   }
-  
   return Math.max(boxHeight, textY - startY + 40);
 }
 
-
 // --- drawCard ---
 async function drawCard() {
-  const textOrder = [
-    { key: "card", box: null },
-    { key: "evolve", box: "evolve" },
-    { key: "superEvolve", box: "superEvolve" },
-    { key: "crest", box: "crest" },
-    { key: "faith", box: "faith" }
-  ];
-  const boxX = 768;
-  const startY = 246;
-
+  const textOrder = [{ key: "card", box: null }, { key: "evolve", box: "evolve" }, { key: "superEvolve", box: "superEvolve" }, { key: "crest", box: "crest" }, { key: "faith", box: "faith" }];
+  const boxX = 768, startY = 246;
   const currentCardType = typeSelect.value.toLowerCase();
   const isFollower = (currentCardType === 'follower');
   const saveCardOnly = saveCardOnlyCheckbox.checked; 
 
-  // 1. Calculate Height / Stretch
   let stretchPixels = 0;
-  
   if (!saveCardOnly) {
       let calculatedTotalY = startY;
       for (const { key } of textOrder) {
           const textValue = textInputs[key].value.trim();
           if (!textValue) continue; 
-
           const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
-          if (isEvolveBlock && !isFollower) {
-              continue;
-          }
+          if (isEvolveBlock && !isFollower) continue;
           const blockHeight = await calculateTextBlockHeight(key); 
           calculatedTotalY += blockHeight - 10;
       }
-
       const illustrator = document.getElementById("illustratorName").value.trim();
       const showBottomBar = wordCountCheckbox.checked || illustrator;
-
-      const defaultStretchThreshold = 900;
-      const bottomBarStretchThreshold = 825;
-      const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
-      
+      const stretchThreshold = showBottomBar ? 825 : 900;
       stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
   }
 
   const stretchCount = stretchPixels / 50;
   const boxAsset = (wordCountCheckbox.checked || document.getElementById("illustratorName").value.trim()) ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
-  
   const mainBoxImg = await getImage(boxAsset);
   
-  // 2. Set Canvas Dimensions
-  const baseHeight = 1080; 
-  const baseWidth = 1920;
-  
-  // UPDATED: Set explicit dimensions for Card Only mode
+  const baseHeight = 1080, baseWidth = 1920;
   const newWidth = saveCardOnly ? 729 : baseWidth;
   const newHeight = saveCardOnly ? 882 : (baseHeight + stretchPixels);
 
-  if (canvas.height !== newHeight) {
-    canvas.height = newHeight;
-  }
-  if (canvas.width !== newWidth) {
-    canvas.width = newWidth;
-  }
+  if (canvas.height !== newHeight) canvas.height = newHeight;
+  if (canvas.width !== newWidth) canvas.width = newWidth;
 
-  // 3. Clear Canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
   
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-
-  // === START TRANSLATION ===
-  // If saving card only, shift the context UP so the card (which starts at Y=153) hits the top (Y=0)
   ctx.save();
-  if (saveCardOnly) {
-    ctx.translate(-48, -153);
-  }
+  if (saveCardOnly) ctx.translate(-48, -153);
 
-  // 4. Draw Background (SKIP if Save Card Only)
   if (!saveCardOnly) {
       const bg = await getImage(assets.backgrounds[classSelect.value]);
       const slicePointY = 1000;
       const topHeight = Math.min(slicePointY, bg.height);
       const bottomPartHeight = bg.height - topHeight;
-
       ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
-
-      if (bottomPartHeight > 0) {
-        const newBottomHeight = bottomPartHeight + stretchPixels;
-        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
-      }
+      if (bottomPartHeight > 0) ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, bottomPartHeight + stretchPixels);
   }
 
-  // Load Assets
   const [gem, frame] = await Promise.all([
     getImage(assets.gems[classSelect.value]),
-    getImage(
-      assets[typeSelect.value.toLowerCase()][
-        ["bronze", "silver", "gold", "legendary", "signature"].indexOf(
-          raritySelect.value.toLowerCase()
-        )
-      ]
-    )
+    getImage(assets[typeSelect.value.toLowerCase()][["bronze", "silver", "gold", "legendary", "signature"].indexOf(raritySelect.value.toLowerCase())])
   ]);
 
-  // 5. Masked Main Art
   if (uploadedArt) {
     const s = previewState.main;
-    const dWidth = uploadedArt.width * s.scale;
-    const dHeight = uploadedArt.height * s.scale;
-
-    const bmp = await createImageBitmap(uploadedArt, 0, 0, uploadedArt.width, uploadedArt.height, {
-      resizeWidth: Math.round(dWidth),
-      resizeHeight: Math.round(dHeight),
-      resizeQuality: "high" 
-    });
-    
+    const dWidth = uploadedArt.width * s.scale, dHeight = uploadedArt.height * s.scale;
+    const bmp = await createImageBitmap(uploadedArt, 0, 0, uploadedArt.width, uploadedArt.height, { resizeWidth: Math.round(dWidth), resizeHeight: Math.round(dHeight), resizeQuality: "high" });
     ctx.save();
-    ctx.beginPath();
-    ctx.rect(MAIN_ART_X, MAIN_ART_Y, MAIN_MASK_W, MAIN_MASK_H);
-    ctx.closePath();
-    ctx.clip();
-    
+    ctx.beginPath(); ctx.rect(MAIN_ART_X, MAIN_ART_Y, MAIN_MASK_W, MAIN_MASK_H); ctx.closePath(); ctx.clip();
     ctx.drawImage(bmp, MAIN_ART_X + s.tx, MAIN_ART_Y + s.ty);
-    
     ctx.restore();
     bmp.close();
   }
@@ -675,24 +449,14 @@ async function drawCard() {
   ctx.drawImage(gem, 398, 863);
   ctx.drawImage(frame, 48, 153);
 
-  // 6. Text Box & Text (SKIP if Save Card Only)
   if (!saveCardOnly) {
-      const textBoxX = 722;
-      const textBoxY = 206;
-      
-      const dynamicBoxWidth = mainBoxImg.width;
-      const dynamicBoxHeight = mainBoxImg.height + stretchPixels; 
-
+      const textBoxX = 722, textBoxY = 206;
+      const dynamicBoxWidth = mainBoxImg.width, dynamicBoxHeight = mainBoxImg.height + stretchPixels; 
       const offCanvas = document.createElement("canvas");
-      offCanvas.width = dynamicBoxWidth;
-      offCanvas.height = dynamicBoxHeight;
+      offCanvas.width = dynamicBoxWidth; offCanvas.height = dynamicBoxHeight;
       const offCtx = offCanvas.getContext("2d");
-      
       offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
-      
-      offCtx.filter = "blur(5px)";
-      offCtx.drawImage(offCanvas, 0, 0);
-      
+      offCtx.filter = "blur(5px)"; offCtx.drawImage(offCanvas, 0, 0);
       ctx.drawImage(offCanvas, textBoxX, textBoxY);
 
       drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
@@ -701,186 +465,97 @@ async function drawCard() {
       for (const { key, box } of textOrder) {
         const textValue = textInputs[key].value.trim();
         if (!textValue) continue; 
-
         const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
-        if (isEvolveBlock && !isFollower) {
-          continue;
-        }
-
+        if (isEvolveBlock && !isFollower) continue;
         const blockHeight = await drawTextBlock(key, box, boxX, currentY);
         
-        // Draw Icons (Crest/Faith)
-        const isCrest = key === "crest";
-        const isFaith = key === "faith";
+        const isCrest = key === "crest", isFaith = key === "faith";
         if (isCrest || isFaith) {
-          const iconX = boxX + 120;
-          const iconY = currentY + 32;
+          const iconX = boxX + 120, iconY = currentY + 32;
           const iconImg = isCrest ? crestArt : faithArt;
           const nameField = document.getElementById(isCrest ? "crestName" : "faithName");
           const nameValue = nameField ? nameField.value.trim() : "";
 
           if (iconImg) {
             const s = previewState[isCrest ? "crest" : "faith"];
-            const dWidth = iconImg.width * s.scale;
-            const dHeight = iconImg.height * s.scale;
-
-            const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
-              resizeWidth: Math.round(dWidth),
-              resizeHeight: Math.round(dHeight),
-              resizeQuality: "high"
-            });
+            const dWidth = iconImg.width * s.scale, dHeight = iconImg.height * s.scale;
+            const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, { resizeWidth: Math.round(dWidth), resizeHeight: Math.round(dHeight), resizeQuality: "high" });
             const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = Math.round(dWidth);
-            tempCanvas.height = Math.round(dHeight);
+            tempCanvas.width = Math.round(dWidth); tempCanvas.height = Math.round(dHeight);
             const tempCtx = tempCanvas.getContext('2d');
             tempCtx.drawImage(bmp, 0, 0);
             applySharpen(tempCtx, tempCanvas.width, tempCanvas.height, 0.25);
-
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
-            ctx.closePath();
-            ctx.clip();
-            ctx.drawImage(tempCanvas, iconX + s.tx, iconY + s.ty);
-            ctx.restore();
-            bmp.close();
+            ctx.save(); ctx.beginPath(); ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
+            ctx.drawImage(tempCanvas, iconX + s.tx, iconY + s.ty); ctx.restore(); bmp.close();
           }
-          
           const defaultName = isCrest ? "Crest" : "Faith";
           const displayName = nameValue || defaultName;
           if (displayName) {
-            ctx.save();
-            ctx.font = "33px 'Memento'";
-            ctx.fillStyle = "#f3d87d";
-            ctx.textAlign = "left";
-            ctx.shadowColor = "black";
-            ctx.shadowBlur = 4;
-            ctx.fillText(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10);
-            ctx.restore();
+            ctx.save(); ctx.font = "33px 'Memento'"; ctx.fillStyle = "#f3d87d"; ctx.textAlign = "left"; ctx.shadowColor = "black"; ctx.shadowBlur = 4;
+            ctx.fillText(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10); ctx.restore();
           }
         }
         currentY += blockHeight - 10;
       }
   }
 
-  // 7. Stats & Name
-  ctx.shadowColor = "black";
-  ctx.shadowBlur = 6;
-  ctx.fillStyle = "#efeee9";
-  
+  ctx.shadowColor = "black"; ctx.shadowBlur = 6; ctx.fillStyle = "#efeee9";
   const nameText = nameInput.value.trim() || "Unnamed Card";
 
-  // UPDATED: Only draw the Top Header Name/Trait if NOT in "Card Only" mode
   if (!saveCardOnly) {
-    ctx.font = "56px 'Memento'";
-    ctx.textAlign = "left";
-    ctx.fillText(nameText, 163, 150);
-
-    ctx.font = "33px 'Memento'";
-    ctx.textAlign = "left";
-    const traitText = traitInput.value.trim() || "—";
-    ctx.fillText(traitText, 1306, 147);
+    ctx.font = "56px 'Memento'"; ctx.textAlign = "left"; ctx.fillText(nameText, 163, 150);
+    ctx.font = "33px 'Memento'"; ctx.textAlign = "left"; ctx.fillText(traitInput.value.trim() || "—", 1306, 147);
   }
 
-  // Draw the Secondary Name (The one inside the card frame)
   let secondaryFontSize = 42;
   ctx.font = `${secondaryFontSize}px 'Memento'`;
   let textWidth = ctx.measureText(nameText).width;
-  const maxWidth = 363;
-  const baseY = 331;
-  const offsetPerStep = -0.75;
-  let shrinkSteps = 0;
-  while (textWidth > maxWidth && secondaryFontSize > 2) {
-    secondaryFontSize -= 2;
-    shrinkSteps++;
-    ctx.font = `${secondaryFontSize}px 'Memento'`;
-    textWidth = ctx.measureText(nameText).width;
+  while (textWidth > 363 && secondaryFontSize > 2) {
+    secondaryFontSize -= 2; ctx.font = `${secondaryFontSize}px 'Memento'`; textWidth = ctx.measureText(nameText).width;
   }
-  const secondaryNameY = baseY + (shrinkSteps * offsetPerStep);
-  ctx.textAlign = "center";
-  ctx.fillText(nameText, 455, secondaryNameY);
+  ctx.textAlign = "center"; ctx.fillText(nameText, 455, 331 + (-0.75 * (42 - secondaryFontSize)/2)); // Approx center nudge
 
-  const numberSpacing = -5;
-  const numberFont = 'Sv_numbers';
-  const costMaxWidth = 95;
-  const statMaxWidth = 90;
-  const COST_NUDGE = -0.2;
-  const STAT_NUDGE = -0.2;
-
-  drawScaledNumber(costInput.value, 197, 335, 80, costMaxWidth, numberFont, numberSpacing, COST_NUDGE);
-
+  const numberFont = 'Sv_numbers', numberSpacing = -5;
+  drawScaledNumber(costInput.value, 197, 335, 80, 95, numberFont, numberSpacing, -0.2);
   if (typeSelect.value === "Follower") {
-    drawScaledNumber(attackInput.value, 201, 922, 82, statMaxWidth, numberFont, numberSpacing, STAT_NUDGE);
-    drawScaledNumber(defenseInput.value, 642, 917, 82, statMaxWidth, numberFont, numberSpacing, STAT_NUDGE);
+    drawScaledNumber(attackInput.value, 201, 922, 82, 90, numberFont, numberSpacing, -0.2);
+    drawScaledNumber(defenseInput.value, 642, 917, 82, 90, numberFont, numberSpacing, -0.2);
   }
   ctx.letterSpacing = "0px";
 
-  // Footer Elements (Skip if Save Card Only)
   if (!saveCardOnly) {
       if (tokenCheckbox.checked) {
-        ctx.font = "28px 'NotoSans'";
-        ctx.textAlign = "right";
-        ctx.fillText("*This is a token card.", 1788, canvas.height - 55);
+        ctx.font = "28px 'NotoSans'"; ctx.textAlign = "right"; ctx.fillText("*This is a token card.", 1788, canvas.height - 55);
       }
-
-      const bottomBarBaseY = 911;
-      const dynamicBottomBarY = bottomBarBaseY + stretchPixels;
-
+      const dynamicBottomBarY = 911 + stretchPixels;
       const illustrator = document.getElementById("illustratorName").value.trim();
       if (illustrator) {
-        ctx.font = "28px 'NotoSans'";
-        ctx.textAlign = "left";
-        ctx.fillText(`Illustrator: ${illustrator}`, 790, dynamicBottomBarY);
+        ctx.font = "28px 'NotoSans'"; ctx.textAlign = "left"; ctx.fillText(`Illustrator: ${illustrator}`, 790, dynamicBottomBarY);
       }
       if (wordCountCheckbox.checked) {
-        const wordCount = calculateTotalWordCount();
-        ctx.font = "28px 'NotoSans'";
-        ctx.textAlign = "right";
-        ctx.fillText(`Word count: ${wordCount}`, 1730, dynamicBottomBarY);
+        ctx.font = "28px 'NotoSans'"; ctx.textAlign = "right"; ctx.fillText(`Word count: ${calculateTotalWordCount()}`, 1730, dynamicBottomBarY);
       }
   }
-  
-  // === END TRANSLATION ===
-  ctx.restore();
-  
-  ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
+  ctx.restore(); ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
 }
 
-/***********************
-  PREVIEW COLUMN HANDLERS (clamped)
-***********************/
-const MAIN_MASK_W = 450, MAIN_MASK_H = 560;
-const MAIN_ART_X = 200, MAIN_ART_Y = 350;
-const ICON_W = 56, ICON_H = 57;
+// --- Preview Logic ---
+const MAIN_MASK_W = 450, MAIN_MASK_H = 560, MAIN_ART_X = 200, MAIN_ART_Y = 350, ICON_W = 56, ICON_H = 57;
 let artX = MAIN_ART_X, artY = MAIN_ART_Y, artW = MAIN_MASK_W, artH = MAIN_MASK_H;
-window.ICON_W = ICON_W; window.ICON_H = ICON_H;
-
 const ICON_SCALE = 5;
 
 const mainPreviewCanvas = document.getElementById("mainPreviewCanvas");
 const mainPreviewCtx = mainPreviewCanvas ? mainPreviewCanvas.getContext("2d") : null;
-if (mainPreviewCtx) mainPreviewCtx.imageSmoothingEnabled = true;
 const mainZoomSlider = document.getElementById("mainZoomSlider");
-
 const crestPreviewCanvas = document.getElementById("crestPreviewCanvas");
 const crestPreviewCtx = crestPreviewCanvas ? crestPreviewCanvas.getContext("2d") : null;
-if (crestPreviewCtx) {
-  crestPreviewCtx.imageSmoothingEnabled = true; 
-  crestPreviewCtx.scale(ICON_SCALE, ICON_SCALE);
-}
 const crestZoomSlider = document.getElementById("crestZoomSlider");
-
 const faithPreviewCanvas = document.getElementById("faithPreviewCanvas");
 const faithPreviewCtx = faithPreviewCanvas ? faithPreviewCanvas.getContext("2d") : null;
-if (faithPreviewCtx) {
-  faithPreviewCtx.imageSmoothingEnabled = true; 
-  faithPreviewCtx.scale(ICON_SCALE, ICON_SCALE);
-}
 const faithZoomSlider = document.getElementById("faithZoomSlider");
 
-const artInput = document.getElementById("artUpload");
-const crestInput = document.getElementById("crestArtUpload");
-const faithInput = document.getElementById("faithArtUpload");
+if (crestPreviewCtx) crestPreviewCtx.scale(ICON_SCALE, ICON_SCALE);
+if (faithPreviewCtx) faithPreviewCtx.scale(ICON_SCALE, ICON_SCALE);
 
 const previewState = {
   main: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H, minScale: 1 },
@@ -900,294 +575,98 @@ function loadImageFromFile(file) {
 
 function fitImageToMask(img, s) {
   const scale = Math.max(s.maskW / img.width, s.maskH / img.height);
-  s.scale = scale;
-  s.minScale = scale; 
-  s.tx = (s.maskW - img.width * scale) / 2;
-  s.ty = (s.maskH - img.height * scale) / 2;
+  s.scale = scale; s.minScale = scale; 
+  s.tx = (s.maskW - img.width * scale) / 2; s.ty = (s.maskH - img.height * scale) / 2;
 }
 
 function clampPan(s) {
   if (!s.img) return;
-  const imgW = s.img.width * s.scale;
-  const imgH = s.img.height * s.scale;
-  if (imgW <= s.maskW) {
-    s.tx = (s.maskW - imgW) / 2;
-  } else {
-    const minX = s.maskW - imgW;
-    const maxX = 0;
-    if (s.tx < minX) s.tx = minX;
-    if (s.tx > maxX) s.tx = maxX;
-  }
-  if (imgH <= s.maskH) {
-    s.ty = (s.maskH - imgH) / 2;
-  } else {
-    const minY = s.maskH - imgH;
-    const maxY = 0;
-    if (s.ty < minY) s.ty = minY;
-    if (s.ty > maxY) s.ty = maxY;
-  }
+  const imgW = s.img.width * s.scale, imgH = s.img.height * s.scale;
+  if (imgW <= s.maskW) s.tx = (s.maskW - imgW) / 2;
+  else { const minX = s.maskW - imgW; if (s.tx < minX) s.tx = minX; if (s.tx > 0) s.tx = 0; }
+  if (imgH <= s.maskH) s.ty = (s.maskH - imgH) / 2;
+  else { const minY = s.maskH - imgH; if (s.ty < minY) s.ty = minY; if (s.ty > 0) s.ty = 0; }
 }
 
 function drawPreviewCanvas(ctx, canvasEl, s, shape) {
   if (!ctx || !canvasEl) return;
   const { img, scale, tx, ty, maskW, maskH } = s;
-  
   ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-  ctx.fillStyle = "rgba(20,20,20,0.95)";
-  ctx.fillRect(0, 0, canvasEl.width, canvasEl.height); 
-
+  ctx.fillStyle = "rgba(20,20,20,0.95)"; ctx.fillRect(0, 0, canvasEl.width, canvasEl.height); 
   const renderScale = canvasEl.width / maskW;
-  const borderThickness = 1 / renderScale;
-
+  
   if (!img) {
-    ctx.strokeStyle = "rgba(255,255,255,0.06)";
-    ctx.lineWidth = borderThickness;
-    if (shape === "circle") {
-      ctx.beginPath();
-      ctx.arc(maskW / 2, maskH / 2, Math.min(maskW, maskH) / 2 - 1, 0, Math.PI * 2);
-      ctx.stroke();
-    } else {
-      ctx.strokeRect(0.5, 0.5, maskW - 1, maskH - 1);
-    }
+    ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1/renderScale;
+    if (shape === "circle") { ctx.beginPath(); ctx.arc(maskW / 2, maskH / 2, Math.min(maskW, maskH) / 2 - 1, 0, Math.PI * 2); ctx.stroke(); } 
+    else ctx.strokeRect(0.5, 0.5, maskW - 1, maskH - 1);
     return;
   }
 
   ctx.save();
-  if (shape === "circle") {
-    ctx.beginPath();
-    ctx.arc(maskW / 2, maskH / 2, Math.min(maskW, maskH) / 2, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.clip();
-  } else {
-    ctx.beginPath();
-    ctx.rect(0, 0, maskW, maskH);
-    ctx.closePath();
-    ctx.clip();
-  }
-
+  if (shape === "circle") { ctx.beginPath(); ctx.arc(maskW / 2, maskH / 2, Math.min(maskW, maskH) / 2, 0, Math.PI * 2); ctx.closePath(); ctx.clip(); } 
+  else { ctx.beginPath(); ctx.rect(0, 0, maskW, maskH); ctx.closePath(); ctx.clip(); }
   ctx.drawImage(img, tx, ty, img.width * scale, img.height * scale);
   ctx.restore();
-
-  ctx.strokeStyle = "rgba(255,255,255,0.06)";
-  ctx.lineWidth = borderThickness;
-  if (shape === "circle") {
-    ctx.beginPath();
-    ctx.arc(maskW / 2, maskH / 2, Math.min(maskW, maskH) / 2 - 1, 0, Math.PI * 2);
-    ctx.stroke();
-  } else {
-    ctx.strokeRect(0.5, 0.5, maskW - 1, maskH - 1);
-  }
-}
-
-function syncMainToGlobals() {
-  const s = previewState.main;
-  if (!s.img) {
-    uploadedArt = null;
-    artW = MAIN_MASK_W;
-    artH = MAIN_MASK_H;
-    artX = MAIN_ART_X;
-    artY = MAIN_ART_Y;
-    return;
-  }
-  uploadedArt = s.img;
-  artW = Math.round(s.img.width * s.scale);
-  artH = Math.round(s.img.height * s.scale);
-  artX = Math.round(MAIN_ART_X + s.tx);
-  artY = Math.round(MAIN_ART_Y + s.ty);
-}
-
-function syncIconToGlobals(which) {
-  const s = previewState[which];
-  if (!s.img) {
-    if (which === "crest") crestArt = null;
-    else faithArt = null;
-    return;
-  }
-  if (which === "crest") crestArt = s.img;
-  else faithArt = s.img;
-  window.ICON_W = s.maskW;
-  window.ICON_H = s.maskH;
 }
 
 function updateAll() {
-  clampPan(previewState.main);
-  clampPan(previewState.crest);
-  clampPan(previewState.faith);
-
-  syncMainToGlobals();
-  syncIconToGlobals("crest");
-  syncIconToGlobals("faith");
-
+  clampPan(previewState.main); clampPan(previewState.crest); clampPan(previewState.faith);
+  if (previewState.main.img) uploadedArt = previewState.main.img;
+  if (previewState.crest.img) crestArt = previewState.crest.img; else crestArt = null;
+  if (previewState.faith.img) faithArt = previewState.faith.img; else faithArt = null;
   drawPreviewCanvas(mainPreviewCtx, mainPreviewCanvas, previewState.main, "rect");
   drawPreviewCanvas(crestPreviewCtx, crestPreviewCanvas, previewState.crest, "circle");
   drawPreviewCanvas(faithPreviewCtx, faithPreviewCanvas, previewState.faith, "circle");
 }
 
-/* ---------- Upload handlers ---------- */
-if (artInput) {
-  artInput.addEventListener("change", async (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    const mainArtTitleEl = document.getElementById("mainArtPreviewTitle");
-    if (mainArtTitleEl) {
-      mainArtTitleEl.textContent = file.name;
-    }
-    try {
-      const img = await loadImageFromFile(file);
-      previewState.main.img = img;
-      fitImageToMask(img, previewState.main);
-      if (mainZoomSlider) {
-        const min = previewState.main.minScale;
-        const max = min * 5; 
-        mainZoomSlider.min = min;
-        mainZoomSlider.max = max;
-        mainZoomSlider.step = (max - min) / 100;
-        mainZoomSlider.value = previewState.main.scale;
-      }
-      updateAll();
-    } catch (err) {
-      console.error("Failed to load main art:", err);
-    }
-  });
-}
-if (crestInput) {
-  crestInput.addEventListener("change", async (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    try {
-      const img = await loadImageFromFile(file);
-      previewState.crest.img = img;
-      fitImageToMask(img, previewState.crest);
-      if (crestZoomSlider) {
-        const min = previewState.crest.minScale;
-        const max = min * 8; 
-        crestZoomSlider.min = min;
-        crestZoomSlider.max = max;
-        crestZoomSlider.step = (max - min) / 100;
-        crestZoomSlider.value = previewState.crest.scale;
-      }
-      updateAll();
-    } catch (err) {
-      console.error("Failed to load crest art:", err);
-    }
-  });
-}
-if (faithInput) {
-  faithInput.addEventListener("change", async (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    try {
-      const img = await loadImageFromFile(file);
-      previewState.faith.img = img;
-      fitImageToMask(img, previewState.faith);
-      if (faithZoomSlider) {
-        const min = previewState.faith.minScale;
-        const max = min * 8; 
-        faithZoomSlider.min = min;
-        faithZoomSlider.max = max;
-        faithZoomSlider.step = (max - min) / 100;
-        faithZoomSlider.value = previewState.faith.scale;
-      }
-      updateAll();
-    } catch (err) {
-      console.error("Failed to load faith art:", err);
-    }
-  });
-}
-
-/* ---------- Pan & zoom helpers ---------- */
-function getEventPos(e, canvasEl) {
-  const rect = canvasEl.getBoundingClientRect();
-  if (e.touches && e.touches.length) {
-    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
-  } else {
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-  }
-}
+document.getElementById("artUpload").addEventListener("change", async (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  document.getElementById("mainArtPreviewTitle").textContent = file.name;
+  const img = await loadImageFromFile(file);
+  previewState.main.img = img; fitImageToMask(img, previewState.main);
+  mainZoomSlider.min = previewState.main.minScale; mainZoomSlider.max = previewState.main.minScale * 5; mainZoomSlider.value = previewState.main.scale; mainZoomSlider.step = (mainZoomSlider.max - mainZoomSlider.min)/100;
+  updateAll();
+});
+crestArtUpload.addEventListener("change", async (e) => {
+  const file = e.target.files && e.target.files[0]; if (!file) return;
+  const img = await loadImageFromFile(file);
+  previewState.crest.img = img; fitImageToMask(img, previewState.crest);
+  crestZoomSlider.min = previewState.crest.minScale; crestZoomSlider.max = previewState.crest.minScale * 8; crestZoomSlider.value = previewState.crest.scale; crestZoomSlider.step = (crestZoomSlider.max - crestZoomSlider.min)/100;
+  updateAll();
+});
+faithArtUpload.addEventListener("change", async (e) => {
+  const file = e.target.files && e.target.files[0]; if (!file) return;
+  const img = await loadImageFromFile(file);
+  previewState.faith.img = img; fitImageToMask(img, previewState.faith);
+  faithZoomSlider.min = previewState.faith.minScale; faithZoomSlider.max = previewState.faith.minScale * 8; faithZoomSlider.value = previewState.faith.scale; faithZoomSlider.step = (faithZoomSlider.max - faithZoomSlider.min)/100;
+  updateAll();
+});
 
 function attachPanAndZoom(canvasEl, state, sliderEl) {
   if (!canvasEl) return;
-  let dragging = false;
-  let lastX = 0, lastY = 0;
-
-  canvasEl.addEventListener("pointerdown", (e) => {
-    if (!state.img) return;
-    dragging = true;
-    const p = getEventPos(e, canvasEl);
-    lastX = p.x; lastY = p.y;
-    if (canvasEl.setPointerCapture) try { canvasEl.setPointerCapture(e.pointerId); } catch (err) {}
-  });
-
+  let dragging = false, lastX = 0, lastY = 0;
+  const getEventPos = (e) => { const rect = canvasEl.getBoundingClientRect(); return { x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left, y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top }; };
+  
+  canvasEl.addEventListener("pointerdown", (e) => { if (!state.img) return; dragging = true; const p = getEventPos(e); lastX = p.x; lastY = p.y; canvasEl.setPointerCapture(e.pointerId); });
   canvasEl.addEventListener("pointermove", (e) => {
     if (!dragging || !state.img) return;
-    
-    const rect = canvasEl.getBoundingClientRect();
-    const scaleX = state.maskW / rect.width; 
-
-    const p = getEventPos(e, canvasEl);
-    const dx = (p.x - lastX) * scaleX;
-    const dy = (p.y - lastY) * scaleX; 
-
-    lastX = p.x; lastY = p.y;
-    state.tx += dx; state.ty += dy;
-    clampPan(state);
-    updateAll();
+    const rect = canvasEl.getBoundingClientRect(); const scaleX = state.maskW / rect.width;
+    const p = getEventPos(e);
+    state.tx += (p.x - lastX) * scaleX; state.ty += (p.y - lastY) * scaleX;
+    lastX = p.x; lastY = p.y; clampPan(state); updateAll();
   });
-
-  function stopDrag(e) {
-    dragging = false;
-  }
-  canvasEl.addEventListener("pointerup", stopDrag);
-  canvasEl.addEventListener("pointerleave", stopDrag);
-
-  canvasEl.addEventListener("wheel", (ev) => {
+  canvasEl.addEventListener("pointerup", () => dragging = false);
+  canvasEl.addEventListener("pointerleave", () => dragging = false);
+  
+  if (sliderEl) sliderEl.addEventListener("input", (ev) => {
     if (!state.img) return;
-    ev.preventDefault();
-    
-    const zoomIntensity = 0.05;
-    const delta = ev.deltaY > 0 ? -1 : 1; 
-    const oldScale = state.scale;
-    
-    const minScale = state.minScale;
-    const maxScale = sliderEl ? parseFloat(sliderEl.max) : oldScale * 2;
-    
-    let newScale = oldScale * (1 + delta * zoomIntensity);
-    newScale = Math.max(minScale, Math.min(maxScale, newScale));
-    
-    const rect = canvasEl.getBoundingClientRect();
-    const scaleFactor = state.maskW / rect.width;
-
-    const cx = (ev.clientX - rect.left) * scaleFactor;
-    const cy = (ev.clientY - rect.top) * scaleFactor;
-
-    const imgSpaceX = (cx - state.tx) / oldScale;
-    const imgSpaceY = (cy - state.ty) / oldScale;
-    
-    state.scale = newScale;
-    state.tx = cx - imgSpaceX * newScale;
-    state.ty = cy - imgSpaceY * newScale;
-    clampPan(state);
-    if (sliderEl) sliderEl.value = state.scale;
-    updateAll();
-  }, { passive: false });
-
-  if (sliderEl) {
-    sliderEl.addEventListener("input", (ev) => {
-      if (!state.img) return;
-      const newScale = Math.max(state.minScale, parseFloat(ev.target.value)); 
-      const oldScale = state.scale;
-      const cx = state.maskW / 2, cy = state.maskH / 2;
-      const imgSpaceX = (cx - state.tx) / oldScale;
-      const imgSpaceY = (cy - state.ty) / oldScale;
-      state.scale = newScale;
-      state.tx = cx - imgSpaceX * newScale;
-      state.ty = cy - imgSpaceY * newScale;
-      clampPan(state);
-      updateAll();
-    });
-  }
+    const newScale = parseFloat(ev.target.value); const oldScale = state.scale;
+    const cx = state.maskW / 2, cy = state.maskH / 2;
+    state.tx = cx - (cx - state.tx) / oldScale * newScale; state.ty = cy - (cy - state.ty) / oldScale * newScale;
+    state.scale = newScale; clampPan(state); updateAll();
+  });
 }
-
 attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
@@ -1196,85 +675,82 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
   button.addEventListener("click", (e) => {
     e.preventDefault();
     const format = button.dataset.format;
-    const field = button.closest(".field");
-    if (!field) return;
-    const textarea = field.querySelector("textarea");
+    const textarea = button.closest(".field").querySelector("textarea");
     if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const value = textarea.value;
+    const start = textarea.selectionStart, end = textarea.selectionEnd, value = textarea.value;
     const selected = value.slice(start, end);
-
-    let openTag = "", closeTag = "";
-    if (format === "bold") { openTag = "**"; closeTag = "**"; }
-    else if (format === "italic") { openTag = "_"; closeTag = "_"; }
-    else if (format === "color") { openTag = "<c>"; closeTag = "</c>"; }
-    else if (format === "all") { openTag = "**_<c>"; closeTag = "</c>_**"; }
-    else return;
-
-    if (start !== end) {
-      const before = value.slice(0, start);
-      const after = value.slice(end);
-      const currentlyWrapped = before.endsWith(openTag) && after.startsWith(closeTag);
-      if (currentlyWrapped) {
-        const newBefore = before.slice(0, before.length - openTag.length);
-        const newAfter = after.slice(closeTag.length);
-        textarea.value = newBefore + selected + newAfter;
-        textarea.setSelectionRange(newBefore.length, newBefore.length + selected.length);
-      } else {
-        textarea.value = before + openTag + selected + closeTag + after;
-        textarea.setSelectionRange(start + openTag.length, end + openTag.length);
-      }
-      textarea.focus();
-      textarea.dispatchEvent(new Event("input"));
-      return;
-    }
-
-    const before = value.slice(0, start);
-    const after = value.slice(start);
-    textarea.value = before + openTag + closeTag + after;
-    const caret = before.length + openTag.length;
-    textarea.setSelectionRange(caret, caret);
-    textarea.focus();
+    let open = "", close = "";
+    if (format === "bold") { open = "**"; close = "**"; } else if (format === "italic") { open = "_"; close = "_"; } else if (format === "color") { open = "<c>"; close = "</c>"; } else if (format === "all") { open = "**_<c>"; close = "</c>_**"; }
+    textarea.value = value.slice(0, start) + open + selected + close + value.slice(end);
     textarea.dispatchEvent(new Event("input"));
   });
 });
 
-document.fonts.ready.then(() => {
-  setTimeout(() => {
-    updateAll();
-    updateLiveWordCount(); 
-  }, 60);
+document.fonts.ready.then(() => { setTimeout(() => { updateAll(); updateLiveWordCount(); renderWorkshopGrid(); }, 60); });
+
+document.getElementById("previewBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("previewBtn"); const originalText = btn.textContent;
+  btn.textContent = "Loading..."; btn.disabled = true;
+  try {
+    await document.fonts.ready; await Promise.all([document.fonts.load("60px 'Memento'"), document.fonts.load("60px 'Sv_numbers'"), document.fonts.load("30px 'NotoSans'")]);
+    await drawCard(); 
+    const dataUrl = canvas.toDataURL("image/png", 1.0);
+    const win = window.open("");
+    if (win) { win.document.body.style.margin = "0"; win.document.body.style.backgroundColor = "#222"; win.document.body.innerHTML = `<img src="${dataUrl}" style="max-width: 100%; height: auto; display: block; margin: auto;">`; }
+  } catch (err) { console.error(err); alert("Error generating preview."); } finally { btn.textContent = originalText; btn.disabled = false; }
 });
 
-// --- Button Event Listeners (Updated with Font Loading) ---
+// =========================================
+// --- CAROUSEL NAVIGATION ---
+// =========================================
+function navigateTo(page) {
+  const track = document.getElementById("app-carousel");
+  const viewport = document.getElementById("app-viewport");
+  if (page === 'balance') track.style.transform = "translateX(0%)";
+  else if (page === 'home') track.style.transform = "translateX(-33.3333%)";
+  else if (page === 'workshop') track.style.transform = "translateX(-66.6666%)";
+  if (viewport) viewport.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-// --- Updated Download Button Listener ---
+// =========================================
+// --- WORKSHOP & STORAGE ---
+// =========================================
+const STORAGE_KEY = 'sv_workshop_cards';
+
+function getSavedCards() {
+  const data = localStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+function saveCardsToStorage(cards) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cards)); }
+    catch (e) { console.error(e); alert("Failed to save to Workshop. Storage full."); }
+}
+
+function formatDetailsText(text) {
+  if (!text) return "";
+  let formatted = text.replace(HIGHLIGHT_REGEX, '<span class="details-keyword">$1</span>');
+  formatted = formatted.replace(/----------/g, '<hr class="details-divider" style="margin: 10px 0; opacity: 0.2;">');
+  formatted = formatted.replace(/<c>(.*?)<\/c>/g, '<span style="color: #f3d87d;">$1</span>');
+  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  formatted = formatted.replace(/_(.*?)_/g, '<i>$1</i>');
+  return formatted;
+}
+
+// --- Modified Download ---
 document.getElementById("downloadBtn").addEventListener("click", async () => { 
-  const btn = document.getElementById("downloadBtn");
-  const originalText = btn.textContent;
-  btn.textContent = "Processing...";
-  btn.disabled = true;
+  const btn = document.getElementById("downloadBtn"); const originalText = btn.textContent;
+  btn.textContent = "Processing..."; btn.disabled = true;
 
   try {
     await document.fonts.ready;
-    // Ensure fonts used in canvas are loaded
-    await Promise.all([
-        document.fonts.load("60px 'Memento'"),
-        document.fonts.load("60px 'Sv_numbers'"),
-        document.fonts.load("30px 'NotoSans'")
-    ]);
-
-    // 1. Draw the card to the canvas
+    await Promise.all([document.fonts.load("60px 'Memento'"), document.fonts.load("60px 'Sv_numbers'"), document.fonts.load("30px 'NotoSans'")]);
     await drawCard(); 
 
-    const canvas = document.getElementById("previewCanvas");
-    const dataUrl = canvas.toDataURL("image/png", 0.8); // slightly compress for storage
-
-    // 2. Gather all card data for the workshop
+    const dataUrl = canvas.toDataURL("image/png", 0.8);
+    
     const newCardData = {
-        id: Date.now(), // Unique ID used for finding the card later
+        id: Date.now(),
         image: dataUrl,
         name: nameInput.value.trim() || "Unnamed Card",
         trait: traitInput.value.trim() || "-",
@@ -1284,119 +760,30 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
         cost: costInput.value,
         attack: attackInput.value,
         defense: defenseInput.value,
-        // Store original raw text values
         textRaw: {
             card: textInputs.card.value,
             evolve: textInputs.evolve.value,
-            superEvolve: textInputs.superEvolve.value,
-            crest: textInputs.crest.value,
-            faith: textInputs.faith.value
-        },
-        illustrator: document.getElementById("illustratorName").value.trim()
+            superEvolve: textInputs.superEvolve.value
+        }
     };
 
-    // 3. Save to LocalStorage
     const currentCards = getSavedCards();
-    // Add new card to the *beginning* of the array so newest shows first
     currentCards.unshift(newCardData); 
     saveCardsToStorage(currentCards);
-
-    // 4. Re-render workshop grid immediately to show the new card
     renderWorkshopGrid();
 
-    // 5. Trigger actual download
     const link = document.createElement("a");
     link.download = `${newCardData.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
     link.href = dataUrl; 
     link.click();
     
-  } catch (err) {
-    console.error("Download/Save failed:", err);
-    alert("Error: Could not process card. See console.");
-  } finally {
-    btn.textContent = originalText;
-    btn.disabled = false;
-  }
+  } catch (err) { console.error(err); alert("Error saving card."); } finally { btn.textContent = originalText; btn.disabled = false; }
 });
-
-document.getElementById("previewBtn").addEventListener("click", async () => {
-  const btn = document.getElementById("previewBtn");
-  const originalText = btn.textContent;
-  
-  // Visual feedback
-  btn.textContent = "Loading assets...";
-  btn.disabled = true;
-
-  try {
-    // === FIX: Force wait for fonts to load before drawing ===
-    await document.fonts.ready;
-    await Promise.all([
-        document.fonts.load("60px 'Memento'"),
-        document.fonts.load("60px 'Sv_numbers'"),
-        document.fonts.load("30px 'NotoSans'")
-    ]);
-
-    btn.textContent = "Generating...";
-
-    await drawCard(); 
-    
-    const canvas = document.getElementById("previewCanvas");
-    const dataUrl = canvas.toDataURL("image/png", 1.0);
-    
-    const previewWindow = window.open("");
-    if (previewWindow) {
-      previewWindow.document.title = `${(nameInput.value.trim() || "card")}-preview`;
-      previewWindow.document.body.style.margin = "0";
-      previewWindow.document.body.style.backgroundColor = "#222";
-      previewWindow.document.body.innerHTML = `<img src="${dataUrl}" alt="Card Preview" style="max-width: 100%; height: auto; display: block; margin: auto;">`;
-    } else {
-      alert("Pop-up blocked! Please allow pop-ups for this site to use the preview feature.");
-    }
-
-  } catch (err) {
-    console.error("Preview failed:", err);
-    alert("Error: Could not generate preview. Try again.");
-  } finally {
-    btn.textContent = originalText;
-    btn.disabled = false;
-  }
-});
-
-
-// --- Navigation Carousel Logic ---
-function navigateTo(page) {
-  const track = document.getElementById("app-carousel");
-  
-  // 0% = Left Page (Balance)
-  // -33.3333% = Center Page (Home)
-  // -66.6666% = Right Page (Workshop)
-  
-  if (page === 'balance') {
-    track.style.transform = "translateX(0%)";
-  } else if (page === 'home') {
-    track.style.transform = "translateX(-33.3333%)";
-  } else if (page === 'workshop') {
-    track.style.transform = "translateX(-66.6666%)";
-  }
-  
-  // Optional: Scroll to top of viewport when switching
-  const viewport = document.getElementById("app-viewport");
-  if (viewport) viewport.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-
-
-
-// =========================================
-// --- WORKSHOP UI LOGIC ---
-// =========================================
 
 const workshopGrid = document.getElementById('workshopGrid');
 const emptyMsg = document.getElementById('emptyWorkshopMsg');
 const detailsPlaceholder = document.getElementById('detailsPlaceholder');
 const detailsContent = document.getElementById('detailsContent');
-
-// Elements in the details panel to populate
 const detailElements = {
     name: document.getElementById('detailName'),
     trait: document.getElementById('detailTraitValue'),
@@ -1413,57 +800,36 @@ const detailElements = {
     superEvolveText: document.getElementById('detailSuperEvolveTextBlock')
 };
 
-
-// Function to fetch data and build the thumbnail grid
 function renderWorkshopGrid() {
   const cards = getSavedCards();
-  
-  // Clear existing thumbnails (keep the empty message element)
   const existingThumbnails = workshopGrid.querySelectorAll('.grid-thumbnail');
   existingThumbnails.forEach(el => el.remove());
 
   if (cards.length === 0) {
-    emptyMsg.style.display = 'block';
-    resetDetailsPanel();
-    return;
+    emptyMsg.style.display = 'block'; resetDetailsPanel(); return;
   }
-
   emptyMsg.style.display = 'none';
 
   cards.forEach(cardObj => {
       const img = document.createElement('img');
-      img.src = cardObj.image;
-      img.alt = cardObj.name;
-      img.className = 'grid-thumbnail';
-      img.dataset.id = cardObj.id; // Store ID for click handler
-
+      img.src = cardObj.image; img.alt = cardObj.name; img.className = 'grid-thumbnail';
       img.addEventListener('click', () => {
-          // Remove active class from others
           document.querySelectorAll('.grid-thumbnail').forEach(t => t.classList.remove('active'));
-          // Add active class to clicked
           img.classList.add('active');
-          // Show details
-          populate WorkshopDetails(cardObj);
+          populateWorkshopDetails(cardObj);
       });
-
       workshopGrid.appendChild(img);
   });
 }
 
-// Function to populate the right-hand details panel
 function populateWorkshopDetails(card) {
-    // Hide placeholder, show content
-    detailsPlaceholder.style.display = 'none';
-    detailsContent.style.display = 'block';
-
-    // Basic Info
+    detailsPlaceholder.style.display = 'none'; detailsContent.style.display = 'block';
     detailElements.name.textContent = card.name;
     detailElements.trait.textContent = card.trait;
     detailElements.class.textContent = card.class;
     detailElements.image.src = card.image;
     detailElements.cost.textContent = card.cost;
 
-    // Stats (Only show Atk/Def for followers)
     if (card.type.toLowerCase() === 'follower') {
         detailElements.statsRow.style.display = 'flex';
         detailElements.atk.textContent = card.attack;
@@ -1472,53 +838,24 @@ function populateWorkshopDetails(card) {
         detailElements.statsRow.style.display = 'none';
     }
 
-    // Main Text
     detailElements.textBlock.innerHTML = formatDetailsText(card.textRaw.card);
     
-    // Evolve Text (Only show if present and is follower)
-    if (card.type.toLowerCase() === 'follower' && card.textRaw.evolve.trim()) {
+    if (card.type.toLowerCase() === 'follower' && card.textRaw.evolve && card.textRaw.evolve.trim()) {
         detailElements.evolveSection.style.display = 'block';
         detailElements.evolveText.innerHTML = formatDetailsText(card.textRaw.evolve);
-    } else {
-        detailElements.evolveSection.style.display = 'none';
-    }
+    } else { detailElements.evolveSection.style.display = 'none'; }
 
-    // Super-Evolve Text
-    if (card.type.toLowerCase() === 'follower' && card.textRaw.superEvolve.trim()) {
+    if (card.type.toLowerCase() === 'follower' && card.textRaw.superEvolve && card.textRaw.superEvolve.trim()) {
         detailElements.superEvolveSection.style.display = 'block';
         detailElements.superEvolveText.innerHTML = formatDetailsText(card.textRaw.superEvolve);
-    } else {
-        detailElements.superEvolveSection.style.display = 'none';
-    }
-    
-    // Note: Crest/Faith text is currently not shown in the reference image UI format, 
-    // so it is omitted here to keep the UI clean, although the data is saved.
+    } else { detailElements.superEvolveSection.style.display = 'none'; }
 }
 
-// Reset details panel to placeholder state
 function resetDetailsPanel() {
-    detailsPlaceholder.style.display = 'block';
-    detailsContent.style.display = 'none';
-     document.querySelectorAll('.grid-thumbnail').forEach(t => t.classList.remove('active'));
+    detailsPlaceholder.style.display = 'block'; detailsContent.style.display = 'none';
+    document.querySelectorAll('.grid-thumbnail').forEach(t => t.classList.remove('active'));
 }
 
-
-// Event Listener for Clearing Workshop
 document.getElementById('clearWorkshopBtn').addEventListener('click', () => {
-    if (confirm("Are you sure you want to delete all saved cards? This cannot be undone.")) {
-        localStorage.removeItem(STORAGE_KEY);
-        renderWorkshopGrid();
-    }
+    if (confirm("Delete all saved cards?")) { localStorage.removeItem(STORAGE_KEY); renderWorkshopGrid(); }
 });
-
-
-// Initial Render on Page Load
-// Wait for fonts just in case, though less critical here than drawing
-document.fonts.ready.then(() => {
-    renderWorkshopGrid();
-});
-
-
-
-
-
