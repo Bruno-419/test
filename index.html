@@ -275,10 +275,13 @@
         <div class="page-content">
           <header>
             <h1>Workshop</h1>
+            <p class="subheader">Your saved card history is stored locally in your browser.</p>
             <button class="nav-btn nav-left" onclick="navigateTo('home')">&larr; Back to Generator</button>
+            <button class="nav-btn nav-right" style="background:#522;" onclick="clearWorkshop()">Clear History</button>
           </header>
-          <div class="placeholder-content">
-            <p>Workshop tools coming soon...</p>
+          
+          <div id="workshopGrid" class="workshop-grid">
+            <p class="placeholder-text">No cards generated yet. Create and download a card to see it here!</p>
           </div>
         </div>
       </section>
@@ -289,6 +292,55 @@
   <section class="canvas-container" style="display: none;">
     <canvas id="previewCanvas" width="1920" height="1080"></canvas>
   </section>
+
+  <div id="workshopModal" class="modal">
+    <div class="modal-content workshop-modal-content">
+      <span class="close-modal" onclick="closeWorkshopModal()">&times;</span>
+      <div class="modal-body">
+        <div class="modal-image-col">
+          <img id="modalCardImage" src="" alt="Card Image">
+        </div>
+        <div class="modal-info-col">
+          <h2 id="modalCardName">Card Name</h2>
+          <div class="modal-meta">
+            <span id="modalCardClass" class="meta-tag">Class</span>
+            <span id="modalCardRarity" class="meta-tag">Rarity</span>
+            <span id="modalCardType" class="meta-tag">Type</span>
+            <span id="modalCardTrait" class="meta-tag">Trait</span>
+          </div>
+          
+          <div class="modal-text-section">
+            <div class="info-label">Card Text</div>
+            <p id="modalCardText"></p>
+          </div>
+
+          <div id="modalEvolveSection" class="modal-text-section" style="display:none;">
+            <div class="info-label">Evolve Text</div>
+            <p id="modalEvolveText"></p>
+          </div>
+
+          <div id="modalSuperEvolveSection" class="modal-text-section" style="display:none;">
+            <div class="info-label">Super-Evolve Text</div>
+            <p id="modalSuperEvolveText"></p>
+          </div>
+
+          <div id="modalCrestSection" class="modal-text-section" style="display:none;">
+            <div class="info-label">Crest: <span id="modalCrestName"></span></div>
+            <p id="modalCrestText"></p>
+          </div>
+
+          <div id="modalFaithSection" class="modal-text-section" style="display:none;">
+             <div class="info-label">Faith: <span id="modalFaithName"></span></div>
+             <p id="modalFaithText"></p>
+          </div>
+
+          <div class="modal-footer">
+            <span class="info-label">Illustrator: </span> <span id="modalIllustrator"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
   <script>
@@ -331,8 +383,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
