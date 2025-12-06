@@ -8,30 +8,17 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* === Load custom fonts (kept from your original) === */
+    /* === Load custom fonts === */
     @font-face { font-family: 'Memento'; src: url('font/Memento-SemiBold.ttf') format('truetype'); }
     @font-face { font-family: 'NotoSans'; src: url('font/NotoSansJP-Regular.ttf') format('truetype'); }
     @font-face { font-family: 'Roboto'; src: url('font/Roboto-Regular.ttf') format('truetype'); }
     @font-face { font-family: 'Sv_numbers'; src: url('font/Sv_numbers-Regular.ttf') format('truetype'); }
 
     * { font-family: 'Roboto', sans-serif; box-sizing: border-box; }
-  </style>
-
-  <style>
-    /* NEW ADDED CODE: Definitive Fix for Mobile Panning */
     
-    /* Prevents screen scrolling/panning when touching/dragging the main art preview block */
-    .preview-block {
+    /* Mobile Panning Fixes */
+    .preview-block, .crest-art-container, .faith-art-container {
       touch-action: none; 
-      user-select: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-    }
-
-    /* Prevents screen scrolling/panning when touching/dragging the smaller crest/faith art containers */
-    .crest-art-container,
-    .faith-art-container {
-      touch-action: none;
       user-select: none;
       -webkit-user-select: none;
       -moz-user-select: none;
@@ -39,6 +26,7 @@
   </style>
 </head>
 <body>
+
   <div id="app-viewport">
     
     <div id="app-carousel">
@@ -56,6 +44,7 @@
       </section>
 
       <section class="app-page" id="page-home">
+        
         <button class="nav-btn nav-top-left" onclick="navigateTo('balance')">&larr; Balance Adjustments</button>
         <button class="nav-btn nav-top-right" onclick="navigateTo('workshop')">Workshop &rarr;</button>
 
@@ -63,10 +52,8 @@
           <header>
             <h1>Shadowverse: Worlds Beyond Card Generator</h1>
             <p class="subheader">
-              V1.6.2 — May not work on all browsers, probably works in Chrome/Firefox.
-              Enable JavaScript or this website will explode!
+              V1.6.2 — Enable JavaScript or this website will explode!
             </p>
-
             <p class="subheader">
               This site is not official or in affiliation with Cygames.
             </p>
@@ -272,7 +259,8 @@
       </section>
 
       <section class="app-page" id="page-workshop">
-        <div class="page-content" style="max-width: 1600px;"> <header>
+        <div class="page-content" style="max-width: 1600px;">
+          <header>
             <h1>Workshop</h1>
             <div class="workshop-nav-container">
                  <button class="nav-btn nav-left" onclick="navigateTo('home')">&larr; Back to Generator</button>
@@ -281,7 +269,6 @@
           </header>
           
           <div class="workshop-container">
-            
             <div class="workshop-grid-wrapper">
                 <div id="workshopGrid" class="workshop-grid">
                     <p id="emptyWorkshopMsg" class="muted" style="grid-column: 1 / -1; text-align: center;">No cards saved yet. Download a card to see it here.</p>
@@ -311,8 +298,7 @@
                              <h2 id="detailName">Card Name</h2>
                              <hr class="details-divider">
                              
-                             <div class="details-text-block" id="detailCardTextBlock">
-                                 </div>
+                             <div class="details-text-block" id="detailCardTextBlock"></div>
 
                              <div id="detailEvolveSection" style="display:none;">
                                  <hr class="details-divider">
@@ -330,7 +316,8 @@
                 </div>
             </div>
 
-          </div> </div>
+          </div>
+        </div>
       </section>
 
     </div>
@@ -341,6 +328,7 @@
   </section>
 
   <script src="script.js"></script>
+
   <script>
     const cardTypeSelect = document.getElementById('cardType');
     const cardRaritySelect = document.getElementById('cardRarity');
@@ -381,9 +369,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
