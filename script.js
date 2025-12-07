@@ -1389,61 +1389,106 @@ async function renderWorkshop() {
 // 3. Modal Logic
 const workshopModal = document.getElementById("workshopModal");
 
+// script.js - Updated openWorkshopModal
+
 function openWorkshopModal(card) {
   if (!card) return;
 
-  // Populate Fields
+  // 1. Basic Images and Name
   document.getElementById("modalCardImage").src = card.image;
   document.getElementById("modalCardName").textContent = card.name;
-  document.getElementById("modalCardClass").textContent = card.class;
-  document.getElementById("modalCardType").textContent = card.type;
-  document.getElementById("modalCardRarity").textContent = card.rarity;
-  document.getElementById("modalCardTrait").textContent = card.trait || "-";
+
+  // 2. Build the "Meta String" (Trait | Class)
+  // Screenshot format: "Trait: - | Class: Forestcraft | Voice: ..."
+  // We don't have voice data, so we just do Trait and Class.
+  const traitStr = card.trait ? card.trait : "-";
+  const classStr = card.class ? card.class : "Neutral";
+  
+  // HTML formatting for the labels to be bold/gold if desired, 
+  // but the CSS handles the general look. We'll pass a clean string.
+  const metaString = `Trait: ${traitStr}  |  Class: ${classStr}`;
+  document.getElementById("modalMetaString").textContent = metaString;
+
   document.getElementById("modalIllustrator").textContent = card.illustrator || "Unknown";
 
-  // Text handling
-  document.getElementById("modalCardText").textContent = card.text.card;
-  
-  // Toggle Sections based on Type
+  // 3. Construct the Text Body
+  const container = document.getElementById("modalTextContainer");
+  container.innerHTML = ""; // Clear previous
+
+  // Helper to colorize keywords like "Fanfare" or "Last Words"
+  // This matches the style: <span class="sv-keyword">Keyword:</span> Rest of text
+  const formatText = (text) => {
+    if (!text) return "";
+    
+    // Simple regex to wrap specific keywords in gold. 
+    // You can add more keywords to this list.
+    const keywords = ["Fanfare", "Last Words", "Evolve", "Super-Evolve", "Strike", "Clash", "Storm", "Rush", "Ward", "Bane", "Drain"];
+    const regex = new RegExp(`^(${keywords.join("|")})(.*)`, "gm"); // Matches keyword at start of line
+    
+    // Replace newline characters with HTML breaks
+    let html = text.replace(/\n/g, "<br>");
+    
+    // If the text starts with a keyword (like "Fanfare:"), wrap the keyword
+    // Note: The regex needs to handle the colon if present.
+    // Let's do a simpler approach: Just highlight the known keywords anywhere?
+    // The screenshot has "Fanfare:" in gold.
+    
+    keywords.forEach(kw => {
+      // Replace "Keyword:" with colored span
+      html = html.replace(new RegExp(`${kw}:`, 'g'), `<span class="sv-keyword">${kw}:</span>`);
+      // Also handle "Super-Evolve:" specifically if not caught
+    });
+
+    return html;
+  };
+
+  // Add Card Text
+  if (card.text.card) {
+    const p = document.createElement("div");
+    p.className = "sv-text-block";
+    p.innerHTML = formatText(card.text.card);
+    container.appendChild(p);
+  }
+
   const isFollower = card.type === "Follower";
+
+  // If there is Evolve/SuperEvolve/Crest/Faith, add a divider and the text
+  const extras = [];
+  if (isFollower && card.text.evolve) extras.push({ label: "Evolve", text: card.text.evolve });
+  if (isFollower && card.text.superEvolve) extras.push({ label: "Super-Evolve", text: card.text.superEvolve });
   
-  const evolveSection = document.getElementById("modalEvolveSection");
-  if (isFollower && card.text.evolve) {
-    evolveSection.style.display = "block";
-    document.getElementById("modalEvolveText").textContent = card.text.evolve;
-  } else {
-    evolveSection.style.display = "none";
+  if (card.names.crest || card.text.crest) {
+    const label = `Crest (${card.names.crest || "Unnamed"})`;
+    extras.push({ label: label, text: card.text.crest });
+  }
+  if (card.names.faith || card.text.faith) {
+    const label = `Faith (${card.names.faith || "Unnamed"})`;
+    extras.push({ label: label, text: card.text.faith });
   }
 
-  const superEvolveSection = document.getElementById("modalSuperEvolveSection");
-  if (isFollower && card.text.superEvolve) {
-    superEvolveSection.style.display = "block";
-    document.getElementById("modalSuperEvolveText").textContent = card.text.superEvolve;
-  } else {
-    superEvolveSection.style.display = "none";
-  }
+  // Loop through extras and add them with dividers
+  extras.forEach(item => {
+    // Add Divider
+    const hr = document.createElement("hr");
+    hr.className = "sv-divider";
+    container.appendChild(hr);
 
-  // Crest/Faith
-  const crestSection = document.getElementById("modalCrestSection");
-  if (card.text.crest || card.names.crest) {
-    crestSection.style.display = "block";
-    document.getElementById("modalCrestName").textContent = card.names.crest || "Crest";
-    document.getElementById("modalCrestText").textContent = card.text.crest;
-  } else {
-    crestSection.style.display = "none";
-  }
-
-  const faithSection = document.getElementById("modalFaithSection");
-  if (card.text.faith || card.names.faith) {
-    faithSection.style.display = "block";
-    document.getElementById("modalFaithName").textContent = card.names.faith || "Faith";
-    document.getElementById("modalFaithText").textContent = card.text.faith;
-  } else {
-    faithSection.style.display = "none";
-  }
+    // Add Text
+    const p = document.createElement("div");
+    p.className = "sv-text-block";
+    // We manually prepend the Label if it's Evolve/SuperEvolve to match the screenshot style
+    // The screenshot shows "Super-Evolve: Replicate..."
+    // If the user didn't type "Super-Evolve:" in the box, we might want to add it.
+    // But usually, users type the full text. Let's assume the formatText handles the highlighting.
+    
+    // Force the label color if it exists at the start
+    let htmlContent = formatText(item.text);
+    p.innerHTML = htmlContent;
+    container.appendChild(p);
+  });
 
   // Show Modal
-  workshopModal.style.display = "block";
+  document.getElementById("workshopModal").style.display = "block";
 }
 
 function closeWorkshopModal() {
@@ -1542,3 +1587,4 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
