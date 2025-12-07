@@ -1123,3 +1123,173 @@ body {
   .modal-image-col { height: 300px; }
   .modal-image-col img { height: 100%; width: auto; }
 }
+
+/* style.css - Add to bottom */
+
+/* === SHADOWVERSE WORLDS BEYOND MODAL THEME === */
+
+/* Main Container Override */
+.workshop-modal-content.sv-theme {
+  background: rgba(30, 35, 45, 0.95); /* Dark Slate Blue/Grey */
+  border: 1px solid #4a5568;
+  border-radius: 4px; /* Sharper corners */
+  padding: 0; /* Remove default padding, we handle it internally */
+  box-shadow: 0 0 50px rgba(0,0,0,0.8);
+  width: 900px;
+  position: relative;
+  overflow: visible; /* Allow arrows to hang outside if needed */
+}
+
+/* 1. Header Bar */
+.sv-modal-header {
+  background: linear-gradient(to bottom, #2b3342, #1f242f);
+  padding: 15px 0;
+  border-bottom: 1px solid #000;
+  position: relative;
+  text-align: center;
+}
+
+.sv-modal-header h2 {
+  font-family: 'Memento', serif; /* Use your existing serif font */
+  color: #dcbb78; /* Gold color */
+  font-size: 32px;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  letter-spacing: 1px;
+}
+
+/* Close "X" styling */
+.sv-modal-header .close-modal {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 28px;
+  line-height: 1;
+}
+
+/* 2. Meta Bar (Black Strip) */
+.sv-meta-bar {
+  background: #000;
+  padding: 6px 0;
+  text-align: center;
+  border-bottom: 1px solid #333;
+}
+
+#modalMetaString {
+  color: #aaa;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* 3. Body Layout */
+.sv-body {
+  display: flex;
+  align-items: flex-start; /* Align top */
+  padding: 30px;
+  min-height: 500px;
+  background: radial-gradient(circle at center, #232935 0%, #161a22 100%);
+}
+
+/* Left Column (Image) */
+.sv-theme .modal-image-col {
+  width: 45%;
+  border: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.sv-theme .modal-image-col img {
+  max-width: 100%;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border: none;
+}
+
+/* Evolve Button (Visual) */
+.sv-evolve-btn-container {
+  margin-top: 20px;
+  width: 100%;
+  text-align: center;
+}
+.sv-evolve-btn {
+  background: linear-gradient(to bottom, #2d4f68, #1a2e3d);
+  border: 1px solid #4a6fa5;
+  color: #fff;
+  font-family: 'Memento', serif;
+  padding: 8px 30px;
+  font-size: 16px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* Right Column (Text) */
+.sv-theme .modal-info-col {
+  width: 55%;
+  padding: 10px 0 10px 30px; /* Left padding to separate from image */
+  text-align: left;
+  background: transparent;
+  border: none; /* Remove old borders */
+  overflow: visible;
+}
+
+/* Text Container */
+.sv-text-container {
+  color: #e0e0e0;
+  font-size: 16px;
+  line-height: 1.6;
+  font-family: 'Roboto', sans-serif;
+}
+
+.sv-text-block {
+  margin-bottom: 15px;
+}
+
+/* The divider line */
+.sv-divider {
+  border: 0;
+  height: 1px;
+  background: #444;
+  margin: 20px 0;
+}
+
+/* Keyword highlighting (Fanfare, etc) */
+.sv-keyword {
+  color: #dcbb78; /* Gold */
+  font-weight: bold;
+}
+
+/* Illustrator Text */
+.sv-illustrator-credit {
+  margin-top: 40px;
+  font-size: 12px;
+  color: #666;
+  border-top: 1px solid #333;
+  padding-top: 10px;
+}
+
+/* Decorative Arrows */
+.sv-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 40px;
+  color: #dcbb78;
+  cursor: default; /* Just visual for now */
+  opacity: 0.7;
+  font-family: serif;
+}
+.sv-arrow-left { left: -50px; }
+.sv-arrow-right { right: -50px; }
+
+/* Responsive Mobile Tweak */
+@media (max-width: 768px) {
+  .workshop-modal-content.sv-theme { width: 95%; }
+  .sv-body { flex-direction: column; align-items: center; }
+  .sv-theme .modal-image-col, .sv-theme .modal-info-col { width: 100%; padding: 0; }
+  .sv-theme .modal-info-col { margin-top: 20px; }
+  .sv-nav-arrow { display: none; }
+}
