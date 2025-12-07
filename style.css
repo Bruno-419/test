@@ -1131,13 +1131,25 @@ body {
 /* Main Container Override */
 .workshop-modal-content.sv-theme {
   background: rgba(30, 35, 45, 0.95); /* Dark Slate Blue/Grey */
-  border: 1px solid #4a5568;
-  border-radius: 4px; /* Sharper corners */
-  padding: 0; /* Remove default padding, we handle it internally */
+  
+  /* === NEW DIMENSIONS === */
+  width: 1014px;
+  height: 823px;
+  max-width: 95vw; /* Safety for smaller screens */
+  
+  /* === NEW BORDER STYLES === */
+  border-top: 2px solid #dcbb78;    /* Gold */
+  border-bottom: 2px solid #dcbb78; /* Gold */
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  
+  border-radius: 4px; 
+  padding: 0; 
   box-shadow: 0 0 50px rgba(0,0,0,0.8);
-  width: 900px;
   position: relative;
-  overflow: visible; /* Allow arrows to hang outside if needed */
+  overflow: hidden; /* Ensures content stays within the fixed 823px height */
+  display: flex;    /* Helps organize the internal rows (header, meta, body) */
+  flex-direction: column;
 }
 
 /* 1. Header Bar */
@@ -1184,13 +1196,14 @@ body {
   font-weight: bold;
 }
 
-/* 3. Body Layout */
+/* Ensure the body expands to fill the remaining height inside the 823px box */
 .sv-body {
   display: flex;
-  align-items: flex-start; /* Align top */
+  align-items: flex-start;
   padding: 30px;
-  min-height: 500px;
   background: radial-gradient(circle at center, #232935 0%, #161a22 100%);
+  flex: 1;          /* Takes up all remaining space */
+  overflow-y: auto; /* Adds scrollbar inside if content exceeds the fixed height */
 }
 
 /* Left Column (Image) */
@@ -1293,3 +1306,4 @@ body {
   .sv-theme .modal-info-col { margin-top: 20px; }
   .sv-nav-arrow { display: none; }
 }
+
