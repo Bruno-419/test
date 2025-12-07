@@ -1272,69 +1272,124 @@ function navigateTo(page) {
 }
 
 
-// --- WORKSHOP LOGIC ---
+// --- WORKSHOP LOGIC (IndexedDB) ---
 
-// 1. Storage Helper
-function getWorkshopData() {
-  const data = localStorage.getItem("sv_workshop_data");
-  return data ? JSON.parse(data) : [];
+const DB_NAME = "ShadowverseWorkshopDB";
+const STORE_NAME = "cards";
+const DB_VERSION = 1;
+
+// 1. Database Helper Functions
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: "id" });
+      }
+    };
+
+    request.onsuccess = (event) => {
+      resolve(event.target.result);
+    };
+
+    request.onerror = (event) => {
+      reject("IndexedDB error: " + event.target.errorCode);
+    };
+  });
 }
 
-function saveToWorkshop(cardData) {
-  const currentData = getWorkshopData();
-  // Add new card to the beginning
-  currentData.unshift(cardData);
-  // Optional: Limit history to last 50 cards to save space
-  if (currentData.length > 50) currentData.pop();
-  localStorage.setItem("sv_workshop_data", JSON.stringify(currentData));
-  renderWorkshop();
+async function saveToWorkshop(cardData) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_NAME], "readwrite");
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.add(cardData); // Adds to the DB
+
+    request.onsuccess = () => resolve();
+    request.onerror = (e) => reject(e.target.error);
+  });
 }
 
-function clearWorkshop() {
+async function getWorkshopData() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_NAME], "readonly");
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+      // Sort by ID descending (newest first) since getAll returns by key ascending usually
+      const data = request.result;
+      data.sort((a, b) => b.id - a.id);
+      resolve(data);
+    };
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function clearWorkshop() {
   if(confirm("Are you sure you want to clear your card history?")) {
-    localStorage.removeItem("sv_workshop_data");
-    renderWorkshop();
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.clear();
+
+      request.onsuccess = () => {
+        renderWorkshop();
+        resolve();
+      };
+      request.onerror = (e) => reject(e.target.error);
+    });
   }
 }
 
 // 2. Render Helper
-function renderWorkshop() {
+async function renderWorkshop() {
   const grid = document.getElementById("workshopGrid");
   if (!grid) return;
   
-  const data = getWorkshopData();
-  grid.innerHTML = ""; // Clear current
+  // Clear current grid immediately
+  grid.innerHTML = ""; 
 
-  if (data.length === 0) {
-    grid.innerHTML = '<p class="placeholder-text">No cards generated yet. Create and download a card to see it here!</p>';
-    return;
+  try {
+    const data = await getWorkshopData();
+
+    if (data.length === 0) {
+      grid.innerHTML = '<p class="placeholder-text">No cards generated yet. Create and download a card to see it here!</p>';
+      return;
+    }
+
+    data.forEach((card, index) => {
+      const cardEl = document.createElement("div");
+      cardEl.className = "workshop-card";
+      // We pass the card ID or object, but passing index of the sorted array works for display
+      cardEl.onclick = () => openWorkshopModal(card); 
+
+      const img = document.createElement("img");
+      img.src = card.image;
+      img.loading = "lazy";
+
+      const nameDiv = document.createElement("div");
+      nameDiv.className = "card-name";
+      nameDiv.textContent = card.name || "Unnamed Card";
+
+      cardEl.appendChild(img);
+      cardEl.appendChild(nameDiv);
+      grid.appendChild(cardEl);
+    });
+  } catch (err) {
+    console.error("Error loading workshop:", err);
+    grid.innerHTML = '<p class="placeholder-text" style="color:#d55;">Error loading workshop history.</p>';
   }
-
-  data.forEach((card, index) => {
-    const cardEl = document.createElement("div");
-    cardEl.className = "workshop-card";
-    cardEl.onclick = () => openWorkshopModal(index);
-
-    const img = document.createElement("img");
-    img.src = card.image;
-    img.loading = "lazy";
-
-    const nameDiv = document.createElement("div");
-    nameDiv.className = "card-name";
-    nameDiv.textContent = card.name || "Unnamed Card";
-
-    cardEl.appendChild(img);
-    cardEl.appendChild(nameDiv);
-    grid.appendChild(cardEl);
-  });
 }
 
 // 3. Modal Logic
 const workshopModal = document.getElementById("workshopModal");
 
-function openWorkshopModal(index) {
-  const data = getWorkshopData();
-  const card = data[index];
+function openWorkshopModal(card) {
   if (!card) return;
 
   // Populate Fields
@@ -1424,18 +1479,14 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     ]);
 
     // 1. Capture Data for Workshop
-    // We strictly want the "Card Only" version (no background) for the workshop
     const wasChecked = saveCardOnlyCheckbox.checked;
     
     // Force "Save Card Only" mode ON to generate the workshop thumbnail
     saveCardOnlyCheckbox.checked = true;
     await drawCard();
-    const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); // Slightly compressed for storage
+    const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); 
     
-    // Collect Metadata (Excluding stats as requested for the pop-up view, 
-    // but we can store them if we ever change our mind. 
-    // For now, adhering to the "pop-up excluding cost/atk/def" display requirement,
-    // but storing the rest is necessary).
+    // Collect Metadata
     const cardMetadata = {
       id: Date.now(),
       image: workshopImageBase64,
@@ -1458,7 +1509,15 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
       }
     };
 
-    saveToWorkshop(cardMetadata);
+    // SAVE TO DB (Async)
+    try {
+      await saveToWorkshop(cardMetadata);
+      // Re-render workshop so the new card appears immediately if we navigate there
+      await renderWorkshop();
+    } catch (dbError) {
+      console.warn("Failed to save to workshop history (IndexedDB error):", dbError);
+      // We do NOT stop the download if saving fails, but we log it.
+    }
 
     // 2. Prepare Actual Download
     // If the user DID NOT have "Save Card Only" checked originally, we must restore the full card
