@@ -1398,19 +1398,29 @@ function openWorkshopModal(card) {
   document.getElementById("modalCardImage").src = card.image;
   document.getElementById("modalCardName").textContent = card.name;
 
-  // 2. Build the "Meta String" (Trait | Class)
-  // Screenshot format: "Trait: - | Class: Forestcraft | Voice: ..."
-  // We don't have voice data, so we just do Trait and Class.
-  const traitStr = card.trait ? card.trait : "-";
-  const classStr = card.class ? card.class : "Neutral";
+  // 2. Build the "Meta Bar" HTML
+  // We use innerHTML to allow for the gold colored spans
+  const traitVal = card.trait ? card.trait : "-";
+  const classVal = card.class ? card.class : "Neutral";
+  const illustratorVal = card.illustrator ? card.illustrator : "-";
+
+  const metaHTML = `
+    <span class="sv-gold-label">Trait:</span> ${traitVal}
+    <span class="sv-meta-separator">|</span>
+    <span class="sv-gold-label">Class:</span> ${classVal}
+    <span class="sv-meta-separator">|</span>
+    <span class="sv-gold-label">Illustrator:</span> ${illustratorVal}
+  `;
   
-  // HTML formatting for the labels to be bold/gold if desired, 
-  // but the CSS handles the general look. We'll pass a clean string.
-  const metaString = `Trait: ${traitStr}  |  Class: ${classStr}`;
-  document.getElementById("modalMetaString").textContent = metaString;
-
-  document.getElementById("modalIllustrator").textContent = card.illustrator || "Unknown";
-
+  // CAUTION: Ensure your HTML element is <div id="modalMetaBar"> or similar, 
+  // or just clear the previous content of the container and append this.
+  // In the previous step, we had <span id="modalMetaString">. 
+  // Let's update that element's innerHTML.
+  const metaContainer = document.getElementById("modalMetaString");
+  if (metaContainer) {
+      metaContainer.innerHTML = metaHTML;
+  }
+  
   // 3. Construct the Text Body
   const container = document.getElementById("modalTextContainer");
   container.innerHTML = ""; // Clear previous
@@ -1587,4 +1597,5 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
 
