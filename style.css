@@ -1187,12 +1187,12 @@ body {
   height: 47px;           /* Fixed height */
   display: flex;          /* Use Flexbox for alignment */
   align-items: center;    /* Vertically center text */
-  justify-content: flex-start; /* Horizontally align left */
+  justify-content: center; /* Horizontally align left */
   padding: 0 20px;        /* Left/Right padding */
   border-bottom: 1px solid #333;
-  gap: 15px;              /* Space between items */
+  gap: 30px;              /* Space between items */
   font-family: 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: 17px;
   color: #aaa;
   font-weight: bold;
 }
@@ -1320,5 +1320,6 @@ body {
   .sv-theme .modal-info-col { margin-top: 20px; }
   .sv-nav-arrow { display: none; }
 }
+
 
 
