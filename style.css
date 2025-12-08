@@ -1068,14 +1068,14 @@ body {
   margin-bottom: 15px;
 }
 
-.modal-meta {
+.modal- {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 20px;
 }
 
-.meta-tag {
+.-tag {
   background: #333;
   color: #ddd;
   padding: 4px 10px;
@@ -1190,10 +1190,10 @@ body {
   justify-content: center; /* Horizontally align left */
   padding: 0 20px;        /* Left/Right padding */
   border-bottom: 1px solid #333;
-  gap: 30px;              /* Space between items */
+  gap: 50px;              /* Space between items */
   font-family: 'Roboto', sans-serif;
   font-size: 17px;
-  color: #aaa;
+  color: #fff;
   font-weight: bold;
 }
 
@@ -1237,7 +1237,7 @@ body {
 
 .sv-theme .modal-image-col img {
   max-width: 100%;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: none;
   border: none;
 }
 
@@ -1320,6 +1320,7 @@ body {
   .sv-theme .modal-info-col { margin-top: 20px; }
   .sv-nav-arrow { display: none; }
 }
+
 
 
 
