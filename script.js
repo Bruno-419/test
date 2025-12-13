@@ -128,9 +128,14 @@ function applySharpen(ctx, w, h, amount) {
 function getPartsAndWidths(text, fontSize, baseFont = "Memento", hyphenFont = "Roboto") {
   const parts = text.split(/(-)/g);
   let totalWidth = 0;
+  // Define extra spacing for the hyphen in titles
+  const hyphenPadding = 8; 
+
   const widths = parts.map(part => {
     ctx.font = `${fontSize}px '${part === "-" ? hyphenFont : baseFont}'`;
-    const w = ctx.measureText(part).width;
+    let w = ctx.measureText(part).width;
+    // If it's a hyphen, add the padding to the width calculation
+    if (part === "-") w += hyphenPadding;
     totalWidth += w;
     return w;
   });
@@ -149,7 +154,12 @@ function drawTextWithHyphenSwap(text, x, y, fontSize, align = "left", baseFont =
   
   parts.forEach((part, i) => {
     ctx.font = `${fontSize}px '${part === "-" ? hyphenFont : baseFont}'`;
-    ctx.fillText(part, currentX, y);
+    
+    // If it's a hyphen, nudge it to the right so it is centered in the extra space
+    let drawX = currentX;
+    if (part === "-") drawX += 4; // Half of the padding defined in getPartsAndWidths
+
+    ctx.fillText(part, drawX, y);
     currentX += widths[i];
   });
   
@@ -350,7 +360,11 @@ async function calculateTextBlockHeight(key, startY) {
       ctx.font = `${weight}${style}33px 'Roboto'`;
     }
 
-    const tokenWidth = ctx.measureText(token).width;
+    // === CHANGE START ===
+    let tokenWidth = ctx.measureText(token).width;
+    // Add 4px extra spacing for hyphens in body text
+    if (token === "-") tokenWidth += 4; 
+    // === CHANGE END ===
     
     if (currentX > textStartX && currentX + tokenWidth > wrapLimitX && token.trim() !== "") {
       totalHeight += lineHeight;
@@ -531,13 +545,26 @@ async function drawTextBlock(key, box, x, startY) {
       ctx.font = `${weight}${style}33px 'Roboto'`;
     }
 
-    const tokenWidth = ctx.measureText(token).width;
+    // === CHANGE START ===
+    let tokenWidth = ctx.measureText(token).width;
+    let drawX = xPos;
+
+    // Add 4px extra spacing, and nudge the hyphen 2px to the right
+    if (token === "-") {
+        tokenWidth += 4; 
+        drawX += 2; 
+    }
+    // === CHANGE END ===
+
     if (xPos > textStartX && xPos + tokenWidth > wrapLimitX && token.trim() !== "") {
       textY += lineHeight;
       xPos = textStartX;
+      // Reset drawX for the new line if it was a hyphen (edge case)
+      drawX = xPos + (token === "-" ? 2 : 0); 
     }
     if (xPos === textStartX && token.trim() === "") continue;
-    ctx.fillText(token, xPos, textY);
+    
+    ctx.fillText(token, drawX, textY); // Use drawX instead of xPos for drawing
     xPos += tokenWidth;
     if (wetStyle.italic) xPos += 0;
   }
@@ -1520,3 +1547,4 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
