@@ -123,7 +123,6 @@ function loadImage(src) {
 }
 
 // --- NEW: Sharpening Helper Function ---
-// Applies a convolution filter to sharpen the image data on a canvas context
 function applySharpen(ctx, w, h, amount) {
   const imgData = ctx.getImageData(0, 0, w, h);
   const data = imgData.data;
@@ -139,10 +138,7 @@ function applySharpen(ctx, w, h, amount) {
        const left = (y * w + (x - 1)) * 4;
        const right = (y * w + (x + 1)) * 4;
 
-       // Simple Sharpen Kernel Logic:
-       // pixel = pixel + amount * (4 * pixel - up - down - left - right)
-       // This adds the "edges" back into the image to crisp it up.
-       
+       // Simple Sharpen Kernel Logic
        for (let c = 0; c < 3; c++) { // RGB channels
          const edge = 4 * copy[i + c] 
                       - copy[up + c] 
@@ -152,7 +148,6 @@ function applySharpen(ctx, w, h, amount) {
          
          data[i + c] = copy[i + c] + amount * edge;
        }
-       // Alpha channel (data[i+3]) is left alone
     }
   }
   ctx.putImageData(imgData, 0, 0);
@@ -283,7 +278,9 @@ async function calculateTextBlockHeight(key, startY) {
   if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) {
     processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
   }
-  const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+)/g;
+  
+  // Updated regex: includes |-| to split hyphens
+  const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+|-)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
 
   let totalHeight = lineHeight;
@@ -323,6 +320,13 @@ async function calculateTextBlockHeight(key, startY) {
     dryLastTokenWasDivider = false;
 
     setDryFont();
+    // === FIX: Use Roboto for hyphen ===
+    if (token === "-") {
+      const weight = dryStyle.bold || dryStyle.isKeyword ? "bold " : "";
+      const style = dryStyle.italic ? "italic " : "";
+      ctx.font = `${weight}${style}33px 'Roboto'`;
+    }
+
     const tokenWidth = ctx.measureText(token).width;
     
     if (currentX > textStartX && currentX + tokenWidth > wrapLimitX && token.trim() !== "") {
@@ -377,7 +381,8 @@ async function drawTextBlock(key, box, x, startY) {
     processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
   }
 
-  const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+)/g;
+  // Updated regex: includes |-| to split hyphens
+  const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+|-)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
 
   let totalHeight = lineHeight;
@@ -391,6 +396,7 @@ async function drawTextBlock(key, box, x, startY) {
     ctx.font = `${weight}${style}${baseFont}`;
   };
 
+  // DRY RUN to calculate height/wrapping
   for (const token of allTokens) {
     if (token === "**") { dryStyle.bold = !dryStyle.bold; continue; }
     if (token === "_") { dryStyle.italic = !dryStyle.italic; continue; }
@@ -420,6 +426,13 @@ async function drawTextBlock(key, box, x, startY) {
     
     dryLastTokenWasDivider = false;
     setDryFont();
+    // === FIX: Use Roboto for hyphen ===
+    if (token === "-") {
+      const weight = dryStyle.bold || dryStyle.isKeyword ? "bold " : "";
+      const style = dryStyle.italic ? "italic " : "";
+      ctx.font = `${weight}${style}33px 'Roboto'`;
+    }
+
     const tokenWidth = ctx.measureText(token).width;
     if (currentX > textStartX && currentX + tokenWidth > wrapLimitX && token.trim() !== "") {
       totalHeight += lineHeight;
@@ -457,6 +470,7 @@ async function drawTextBlock(key, box, x, startY) {
     assets.boxes[key === "card" ? "divider" : "small_divider"]
   );
 
+  // ACTUAL DRAWING RUN
   for (const token of allTokens) {
     if (token === "**") { wetStyle.bold = !wetStyle.bold; continue; }
     if (token === "_") { wetStyle.italic = !wetStyle.italic; continue; }
@@ -488,12 +502,21 @@ async function drawTextBlock(key, box, x, startY) {
     }
     lastTokenWasDivider = false;
     setWetStyle();
+    
+    // === FIX: Use Roboto for hyphen ===
+    if (token === "-") {
+      const weight = wetStyle.bold || wetStyle.isKeyword ? "bold " : "";
+      const style = wetStyle.italic ? "italic " : "";
+      ctx.font = `${weight}${style}33px 'Roboto'`;
+    }
+
     const tokenWidth = ctx.measureText(token).width;
     if (xPos > textStartX && xPos + tokenWidth > wrapLimitX && token.trim() !== "") {
       textY += lineHeight;
       xPos = textStartX;
     }
     if (xPos === textStartX && token.trim() === "") continue;
+    
     ctx.fillText(token, xPos, textY);
     xPos += tokenWidth;
     if (wetStyle.italic) xPos += 0;
@@ -1597,5 +1620,3 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
-
-
