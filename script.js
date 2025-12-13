@@ -90,13 +90,45 @@ let uploadedArt = null;
 let crestArt = null;
 let faithArt = null;
 
-// --- Hyphen Swap Helper Functions ---
+// --- Helper Functions ---
+
+function loadImage(src) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = rej;
+    img.src = src;
+  });
+}
+
+// Sharpening Helper
+function applySharpen(ctx, w, h, amount) {
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const data = imgData.data;
+  const copy = new Uint8ClampedArray(data);
+
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+       const i = (y * w + x) * 4;
+       const up = ((y - 1) * w + x) * 4;
+       const down = ((y + 1) * w + x) * 4;
+       const left = (y * w + (x - 1)) * 4;
+       const right = (y * w + (x + 1)) * 4;
+
+       for (let c = 0; c < 3; c++) {
+         const edge = 4 * copy[i + c] - copy[up + c] - copy[down + c] - copy[left + c] - copy[right + c];
+         data[i + c] = copy[i + c] + amount * edge;
+       }
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
+// Hyphen Handling Helpers
 function getPartsAndWidths(text, fontSize, baseFont = "Memento", hyphenFont = "Roboto") {
-  // Split text but keep the hyphen delimiter
   const parts = text.split(/(-)/g);
   let totalWidth = 0;
   const widths = parts.map(part => {
-    // Determine font for this segment
     ctx.font = `${fontSize}px '${part === "-" ? hyphenFont : baseFont}'`;
     const w = ctx.measureText(part).width;
     totalWidth += w;
@@ -107,7 +139,7 @@ function getPartsAndWidths(text, fontSize, baseFont = "Memento", hyphenFont = "R
 
 function drawTextWithHyphenSwap(text, x, y, fontSize, align = "left", baseFont = "Memento", hyphenFont = "Roboto") {
   ctx.save();
-  ctx.textAlign = "left"; // We manually calculate positions
+  ctx.textAlign = "left"; 
   
   const { parts, widths, totalWidth } = getPartsAndWidths(text, fontSize, baseFont, hyphenFont);
   
@@ -144,47 +176,6 @@ function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpa
   const yNudge = (maxFontSize - fontSize) * yNudgeCoefficient;
   ctx.fillText(text, x, y + yNudge);
   ctx.letterSpacing = "0px";
-}
-
-// --- Helpers ---
-function loadImage(src) {
-  return new Promise((res, rej) => {
-    const img = new Image();
-    img.onload = () => res(img);
-    img.onerror = rej;
-    img.src = src;
-  });
-}
-
-// --- NEW: Sharpening Helper Function ---
-function applySharpen(ctx, w, h, amount) {
-  const imgData = ctx.getImageData(0, 0, w, h);
-  const data = imgData.data;
-  const copy = new Uint8ClampedArray(data); // Copy for reference
-
-  for (let y = 1; y < h - 1; y++) {
-    for (let x = 1; x < w - 1; x++) {
-       const i = (y * w + x) * 4;
-       
-       // Neighbors for convolution
-       const up = ((y - 1) * w + x) * 4;
-       const down = ((y + 1) * w + x) * 4;
-       const left = (y * w + (x - 1)) * 4;
-       const right = (y * w + (x + 1)) * 4;
-
-       // Simple Sharpen Kernel Logic
-       for (let c = 0; c < 3; c++) { // RGB channels
-         const edge = 4 * copy[i + c] 
-                      - copy[up + c] 
-                      - copy[down + c] 
-                      - copy[left + c] 
-                      - copy[right + c];
-         
-         data[i + c] = copy[i + c] + amount * edge;
-       }
-    }
-  }
-  ctx.putImageData(imgData, 0, 0);
 }
 
 // --- Word Count Functions ---
@@ -313,7 +304,6 @@ async function calculateTextBlockHeight(key, startY) {
     processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
   }
   
-  // Updated regex: includes |-| to split hyphens
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+|-)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
 
@@ -354,7 +344,6 @@ async function calculateTextBlockHeight(key, startY) {
     dryLastTokenWasDivider = false;
 
     setDryFont();
-    // === FIX: Use Roboto for hyphen ===
     if (token === "-") {
       const weight = dryStyle.bold || dryStyle.isKeyword ? "bold " : "";
       const style = dryStyle.italic ? "italic " : "";
@@ -415,10 +404,10 @@ async function drawTextBlock(key, box, x, startY) {
     processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
   }
 
-  // Updated regex: includes |-| to split hyphens
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+|-)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
 
+  // --- Dry Run (Height Calc) ---
   let totalHeight = lineHeight;
   let currentX = textStartX;
   let dryStyle = { bold: false, italic: false, isKeyword: false };
@@ -430,7 +419,6 @@ async function drawTextBlock(key, box, x, startY) {
     ctx.font = `${weight}${style}${baseFont}`;
   };
 
-  // DRY RUN to calculate height/wrapping
   for (const token of allTokens) {
     if (token === "**") { dryStyle.bold = !dryStyle.bold; continue; }
     if (token === "_") { dryStyle.italic = !dryStyle.italic; continue; }
@@ -460,7 +448,7 @@ async function drawTextBlock(key, box, x, startY) {
     
     dryLastTokenWasDivider = false;
     setDryFont();
-    // === FIX: Use Roboto for hyphen ===
+    
     if (token === "-") {
       const weight = dryStyle.bold || dryStyle.isKeyword ? "bold " : "";
       const style = dryStyle.italic ? "italic " : "";
@@ -484,6 +472,7 @@ async function drawTextBlock(key, box, x, startY) {
     ? drawStretchBox(boxImg, x, startY, stretchCount, key)
     : 0;
 
+  // --- Drawing Run ---
   ctx.textAlign = "left";
   ctx.shadowColor = "black";
   ctx.shadowBlur = 4;
@@ -504,7 +493,6 @@ async function drawTextBlock(key, box, x, startY) {
     assets.boxes[key === "card" ? "divider" : "small_divider"]
   );
 
-  // ACTUAL DRAWING RUN
   for (const token of allTokens) {
     if (token === "**") { wetStyle.bold = !wetStyle.bold; continue; }
     if (token === "_") { wetStyle.italic = !wetStyle.italic; continue; }
@@ -536,8 +524,7 @@ async function drawTextBlock(key, box, x, startY) {
     }
     lastTokenWasDivider = false;
     setWetStyle();
-    
-    // === FIX: Use Roboto for hyphen ===
+
     if (token === "-") {
       const weight = wetStyle.bold || wetStyle.isKeyword ? "bold " : "";
       const style = wetStyle.italic ? "italic " : "";
@@ -550,7 +537,6 @@ async function drawTextBlock(key, box, x, startY) {
       xPos = textStartX;
     }
     if (xPos === textStartX && token.trim() === "") continue;
-    
     ctx.fillText(token, xPos, textY);
     xPos += tokenWidth;
     if (wetStyle.italic) xPos += 0;
@@ -576,7 +562,6 @@ async function drawCard() {
   const isFollower = (currentCardType === 'follower');
   const saveCardOnly = saveCardOnlyCheckbox.checked; 
 
-  // 1. Calculate Height / Stretch
   let stretchPixels = 0;
   
   if (!saveCardOnly) {
@@ -584,105 +569,72 @@ async function drawCard() {
       for (const { key } of textOrder) {
           const textValue = textInputs[key].value.trim();
           if (!textValue) continue; 
-
           const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
-          if (isEvolveBlock && !isFollower) {
-              continue;
-          }
+          if (isEvolveBlock && !isFollower) continue;
           const blockHeight = await calculateTextBlockHeight(key); 
           calculatedTotalY += blockHeight - 10;
       }
-
       const illustrator = document.getElementById("illustratorName").value.trim();
       const showBottomBar = wordCountCheckbox.checked || illustrator;
-
       const defaultStretchThreshold = 900;
       const bottomBarStretchThreshold = 825;
       const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
-      
       stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
   }
 
   const stretchCount = stretchPixels / 50;
   const boxAsset = (wordCountCheckbox.checked || document.getElementById("illustratorName").value.trim()) ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
-  
   const mainBoxImg = await getImage(boxAsset);
   
-  // 2. Set Canvas Dimensions
   const baseHeight = 1080; 
   const baseWidth = 1920;
-  
-  // UPDATED: Set explicit dimensions for Card Only mode
   const newWidth = saveCardOnly ? 729 : baseWidth;
   const newHeight = saveCardOnly ? 882 : (baseHeight + stretchPixels);
 
-  if (canvas.height !== newHeight) {
-    canvas.height = newHeight;
-  }
-  if (canvas.width !== newWidth) {
-    canvas.width = newWidth;
-  }
+  if (canvas.height !== newHeight) canvas.height = newHeight;
+  if (canvas.width !== newWidth) canvas.width = newWidth;
 
-  // 3. Clear Canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
-  // === START TRANSLATION ===
-  // If saving card only, shift the context UP so the card (which starts at Y=153) hits the top (Y=0)
   ctx.save();
   if (saveCardOnly) {
     ctx.translate(-48, -153);
   }
 
-  // 4. Draw Background (SKIP if Save Card Only)
   if (!saveCardOnly) {
       const bg = await getImage(assets.backgrounds[classSelect.value]);
       const slicePointY = 1000;
       const topHeight = Math.min(slicePointY, bg.height);
       const bottomPartHeight = bg.height - topHeight;
-
       ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
-
       if (bottomPartHeight > 0) {
         const newBottomHeight = bottomPartHeight + stretchPixels;
         ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
       }
   }
 
-  // Load Assets
   const [gem, frame] = await Promise.all([
     getImage(assets.gems[classSelect.value]),
-    getImage(
-      assets[typeSelect.value.toLowerCase()][
-        ["bronze", "silver", "gold", "legendary", "signature"].indexOf(
-          raritySelect.value.toLowerCase()
-        )
-      ]
-    )
+    getImage(assets[typeSelect.value.toLowerCase()][["bronze", "silver", "gold", "legendary", "signature"].indexOf(raritySelect.value.toLowerCase())])
   ]);
 
-  // 5. Masked Main Art
   if (uploadedArt) {
     const s = previewState.main;
     const dWidth = uploadedArt.width * s.scale;
     const dHeight = uploadedArt.height * s.scale;
-
     const bmp = await createImageBitmap(uploadedArt, 0, 0, uploadedArt.width, uploadedArt.height, {
       resizeWidth: Math.round(dWidth),
       resizeHeight: Math.round(dHeight),
       resizeQuality: "high" 
     });
-    
     ctx.save();
     ctx.beginPath();
     ctx.rect(MAIN_ART_X, MAIN_ART_Y, MAIN_MASK_W, MAIN_MASK_H);
     ctx.closePath();
     ctx.clip();
-    
     ctx.drawImage(bmp, MAIN_ART_X + s.tx, MAIN_ART_Y + s.ty);
-    
     ctx.restore();
     bmp.close();
   }
@@ -690,11 +642,9 @@ async function drawCard() {
   ctx.drawImage(gem, 398, 863);
   ctx.drawImage(frame, 48, 153);
 
-  // 6. Text Box & Text (SKIP if Save Card Only)
   if (!saveCardOnly) {
       const textBoxX = 722;
       const textBoxY = 206;
-      
       const dynamicBoxWidth = mainBoxImg.width;
       const dynamicBoxHeight = mainBoxImg.height + stretchPixels; 
 
@@ -702,12 +652,9 @@ async function drawCard() {
       offCanvas.width = dynamicBoxWidth;
       offCanvas.height = dynamicBoxHeight;
       const offCtx = offCanvas.getContext("2d");
-      
       offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
-      
       offCtx.filter = "blur(5px)";
       offCtx.drawImage(offCanvas, 0, 0);
-      
       ctx.drawImage(offCanvas, textBoxX, textBoxY);
 
       drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
@@ -716,15 +663,11 @@ async function drawCard() {
       for (const { key, box } of textOrder) {
         const textValue = textInputs[key].value.trim();
         if (!textValue) continue; 
-
         const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
-        if (isEvolveBlock && !isFollower) {
-          continue;
-        }
+        if (isEvolveBlock && !isFollower) continue;
 
         const blockHeight = await drawTextBlock(key, box, boxX, currentY);
         
-        // Draw Icons (Crest/Faith)
         const isCrest = key === "crest";
         const isFaith = key === "faith";
         if (isCrest || isFaith) {
@@ -738,7 +681,6 @@ async function drawCard() {
             const s = previewState[isCrest ? "crest" : "faith"];
             const dWidth = iconImg.width * s.scale;
             const dHeight = iconImg.height * s.scale;
-
             const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
               resizeWidth: Math.round(dWidth),
               resizeHeight: Math.round(dHeight),
@@ -765,12 +707,9 @@ async function drawCard() {
           const displayName = nameValue || defaultName;
           if (displayName) {
             ctx.save();
-            //ctx.font = "33px 'Memento'";
             ctx.fillStyle = "#f3d87d";
-            //ctx.textAlign = "left";
             ctx.shadowColor = "black";
             ctx.shadowBlur = 4;
-            // Replaced ctx.fillText with helper
             drawTextWithHyphenSwap(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10, 33, "left");
             ctx.restore();
           }
@@ -779,39 +718,31 @@ async function drawCard() {
       }
   }
 
-  // 7. Stats & Name
   ctx.shadowColor = "black";
   ctx.shadowBlur = 6;
   ctx.fillStyle = "#efeee9";
   
   const nameText = nameInput.value.trim() || "Unnamed Card";
 
-  // UPDATED: Only draw the Top Header Name/Trait if NOT in "Card Only" mode
   if (!saveCardOnly) {
-    // Replaced standard draw with helper
     drawTextWithHyphenSwap(nameText, 163, 150, 56, "left");
-    
     const traitText = traitInput.value.trim() || "—";
-    // Replaced standard draw with helper
     drawTextWithHyphenSwap(traitText, 1306, 147, 33, "left");
   }
 
-  // Draw the Secondary Name (The one inside the card frame)
   let secondaryFontSize = 42;
-  // Use helper to calculate width including font swap
   let { totalWidth } = getPartsAndWidths(nameText, secondaryFontSize);
   const maxWidth = 363;
   const baseY = 331;
   const offsetPerStep = -0.75;
   let shrinkSteps = 0;
-  while (textWidth > maxWidth && secondaryFontSize > 2) {
+  
+  while (totalWidth > maxWidth && secondaryFontSize > 2) {
     secondaryFontSize -= 2;
     shrinkSteps++;
-    // Recalculate using helper
     totalWidth = getPartsAndWidths(nameText, secondaryFontSize).totalWidth;
   }
   const secondaryNameY = baseY + (shrinkSteps * offsetPerStep);
-  // Replaced standard draw with helper
   drawTextWithHyphenSwap(nameText, 455, secondaryNameY, secondaryFontSize, "center");
 
   const numberSpacing = -5;
@@ -829,7 +760,6 @@ async function drawCard() {
   }
   ctx.letterSpacing = "0px";
 
-  // Footer Elements (Skip if Save Card Only)
   if (!saveCardOnly) {
       if (tokenCheckbox.checked) {
         ctx.font = "28px 'NotoSans'";
@@ -854,14 +784,12 @@ async function drawCard() {
       }
   }
   
-  // === END TRANSLATION ===
   ctx.restore();
-  
   ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
 }
 
 /***********************
-  PREVIEW COLUMN HANDLERS (clamped)
+  PREVIEW COLUMN HANDLERS
 ***********************/
 const MAIN_MASK_W = 450, MAIN_MASK_H = 560;
 const MAIN_ART_X = 200, MAIN_ART_Y = 350;
@@ -1266,17 +1194,16 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
   const btn = document.getElementById("previewBtn");
   const originalText = btn.textContent;
   
-  // Visual feedback
   btn.textContent = "Loading assets...";
   btn.disabled = true;
 
   try {
-    // === FIX: Force wait for fonts to load before drawing ===
     await document.fonts.ready;
     await Promise.all([
         document.fonts.load("60px 'Memento'"),
         document.fonts.load("60px 'Sv_numbers'"),
-        document.fonts.load("30px 'NotoSans'")
+        document.fonts.load("30px 'NotoSans'"),
+        document.fonts.load("30px 'Roboto'")
     ]);
 
     btn.textContent = "Generating...";
@@ -1310,10 +1237,6 @@ document.getElementById("previewBtn").addEventListener("click", async () => {
 function navigateTo(page) {
   const track = document.getElementById("app-carousel");
   
-  // 0% = Left Page (Balance)
-  // -33.3333% = Center Page (Home)
-  // -66.6666% = Right Page (Workshop)
-  
   if (page === 'balance') {
     track.style.transform = "translateX(0%)";
   } else if (page === 'home') {
@@ -1322,7 +1245,6 @@ function navigateTo(page) {
     track.style.transform = "translateX(-66.6666%)";
   }
   
-  // Optional: Scroll to top of viewport when switching
   const viewport = document.getElementById("app-viewport");
   if (viewport) viewport.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -1334,7 +1256,6 @@ const DB_NAME = "ShadowverseWorkshopDB";
 const STORE_NAME = "cards";
 const DB_VERSION = 1;
 
-// 1. Database Helper Functions
 function openDB() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -1361,7 +1282,7 @@ async function saveToWorkshop(cardData) {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([STORE_NAME], "readwrite");
     const store = transaction.objectStore(STORE_NAME);
-    const request = store.add(cardData); // Adds to the DB
+    const request = store.add(cardData); 
 
     request.onsuccess = () => resolve();
     request.onerror = (e) => reject(e.target.error);
@@ -1376,7 +1297,6 @@ async function getWorkshopData() {
     const request = store.getAll();
 
     request.onsuccess = () => {
-      // Sort by ID descending (newest first) since getAll returns by key ascending usually
       const data = request.result;
       data.sort((a, b) => b.id - a.id);
       resolve(data);
@@ -1402,12 +1322,10 @@ async function clearWorkshop() {
   }
 }
 
-// 2. Render Helper
 async function renderWorkshop() {
   const grid = document.getElementById("workshopGrid");
   if (!grid) return;
   
-  // Clear current grid immediately
   grid.innerHTML = ""; 
 
   try {
@@ -1421,7 +1339,6 @@ async function renderWorkshop() {
     data.forEach((card, index) => {
       const cardEl = document.createElement("div");
       cardEl.className = "workshop-card";
-      // We pass the card ID or object, but passing index of the sorted array works for display
       cardEl.onclick = () => openWorkshopModal(card); 
 
       const img = document.createElement("img");
@@ -1442,20 +1359,14 @@ async function renderWorkshop() {
   }
 }
 
-// 3. Modal Logic
 const workshopModal = document.getElementById("workshopModal");
-
-// script.js - Updated openWorkshopModal
 
 function openWorkshopModal(card) {
   if (!card) return;
 
-  // 1. Basic Images and Name
   document.getElementById("modalCardImage").src = card.image;
   document.getElementById("modalCardName").textContent = card.name;
 
-  // 2. Build the "Meta Bar" HTML
-  // We use innerHTML to allow for the gold colored spans
   const traitVal = card.trait ? card.trait : "-";
   const classVal = card.class ? card.class : "Neutral";
   const illustratorVal = card.illustrator ? card.illustrator : "-";
@@ -1468,47 +1379,29 @@ function openWorkshopModal(card) {
     <span class="sv-gold-label">Illustrator:</span> ${illustratorVal}
   `;
   
-  // CAUTION: Ensure your HTML element is <div id="modalMetaBar"> or similar, 
-  // or just clear the previous content of the container and append this.
-  // In the previous step, we had <span id="modalMetaString">. 
-  // Let's update that element's innerHTML.
   const metaContainer = document.getElementById("modalMetaString");
   if (metaContainer) {
       metaContainer.innerHTML = metaHTML;
   }
   
-  // 3. Construct the Text Body
   const container = document.getElementById("modalTextContainer");
-  container.innerHTML = ""; // Clear previous
+  container.innerHTML = ""; 
 
-  // Helper to colorize keywords like "Fanfare" or "Last Words"
-  // This matches the style: <span class="sv-keyword">Keyword:</span> Rest of text
   const formatText = (text) => {
     if (!text) return "";
     
-    // Simple regex to wrap specific keywords in gold. 
-    // You can add more keywords to this list.
     const keywords = ["Fanfare", "Last Words", "Evolve", "Super-Evolve", "Strike", "Clash", "Storm", "Rush", "Ward", "Bane", "Drain"];
-    const regex = new RegExp(`^(${keywords.join("|")})(.*)`, "gm"); // Matches keyword at start of line
+    const regex = new RegExp(`^(${keywords.join("|")})(.*)`, "gm"); 
     
-    // Replace newline characters with HTML breaks
     let html = text.replace(/\n/g, "<br>");
     
-    // If the text starts with a keyword (like "Fanfare:"), wrap the keyword
-    // Note: The regex needs to handle the colon if present.
-    // Let's do a simpler approach: Just highlight the known keywords anywhere?
-    // The screenshot has "Fanfare:" in gold.
-    
     keywords.forEach(kw => {
-      // Replace "Keyword:" with colored span
       html = html.replace(new RegExp(`${kw}:`, 'g'), `<span class="sv-keyword">${kw}:</span>`);
-      // Also handle "Super-Evolve:" specifically if not caught
     });
 
     return html;
   };
 
-  // Add Card Text
   if (card.text.card) {
     const p = document.createElement("div");
     p.className = "sv-text-block";
@@ -1518,7 +1411,6 @@ function openWorkshopModal(card) {
 
   const isFollower = card.type === "Follower";
 
-  // If there is Evolve/SuperEvolve/Crest/Faith, add a divider and the text
   const extras = [];
   if (isFollower && card.text.evolve) extras.push({ label: "Evolve", text: card.text.evolve });
   if (isFollower && card.text.superEvolve) extras.push({ label: "Super-Evolve", text: card.text.superEvolve });
@@ -1532,28 +1424,18 @@ function openWorkshopModal(card) {
     extras.push({ label: label, text: card.text.faith });
   }
 
-  // Loop through extras and add them with dividers
   extras.forEach(item => {
-    // Add Divider
     const hr = document.createElement("hr");
     hr.className = "sv-divider";
     container.appendChild(hr);
 
-    // Add Text
     const p = document.createElement("div");
     p.className = "sv-text-block";
-    // We manually prepend the Label if it's Evolve/SuperEvolve to match the screenshot style
-    // The screenshot shows "Super-Evolve: Replicate..."
-    // If the user didn't type "Super-Evolve:" in the box, we might want to add it.
-    // But usually, users type the full text. Let's assume the formatText handles the highlighting.
-    
-    // Force the label color if it exists at the start
     let htmlContent = formatText(item.text);
     p.innerHTML = htmlContent;
     container.appendChild(p);
   });
 
-  // Show Modal
   document.getElementById("workshopModal").style.display = "block";
 }
 
@@ -1561,18 +1443,13 @@ function closeWorkshopModal() {
   workshopModal.style.display = "none";
 }
 
-// Close modal if clicking outside content
 window.addEventListener("click", (e) => {
   if (e.target === workshopModal) {
     closeWorkshopModal();
   }
 });
 
-// Initialize Workshop on load
 document.addEventListener("DOMContentLoaded", renderWorkshop);
-
-
-// --- UPDATED DOWNLOAD HANDLER ---
 
 document.getElementById("downloadBtn").addEventListener("click", async () => { 
   const btn = document.getElementById("downloadBtn");
@@ -1586,18 +1463,16 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     await Promise.all([
         document.fonts.load("60px 'Memento'"),
         document.fonts.load("60px 'Sv_numbers'"),
-        document.fonts.load("30px 'NotoSans'")
+        document.fonts.load("30px 'NotoSans'"),
+        document.fonts.load("30px 'Roboto'")
     ]);
 
-    // 1. Capture Data for Workshop
     const wasChecked = saveCardOnlyCheckbox.checked;
     
-    // Force "Save Card Only" mode ON to generate the workshop thumbnail
     saveCardOnlyCheckbox.checked = true;
     await drawCard();
     const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); 
     
-    // Collect Metadata
     const cardMetadata = {
       id: Date.now(),
       image: workshopImageBase64,
@@ -1620,25 +1495,18 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
       }
     };
 
-    // SAVE TO DB (Async)
     try {
       await saveToWorkshop(cardMetadata);
-      // Re-render workshop so the new card appears immediately if we navigate there
       await renderWorkshop();
     } catch (dbError) {
       console.warn("Failed to save to workshop history (IndexedDB error):", dbError);
-      // We do NOT stop the download if saving fails, but we log it.
     }
 
-    // 2. Prepare Actual Download
-    // If the user DID NOT have "Save Card Only" checked originally, we must restore the full card
     if (!wasChecked) {
       saveCardOnlyCheckbox.checked = false;
-      await drawCard(); // Redraw full version
+      await drawCard(); 
     }
-    // If they DID have it checked, we are already in the correct state.
 
-    // 3. Trigger Download
     const downloadLink = document.createElement("a");
     downloadLink.download = `${(nameInput.value.trim() || "card")}.png`;
     downloadLink.href = canvas.toDataURL("image/png", 1.0); 
@@ -1648,9 +1516,7 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     console.error("Download failed:", err);
     alert("Error: Could not save image. Try again.");
   } finally {
-    // Restore state just in case
     btn.textContent = originalText;
     btn.disabled = false;
   }
 });
-
