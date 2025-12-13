@@ -987,13 +987,6 @@ body {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-  transition: box-shadow 0.2s;
-}
-
-.workshop-card:hover img {
-  box-shadow: 0 10px 25px rgba(0,0,0,0.7); /* Deepen shadow on hover */
 }
 
 .workshop-card .card-name {
@@ -1319,6 +1312,7 @@ body {
   .sv-theme .modal-info-col { margin-top: 20px; }
   .sv-nav-arrow { display: none; }
 }
+
 
 
 
