@@ -968,37 +968,36 @@ body {
 }
 
 .workshop-card {
-  background: #222;
-  border: 1px solid #333;
-  border-radius: 8px;
-  overflow: hidden;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s;
   position: relative;
 }
 
 .workshop-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-  border-color: #555;
+  box-shadow: none;
+  border-color: transparent;
 }
 
 .workshop-card img {
   width: 100%;
   height: auto;
   display: block;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  transition: box-shadow 0.2s;
+}
+
+.workshop-card:hover img {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.7); /* Deepen shadow on hover */
 }
 
 .workshop-card .card-name {
-  padding: 10px;
-  font-size: 14px;
-  text-align: center;
-  color: #ddd;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  background: #1a1a1a;
-  border-top: 1px solid #333;
+  display: none;
 }
 
 .placeholder-text {
@@ -1320,6 +1319,7 @@ body {
   .sv-theme .modal-info-col { margin-top: 20px; }
   .sv-nav-arrow { display: none; }
 }
+
 
 
 
