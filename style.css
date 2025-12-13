@@ -994,7 +994,6 @@ body {
 
 .workshop-card img:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.7);
 }
 
 .workshop-card .card-name {
@@ -1320,6 +1319,7 @@ body {
   .sv-theme .modal-info-col { margin-top: 20px; }
   .sv-nav-arrow { display: none; }
 }
+
 
 
 
