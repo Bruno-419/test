@@ -90,6 +90,40 @@ let uploadedArt = null;
 let crestArt = null;
 let faithArt = null;
 
+// --- Hyphen Swap Helper Functions ---
+function getPartsAndWidths(text, fontSize, baseFont = "Memento", hyphenFont = "Roboto") {
+  // Split text but keep the hyphen delimiter
+  const parts = text.split(/(-)/g);
+  let totalWidth = 0;
+  const widths = parts.map(part => {
+    // Determine font for this segment
+    ctx.font = `${fontSize}px '${part === "-" ? hyphenFont : baseFont}'`;
+    const w = ctx.measureText(part).width;
+    totalWidth += w;
+    return w;
+  });
+  return { parts, widths, totalWidth };
+}
+
+function drawTextWithHyphenSwap(text, x, y, fontSize, align = "left", baseFont = "Memento", hyphenFont = "Roboto") {
+  ctx.save();
+  ctx.textAlign = "left"; // We manually calculate positions
+  
+  const { parts, widths, totalWidth } = getPartsAndWidths(text, fontSize, baseFont, hyphenFont);
+  
+  let currentX = x;
+  if (align === "center") currentX = x - (totalWidth / 2);
+  else if (align === "right") currentX = x - totalWidth;
+  
+  parts.forEach((part, i) => {
+    ctx.font = `${fontSize}px '${part === "-" ? hyphenFont : baseFont}'`;
+    ctx.fillText(part, currentX, y);
+    currentX += widths[i];
+  });
+  
+  ctx.restore();
+}
+
 /**
  * Draws a number, scaling down the font size to fit a max width.
  */
@@ -731,12 +765,13 @@ async function drawCard() {
           const displayName = nameValue || defaultName;
           if (displayName) {
             ctx.save();
-            ctx.font = "33px 'Memento'";
+            //ctx.font = "33px 'Memento'";
             ctx.fillStyle = "#f3d87d";
-            ctx.textAlign = "left";
+            //ctx.textAlign = "left";
             ctx.shadowColor = "black";
             ctx.shadowBlur = 4;
-            ctx.fillText(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10);
+            // Replaced ctx.fillText with helper
+            drawTextWithHyphenSwap(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10, 33, "left");
             ctx.restore();
           }
         }
@@ -753,20 +788,18 @@ async function drawCard() {
 
   // UPDATED: Only draw the Top Header Name/Trait if NOT in "Card Only" mode
   if (!saveCardOnly) {
-    ctx.font = "56px 'Memento'";
-    ctx.textAlign = "left";
-    ctx.fillText(nameText, 163, 150);
-
-    ctx.font = "33px 'Memento'";
-    ctx.textAlign = "left";
+    // Replaced standard draw with helper
+    drawTextWithHyphenSwap(nameText, 163, 150, 56, "left");
+    
     const traitText = traitInput.value.trim() || "—";
-    ctx.fillText(traitText, 1306, 147);
+    // Replaced standard draw with helper
+    drawTextWithHyphenSwap(traitText, 1306, 147, 33, "left");
   }
 
   // Draw the Secondary Name (The one inside the card frame)
   let secondaryFontSize = 42;
-  ctx.font = `${secondaryFontSize}px 'Memento'`;
-  let textWidth = ctx.measureText(nameText).width;
+  // Use helper to calculate width including font swap
+  let { totalWidth } = getPartsAndWidths(nameText, secondaryFontSize);
   const maxWidth = 363;
   const baseY = 331;
   const offsetPerStep = -0.75;
@@ -774,12 +807,12 @@ async function drawCard() {
   while (textWidth > maxWidth && secondaryFontSize > 2) {
     secondaryFontSize -= 2;
     shrinkSteps++;
-    ctx.font = `${secondaryFontSize}px 'Memento'`;
-    textWidth = ctx.measureText(nameText).width;
+    // Recalculate using helper
+    totalWidth = getPartsAndWidths(nameText, secondaryFontSize).totalWidth;
   }
   const secondaryNameY = baseY + (shrinkSteps * offsetPerStep);
-  ctx.textAlign = "center";
-  ctx.fillText(nameText, 455, secondaryNameY);
+  // Replaced standard draw with helper
+  drawTextWithHyphenSwap(nameText, 455, secondaryNameY, secondaryFontSize, "center");
 
   const numberSpacing = -5;
   const numberFont = 'Sv_numbers';
@@ -1620,3 +1653,4 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
