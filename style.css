@@ -972,21 +972,29 @@ body {
   border: none;
   border-radius: 0;
   overflow: visible;
-  cursor: pointer;
-  transition: transform 0.2s;
   position: relative;
+  pointer-events: none; 
 }
 
 .workshop-card:hover {
-  transform: translateY(-5px);
+  background: transparent;
+  border: none;
   box-shadow: none;
-  border-color: transparent;
+  transform: none; 
 }
 
 .workshop-card img {
   width: 100%;
   height: auto;
   display: block;
+  pointer-events: auto; 
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.workshop-card img:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.7);
 }
 
 .workshop-card .card-name {
@@ -1312,6 +1320,7 @@ body {
   .sv-theme .modal-info-col { margin-top: 20px; }
   .sv-nav-arrow { display: none; }
 }
+
 
 
 
