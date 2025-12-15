@@ -1177,45 +1177,61 @@ body {
   font-weight: bold;
 }
 
-/* Wrapper to hold content + arrows */
+/* --- FIXED MODAL WRAPPER & ARROWS --- */
+
+/* 1. The Wrapper: Acts as the coordinate system */
 .sv-modal-wrapper {
-  position: relative;
-  width: 1014px;
-  max-width: 95vw;
-  margin: 24px auto; /* Centers the whole wrapper */
-  pointer-events: none; /* Allows clicks in empty space to pass through to close the modal */
+  position: relative; /* Arrows position relative to this */
+  width: 1014px;      /* Match the width of your modal content */
+  max-width: 95vw;    /* Ensure it fits on small screens */
+  margin: 40px auto;  /* Centers the wrapper on the screen */
+  display: flex;      /* Ensures wrapper takes the height of content */
+  justify-content: center;
+  pointer-events: none; /* Allows clicks in empty space to pass through */
 }
 
-/* Update the existing content class to fit the wrapper */
+/* 2. The Card Content: Removed margins because the wrapper handles centering */
 .workshop-modal-content.sv-theme {
-  margin: 0; /* Remove margin, the wrapper handles it now */
+  margin: 0 !important; 
   width: 100%;
   pointer-events: auto; /* Re-enable clicks on the card itself */
+  position: relative;
+  z-index: 10; /* Ensure card is above background */
 }
 
-/* Update Arrow Styling */
+/* 3. The Arrows: Shared Styles */
 .sv-nav-arrow {
-  /* Ensure arrows are clickable */
-  pointer-events: auto; 
+  position: absolute;
+  top: 50%; /* Move down to middle of wrapper */
+  transform: translateY(-50%); /* Shift back up by half arrow height to center perfectly */
+  width: 60px; /* Adjust size if needed */
+  height: auto;
+  cursor: pointer;
+  z-index: 20; /* Ensure arrows are above everything */
+  pointer-events: auto; /* Make clickable */
+  opacity: 0.7;
+  transition: opacity 0.2s, transform 0.2s;
 }
 
-/* Adjust positions to push them further into the black space */
+.sv-nav-arrow:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1); /* Keep the centering when scaling */
+}
+
+/* 4. Left and Right specific positioning */
+/* Negative values push them OUTSIDE the box into the black space */
 .sv-arrow-left { 
-  left: -90px; 
+  left: -80px; 
 }
+
 .sv-arrow-right { 
-  right: -90px; 
+  right: -80px; 
 }
 
-@media (max-width: 900px) {
-  .workshop-modal-content.sv-theme { width: 95%; }
-  .sv-body { flex-direction: column; align-items: center; }
-  .sv-theme .modal-image-col, .sv-theme .modal-info-col { width: 100%; padding: 15px; margin-left: 0; }
-  .sv-theme .modal-info-col { margin-top: 20px; }
-  
-  /* Move arrows inside on mobile */
-  .sv-arrow-left { left: 10px; }
-  .sv-arrow-right { right: 10px; }
+/* 5. Mobile Adjustment */
+@media (max-width: 1200px) {
+  /* On smaller screens, move arrows inside or to the edge */
+  .sv-arrow-left { left: -10px; }
+  .sv-arrow-right { right: -10px; }
 }
-
 
