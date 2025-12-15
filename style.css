@@ -1140,18 +1140,27 @@ body {
 
 /* === MODIFIED: Right Column (Text with Black Box) === */
 .sv-theme .modal-info-col {
-  width: 55%;
-  padding: 20px 25px; /* Added padding inside box */
+  /* Requested Dimensions */
+  width: 452px;
+  height: 495px;
+  
+  /* Requested Positioning: Lowered by 55px */
+  margin-top: 55px;
+  margin-left: 20px; /* Keep spacing from image */
+  
+  /* Requested Appearance */
+  background-color: #242527; 
+  border-radius: 0; /* Straight edges */
+  
+  /* Standard Box Styles */
+  padding: 20px 25px; 
   text-align: left;
-  
-  /* NEW: Black Box Background */
-  background-color: rgba(0, 0, 0, 0.85); 
-  border-radius: 8px; 
   box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
-  
-  margin-left: 20px; /* Spacing from image */
   border: none;
-  overflow: visible;
+  
+  /* Handle content overflow within the fixed height */
+  overflow-y: auto; 
+  overflow-x: hidden;
 }
 
 .sv-text-container {
@@ -1234,5 +1243,6 @@ body {
   .sv-arrow-left { left: -10px; }
   .sv-arrow-right { right: -10px; }
 }
+
 
 
