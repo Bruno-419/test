@@ -7,7 +7,7 @@
   --muted: #bbb;
   --input: #222;
   --border: #333;
-  --accent: #2aa48a; /* unused but available */
+  --accent: #2aa48a; 
 }
 
 * { box-sizing: border-box; }
@@ -44,14 +44,13 @@ h1 {
 /* Preview column (fixed width) */
 .app-grid {
   display: grid;
-  grid-template-columns: 500px 1fr; /* left preview column fixed at 500px, rest is your existing layout */
+  grid-template-columns: 500px 1fr;
   gap: 20px;
   max-width: 1400px;
   margin: 0 auto;
   align-items: start;
 }
 
-/* Make your existing .layout sit inside the right column; keep its own grid behavior */
 .layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -85,8 +84,8 @@ h1 {
   font-size: 13px;
   color: #cfcfcf;
   margin-bottom: 8px;
-  word-break: break-all;   /* Force breaks on long strings */
-  overflow-wrap: break-word; /* Standard property for word wrapping */
+  word-break: break-all;
+  overflow-wrap: break-word; 
 }
 
 .preview-canvas {
@@ -96,22 +95,18 @@ h1 {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
 }
 
-/* If the canvas should be circular-looking for icon previews */
 .preview-canvas.circle {
   border-radius: 999px;
-  /* === DESKTOP DEFAULT: Force small size === */
   width: 56px;
   height: 57px;
 }
 
-/* Slider */
 .zoom-slider {
   width: 92%;
   margin-top: 8px;
   appearance: none;
 }
 
-/* Hint text */
 .preview-hint {
   font-size: 12px;
   color: #999;
@@ -119,21 +114,20 @@ h1 {
   text-align: center;
 }
 
-/* Responsive: collapse to single column under 980px */
+/* Responsive */
 @media (max-width: 980px) {
   .app-grid {
     grid-template-columns: 1fr;
-    gap: 12px; /* MOBILE COMPACT */
+    gap: 12px; 
   }
   .layout {
-    gap: 12px; /* MOBILE COMPACT */
+    gap: 12px; 
   }
   .left-panel, 
   .right-panel {
-    padding: 15px; /* MOBILE COMPACT */
+    padding: 15px; 
   }
 
-  /* --- MOBILE COMPACT: Main Preview --- */
   .preview-column {
     width: 100%;
     flex-direction: column; 
@@ -146,19 +140,15 @@ h1 {
     margin: 0 auto;
   }
   
-  /* === FIX: Only stretch the Main Art canvas === */
   .preview-canvas.rect {
     width: 100%;
     height: auto;
   }
-  /* === FIX: Allow Crest/Faith to grow on mobile but stay sharp === */
   .preview-canvas.circle {
-    /* Allow width to grow to container or max-width */
     width: 100%;
     height: auto;
-    max-width: 280px; /* Caps at the new high-res limit */
+    max-width: 280px; 
   }
-  /* --- END MOBILE COMPACT --- */
 }
 
 /* top buttons */
@@ -189,15 +179,14 @@ h1 {
   cursor: pointer;
 }
 .upload-btn.small {
-  display: inline-flex;     /* keep natural width */
-  width: auto;              /* no stretching */
+  display: inline-flex;     
+  width: auto;              
   align-self: flex-start;
   padding: 7px 12px;
   font-size: 14px;
   border-radius: 7px;
 }
 
-/* Buttons */
 button {
   background: #333;
   color: #fff;
@@ -209,19 +198,18 @@ button {
 button:hover, .upload-btn:hover { background: #444; }
 
 /* --------------------------
-   Layout grid: two columns
+   Layout grid
    -------------------------- */
 .layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
   justify-content: center;
   gap: 20px;
-  max-width: 900px; /* narrower overall container */
+  max-width: 900px;
   margin: 0 auto;
   align-items: start;
 }
 
-/* Panels stay visually balanced */
 .left-panel,
 .right-panel {
   width: 100%;
@@ -231,11 +219,9 @@ button:hover, .upload-btn:hover { background: #444; }
   padding: 20px;
 }
 
-/* Generic field */
 .field { display: block; margin-bottom: 14px; }
 .field-label { display:block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
 
-/* Inputs */
 input[type="text"], input[type="number"], select, textarea {
   width: 100%;
   background: var(--input);
@@ -247,19 +233,16 @@ input[type="text"], input[type="number"], select, textarea {
 }
 textarea { min-height: 70px; resize: none; overflow-y: hidden; }
 
-/* small fields row (cost/atk/def) */
 .stat-row {
   display: flex;
   align-items: flex-start;
   gap: 10px;
 }
 
-/* Cost field always fixed width */
 .stat-row .field.small-field:first-child {
-  flex: 0 0 90px; /* adjust to match your preferred width */
+  flex: 0 0 90px;
 }
 
-/* Container for Attack/Defense */
 #statExtraFields {
   display: flex;
   gap: 10px;
@@ -267,7 +250,6 @@ textarea { min-height: 70px; resize: none; overflow-y: hidden; }
   transition: opacity 0.2s ease, max-width 0.2s ease;
 }
 
-/* Hide smoothly without shifting Cost */
 #statExtraFields.hidden {
   opacity: 0;
   max-width: 0;
@@ -278,9 +260,6 @@ textarea { min-height: 70px; resize: none; overflow-y: hidden; }
   flex: 1;
 }
 
-/* --------------------------
-   Checkbox group (aligned)
-   -------------------------- */
 .checkbox-group {
   margin-top: 6px;
   margin-bottom: 14px;
@@ -289,11 +268,10 @@ textarea { min-height: 70px; resize: none; overflow-y: hidden; }
   gap: 8px;
 }
 
-/* Make checkbox and text align: checkbox left, text right */
 .checkbox-inline {
   display: inline-flex;
   align-items: center;
-  gap: 10px; /* space between input and text */
+  gap: 10px; 
   cursor: pointer;
   user-select: none;
   background: transparent;
@@ -307,12 +285,11 @@ textarea { min-height: 70px; resize: none; overflow-y: hidden; }
   accent-color: #3aa;
 }
 
-/* Canvas */
 .canvas-container { text-align: center; margin: 28px 0 60px; }
 canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #444; background: #000; }
 
 /* --------------------------
-   Modal styles (dark & centered)
+   Modal styles
    -------------------------- */
 .modal {
   display: none;
@@ -342,7 +319,7 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
 
 .modal-buttons button { padding:8px 14px; border-radius:8px; }
 
-/* === Art Preview Slider Styling === */
+/* Art Preview Slider Styling */
 .preview-column input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -355,14 +332,12 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   margin-bottom: 20px;
 }
 
-/* Track (for Firefox) */
 .preview-column input[type="range"]::-moz-range-track {
   background: #444;
   height: 4px;
   border-radius: 2px;
 }
 
-/* Slider thumb (handle) */
 .preview-column input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -384,7 +359,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   transition: background 0.2s;
 }
 
-/* Hover effect for thumb */
 .preview-column input[type="range"]::-webkit-slider-thumb:hover,
 .preview-column input[type="range"]::-moz-range-thumb:hover {
   background: #fff;
@@ -429,7 +403,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   border-bottom-left-radius: 6px;
 }
 
-/* Gold adornment for Evolve Text */
 #evolveText {
   position: relative;
   border-left: 6px solid #d6a629;
@@ -439,7 +412,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   border-bottom-left-radius: 6px;
 }
 
-/* Purple adornment for Super-Evolve Text */
 #superEvolveText {
   position: relative;
   border-left: 6px solid #8229d6;
@@ -449,7 +421,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   border-bottom-left-radius: 6px;
 }
 
-/* === Adorned Faith Section === */
 .adorned-faith {
   position: relative;
   padding: 14px 16px;
@@ -472,7 +443,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   align-items: center;
 }
 
-/* === Adorned Crest Section === */
 .adorned-crest {
   position: relative;
   padding: 14px 16px;
@@ -495,10 +465,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   align-items: center;
 }
 
-
-/* --------------------------
-   Responsive
-   -------------------------- */
 @media (max-width: 980px) {
   .layout { 
     grid-template-columns: 1fr;
@@ -508,7 +474,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
 }
 
 @media (max-width: 640px) {
-  /* --- MOBILE COMPACT: Header & Body --- */
   body {
     padding: 10px;
   }
@@ -525,44 +490,38 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   .field {
     margin-bottom: 12px;
   }
-  /* --- END MOBILE COMPACT --- */
 
   .stat-row { flex-direction: column; }
   .top-buttons { flex-direction: column; gap: 8px; }
   .checkbox-inline { gap: 8px; }
 
-  /* --- MOBILE COMPACT: Crest & Faith Sections --- */
   .adorned-crest .crest-inner,
   .adorned-faith .faith-inner {
-      flex-direction: column; /* Stack button and preview */
-      align-items: flex-start; /* Align them left */
+      flex-direction: column; 
+      align-items: flex-start; 
       gap: 12px;
   }
   
   .crest-art-container,
   .faith-art-container {
-      transform: translateX(0); /* Reset horizontal transform */
-      margin-left: 0; /* Reset margin */
-      align-items: flex-start; /* Align slider to the left */
+      transform: translateX(0); 
+      margin-left: 0; 
+      align-items: flex-start; 
   }
 
   .crest-section input[type="text"],
   .faith-section input[type="text"] {
-      width: 100% !important; /* Full width on mobile */
+      width: 100% !important; 
   }
-  /* --- END MOBILE COMPACT --- */
 
-  /* --- MOBILE COMPACT: Text Toolbar --- */
   .text-toolbar button {
-    transform: none; /* Reset transform */
+    transform: none; 
   }
   .text-toolbar {
-    flex-wrap: wrap; /* Allow buttons to wrap */
+    flex-wrap: wrap; 
   }
-  /* --- END MOBILE COMPACT --- */
 }
 
-/* === Make all zoom sliders visually identical === */
 .zoom-slider,
 .icon-preview .zoom-slider {
   -webkit-appearance: none;
@@ -576,7 +535,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   margin-bottom: 20px;
 }
 
-/* Track (for Firefox) */
 .zoom-slider::-moz-range-track,
 .icon-preview .zoom-slider::-moz-range-track {
   background: #444;
@@ -584,7 +542,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   border-radius: 2px;
 }
 
-/* Slider thumb (handle) */
 .zoom-slider::-webkit-slider-thumb,
 .icon-preview .zoom-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -608,7 +565,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   transition: background 0.2s;
 }
 
-/* Hover effect */
 .zoom-slider::-webkit-slider-thumb:hover,
 .icon-preview .zoom-slider::-webkit-slider-thumb:hover,
 .zoom-slider::-moz-range-thumb:hover,
@@ -616,7 +572,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   background: #fff;
 }
 
-/* === Crest & Faith section refined layout === */
 .crest-section,
 .faith-section {
   display: flex;
@@ -634,7 +589,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   flex-wrap: wrap;
 }
 
-/* Left column: Upload button and Name field */
 .crest-left,
 .faith-left {
   display: flex;
@@ -643,14 +597,12 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   align-items: flex-start;
 }
 
-/* Compact upload button */
 .upload-btn.small {
   padding: 0.25rem 0.75rem;
   font-size: 0.85rem;
   white-space: nowrap;
 }
 
-/* Preview (art circle + slider) to the right */
 .crest-preview,
 .faith-preview {
   display: flex;
@@ -658,7 +610,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.25rem;
-  /* Removed transform: translateX(-20px) from here */
   transform: none; 
 }
 
@@ -669,7 +620,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   background-color: #000;
 }
 
-/* Slider style — matches main art preview */
 .crest-preview input[type="range"],
 .faith-preview input[type="range"] {
   -webkit-appearance: none;
@@ -698,35 +648,25 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   transform: scale(1.1);
 }
 
-/* === Narrow Crest & Faith Name Fields + Sliders === */
-
-/* Narrow the name input fields */
 .crest-section input[type="text"],
 .faith-section input[type="text"] {
-  width: 30% !important; /* ensures override */
+  width: 30% !important; 
   display: inline-block;
 }
 
-/* Tweak layout for tighter alignment */
 .crest-art-container,
 .faith-art-container {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  /* Removed margin-left: +50px from here */
   margin-left: 0;
 }
 
-/* Optional: keep everything visually balanced */
 .crest-section,
 .faith-section {
   gap: 10px;
 }
 
-
-/* === Compact layout for Crest / Faith sections === */
-
-/* Tighten spacing inside each section */
 .crest-section,
 .faith-section {
   display: flex;
@@ -734,20 +674,17 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   gap: 8px;
 }
 
-/* Upload button spacing */
 .crest-section .upload-btn.small,
 .faith-section .upload-btn.small {
   margin-bottom: 4px; 
 }
 
-/* Name field narrower and tighter */
 .crest-section input[type="text"],
 .faith-section input[type="text"] {
   width: 70% !important;
   margin-bottom: 6px; 
 }
 
-/* Compact preview area positioning */
 .crest-art-container,
 .faith-art-container {
   display: flex;
@@ -758,23 +695,20 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   margin-bottom: -6px; 
 }
 
-/* Adjusted slider width and spacing */
 .crest-art-container .zoom-slider,
 .faith-art-container .zoom-slider {
-  width: 140px; /* Made longer */
-  margin-top: 12px; /* Matches base slider styles */
-  margin-bottom: 20px; /* Matches base slider styles */
+  width: 140px; 
+  margin-top: 12px; 
+  margin-bottom: 20px; 
 }
 
-/* === Always show crest/faith upload buttons === */
 #crestUploadBtn,
 #faithUploadBtn {
-  display: inline-flex !important;  /* always visible */
+  display: inline-flex !important;
   visibility: visible !important;
   opacity: 1 !important;
 }
 
-/* === Text formatting toolbar === */
 .text-toolbar {
   display: flex;
   gap: 6px;
@@ -799,16 +733,12 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   color: #fff;
 }
 
-/* New CSS: Prevents touch-scrolling the main page when manipulating the art canvas */
-
-/* Target the main card art preview canvas */
 #mainPreviewCanvas {
   touch-action: none; 
   user-select: none;
   -webkit-user-select: none;
 }
 
-/* Target the Crest and Faith art preview canvases */
 #crestPreviewCanvas,
 #faithPreviewCanvas {
   touch-action: none; 
@@ -816,26 +746,24 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   -webkit-user-select: none;
 }
 
-/* Target the zoom sliders */
 .zoom-slider {
   touch-action: none;
 }
 
-/* === MOBILE ALIGNMENT FIXES (Must remain at the end to override desktop styles) === */
 @media (max-width: 640px) {
   .crest-art-container,
   .faith-art-container {
-    width: 100%;                   /* Force full width */
-    margin-left: 0 !important;     /* Reset desktop offset */
-    transform: none !important;    /* Reset desktop shifts */
-    align-items: center !important;/* Center the art horizontally */
+    width: 100%;                  
+    margin-left: 0 !important;   
+    transform: none !important;   
+    align-items: center !important;
     margin-top: 12px;
   }
 
   .adorned-crest .crest-inner,
   .adorned-faith .faith-inner {
     flex-direction: column;
-    align-items: flex-start; /* Keep the button left-aligned */
+    align-items: flex-start; 
   }
 }
 
@@ -843,50 +771,42 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
    Carousel / Multi-page Logic
    -------------------------- */
 
-/* Hide main body scroll because we handle it inside the viewport */
 body {
   overflow-x: hidden; 
-  /* Ensure padding doesn't mess up the 100vw calc */
   padding: 0;
   margin: 0;
 }
 
-/* The viewport window */
 #app-viewport {
   width: 100%;
   height: 100vh;
   overflow-x: hidden;
-  overflow-y: auto; /* Vertical scroll happens here */
+  overflow-y: auto; 
   position: relative;
 }
 
-/* The long sliding track */
 #app-carousel {
   display: flex;
-  width: 300%; /* 3 pages */
+  width: 300%; 
   min-height: 100vh;
-  /* Start at the middle page (33.33% is the first page width) */
   transform: translateX(-33.3333%); 
   transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Individual Pages */
 .app-page {
   width: 33.3333%;
   flex-shrink: 0;
   box-sizing: border-box;
-  padding: 20px; /* Restore the padding we removed from body */
+  padding: 20px; 
   position: relative;
 }
 
-/* Content wrapper to maintain your max-widths */
 .page-content {
   max-width: 1400px;
   margin: 0 auto;
   position: relative;
 }
 
-/* Placeholder for new pages */
 .placeholder-content {
   background: #1a1a1a;
   border: 1px solid #333;
@@ -897,15 +817,12 @@ body {
   margin-top: 20px;
 }
 
-/* --------------------------
-   Navigation Buttons
-   -------------------------- */
 .nav-btn {
   background: #2b2b2b;
   color: #ddd;
   border: 1px solid #444;
   padding: 8px 16px;
-  border-radius: 20px; /* Pill shape */
+  border-radius: 20px; 
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
@@ -921,7 +838,6 @@ body {
   box-shadow: 0 6px 10px rgba(0,0,0,0.4);
 }
 
-/* Position on Home Page */
 .nav-top-left {
   position: absolute;
   top: 0;
@@ -936,7 +852,6 @@ body {
   margin: 0;
 }
 
-/* Position on Side Pages (Header inline) */
 .nav-left {
   float: left;
   margin-right: 15px;
@@ -946,7 +861,6 @@ body {
   margin-left: 15px;
 }
 
-/* Responsive adjustments for Nav */
 @media (max-width: 980px) {
   .nav-top-left, .nav-top-right {
     position: static;
@@ -957,9 +871,6 @@ body {
   }
 }
 
-/* --------------------------
-   Workshop Grid
-   -------------------------- */
 .workshop-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -1013,7 +924,7 @@ body {
 .workshop-modal-content {
   width: 1000px;
   max-width: 95%;
-  text-align: left; /* Override center alignment from generic modal */
+  text-align: left; 
   padding: 0;
   overflow: hidden;
 }
@@ -1053,7 +964,7 @@ body {
 .modal-info-col {
   width: 60%;
   padding: 30px;
-  max-height: 80vh; /* Allow scrolling if text is long */
+  max-height: 80vh; 
   overflow-y: auto;
 }
 
@@ -1065,22 +976,6 @@ body {
   border-bottom: 1px solid #333;
   padding-bottom: 15px;
   margin-bottom: 15px;
-}
-
-.modal- {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.-tag {
-  background: #333;
-  color: #ddd;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 13px;
-  border: 1px solid #444;
 }
 
 .modal-text-section {
@@ -1105,7 +1000,7 @@ body {
   font-size: 15px;
   line-height: 1.5;
   color: #eee;
-  white-space: pre-wrap; /* Preserve line breaks */
+  white-space: pre-wrap; 
 }
 
 .modal-footer {
@@ -1123,22 +1018,17 @@ body {
   .modal-image-col img { height: 100%; width: auto; }
 }
 
-/* style.css - Add to bottom */
-
 /* === SHADOWVERSE WORLDS BEYOND MODAL THEME === */
 
-/* Main Container Override */
 .workshop-modal-content.sv-theme {
-  background: rgba(30, 35, 45, 0.95); /* Dark Slate Blue/Grey */
+  background: rgba(30, 35, 45, 0.95); 
   
-  /* === NEW DIMENSIONS === */
   width: 1014px;
   height: 823px;
-  max-width: 95vw; /* Safety for smaller screens */
+  max-width: 95vw; 
   
-  /* === NEW BORDER STYLES === */
-  border-top: 2px solid #dcbb78;    /* Gold */
-  border-bottom: 2px solid #dcbb78; /* Gold */
+  border-top: 2px solid #dcbb78;    
+  border-bottom: 2px solid #dcbb78; 
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   
@@ -1146,12 +1036,11 @@ body {
   padding: 0; 
   box-shadow: 0 0 50px rgba(0,0,0,0.8);
   position: relative;
-  overflow: hidden; /* Ensures content stays within the fixed 823px height */
-  display: flex;    /* Helps organize the internal rows (header, meta, body) */
+  overflow: hidden; 
+  display: flex;    
   flex-direction: column;
 }
 
-/* 1. Header Bar */
 .sv-modal-header {
   background: linear-gradient(to bottom, #2b3342, #1f242f);
   padding: 15px 0;
@@ -1161,15 +1050,14 @@ body {
 }
 
 .sv-modal-header h2 {
-  font-family: 'Memento', serif; /* Use your existing serif font */
-  color: #dcbb78; /* Gold color */
+  font-family: 'Memento', serif; 
+  color: #dcbb78; 
   font-size: 32px;
   margin: 0;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   letter-spacing: 1px;
 }
 
-/* Close "X" styling */
 .sv-modal-header .close-modal {
   position: absolute;
   right: 15px;
@@ -1180,28 +1068,25 @@ body {
   line-height: 1;
 }
 
-/* 2. Meta Bar (Updated) */
 .sv-meta-bar {
   background: #000;
-  height: 47px;           /* Fixed height */
-  display: flex;          /* Use Flexbox for alignment */
-  align-items: center;    /* Vertically center text */
-  justify-content: center; /* Horizontally align left */
-  padding: 0 20px;        /* Left/Right padding */
+  height: 47px;           
+  display: flex;          
+  align-items: center;    
+  justify-content: center; 
+  padding: 0 20px;        
   border-bottom: 1px solid #333;
-  gap: 50px;              /* Space between items */
+  gap: 50px;              
   font-family: 'Roboto', sans-serif;
   font-size: 17px;
   color: #fff;
   font-weight: bold;
 }
 
-/* Helper for the Gold Labels */
 .sv-gold-label {
   color: #dcbb78; 
 }
 
-/* Separator styling */
 .sv-meta-separator {
   color: #444;
 }
@@ -1213,17 +1098,15 @@ body {
   font-weight: bold;
 }
 
-/* Ensure the body expands to fill the remaining height inside the 823px box */
 .sv-body {
   display: flex;
   align-items: flex-start;
   padding: 30px;
   background: radial-gradient(circle at center, #232935 0%, #161a22 100%);
-  flex: 1;          /* Takes up all remaining space */
-  overflow-y: auto; /* Adds scrollbar inside if content exceeds the fixed height */
+  flex: 1;          
+  overflow-y: auto; 
 }
 
-/* Left Column (Image) */
 .sv-theme .modal-image-col {
   width: 45%;
   border: none;
@@ -1240,7 +1123,6 @@ body {
   border: none;
 }
 
-/* Evolve Button (Visual) */
 .sv-evolve-btn-container {
   margin-top: 20px;
   width: 100%;
@@ -1256,17 +1138,22 @@ body {
   box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
-/* Right Column (Text) */
+/* === MODIFIED: Right Column (Text with Black Box) === */
 .sv-theme .modal-info-col {
   width: 55%;
-  padding: 10px 0 10px 30px; /* Left padding to separate from image */
+  padding: 20px 25px; /* Added padding inside box */
   text-align: left;
-  background: transparent;
-  border: none; /* Remove old borders */
+  
+  /* NEW: Black Box Background */
+  background-color: rgba(0, 0, 0, 0.85); 
+  border-radius: 8px; 
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+  
+  margin-left: 20px; /* Spacing from image */
+  border: none;
   overflow: visible;
 }
 
-/* Text Container */
 .sv-text-container {
   color: #e0e0e0;
   font-size: 16px;
@@ -1278,7 +1165,6 @@ body {
   margin-bottom: 15px;
 }
 
-/* The divider line */
 .sv-divider {
   border: 0;
   height: 1px;
@@ -1286,44 +1172,43 @@ body {
   margin: 20px 0;
 }
 
-/* Keyword highlighting (Fanfare, etc) */
 .sv-keyword {
-  color: #dcbb78; /* Gold */
+  color: #dcbb78; 
   font-weight: bold;
 }
 
-/* Hide or Remove the old Illustrator Credit at the bottom */
-.sv-illustrator-credit {
-  display: none;
-}
-
-/* Decorative Arrows */
+/* === NEW: Navigation Arrows (Image Based) === */
 .sv-nav-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 40px;
-  color: #dcbb78;
-  cursor: default; /* Just visual for now */
+  width: 60px; 
+  height: auto;
+  cursor: pointer;
+  z-index: 1300;
   opacity: 0.7;
-  font-family: serif;
+  transition: opacity 0.2s, transform 0.2s;
 }
-.sv-arrow-left { left: -50px; }
-.sv-arrow-right { right: -50px; }
 
-/* Responsive Mobile Tweak */
+.sv-nav-arrow:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.sv-arrow-left { 
+  left: -70px; 
+}
+.sv-arrow-right { 
+  right: -70px; 
+}
+
 @media (max-width: 768px) {
   .workshop-modal-content.sv-theme { width: 95%; }
   .sv-body { flex-direction: column; align-items: center; }
-  .sv-theme .modal-image-col, .sv-theme .modal-info-col { width: 100%; padding: 0; }
+  .sv-theme .modal-image-col, .sv-theme .modal-info-col { width: 100%; padding: 15px; margin-left: 0; }
   .sv-theme .modal-info-col { margin-top: 20px; }
-  .sv-nav-arrow { display: none; }
+  
+  /* Move arrows inside on mobile */
+  .sv-arrow-left { left: 10px; }
+  .sv-arrow-right { right: 10px; }
 }
-
-
-
-
-
-
-
-
