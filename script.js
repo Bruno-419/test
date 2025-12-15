@@ -360,11 +360,8 @@ async function calculateTextBlockHeight(key, startY) {
       ctx.font = `${weight}${style}33px 'Roboto'`;
     }
 
-    // === CHANGE START ===
     let tokenWidth = ctx.measureText(token).width;
-    // Add 4px extra spacing for hyphens in body text
     if (token === "-") tokenWidth += 4; 
-    // === CHANGE END ===
     
     if (currentX > textStartX && currentX + tokenWidth > wrapLimitX && token.trim() !== "") {
       totalHeight += lineHeight;
@@ -469,7 +466,9 @@ async function drawTextBlock(key, box, x, startY) {
       ctx.font = `${weight}${style}33px 'Roboto'`;
     }
 
-    const tokenWidth = ctx.measureText(token).width;
+    let tokenWidth = ctx.measureText(token).width;
+    if (token === "-") tokenWidth += 4; 
+
     if (currentX > textStartX && currentX + tokenWidth > wrapLimitX && token.trim() !== "") {
       totalHeight += lineHeight;
       currentX = textStartX;
@@ -545,26 +544,21 @@ async function drawTextBlock(key, box, x, startY) {
       ctx.font = `${weight}${style}33px 'Roboto'`;
     }
 
-    // === CHANGE START ===
     let tokenWidth = ctx.measureText(token).width;
     let drawX = xPos;
 
-    // Add 4px extra spacing, and nudge the hyphen 2px to the right
     if (token === "-") {
         tokenWidth += 4; 
         drawX += 2; 
     }
-    // === CHANGE END ===
 
     if (xPos > textStartX && xPos + tokenWidth > wrapLimitX && token.trim() !== "") {
       textY += lineHeight;
       xPos = textStartX;
-      // Reset drawX for the new line if it was a hyphen (edge case)
       drawX = xPos + (token === "-" ? 2 : 0); 
     }
     if (xPos === textStartX && token.trim() === "") continue;
-    
-    ctx.fillText(token, drawX, textY); // Use drawX instead of xPos for drawing
+    ctx.fillText(token, drawX, textY);
     xPos += tokenWidth;
     if (wetStyle.italic) xPos += 0;
   }
@@ -1283,6 +1277,10 @@ const DB_NAME = "ShadowverseWorkshopDB";
 const STORE_NAME = "cards";
 const DB_VERSION = 1;
 
+// NEW: Global variables to track workshop navigation state
+let workshopCardsCache = []; 
+let currentCardIndex = -1;
+
 function openDB() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -1357,6 +1355,7 @@ async function renderWorkshop() {
 
   try {
     const data = await getWorkshopData();
+    workshopCardsCache = data; // Cache data for navigation
 
     if (data.length === 0) {
       grid.innerHTML = '<p class="placeholder-text">No cards generated yet. Create and download a card to see it here!</p>';
@@ -1366,7 +1365,12 @@ async function renderWorkshop() {
     data.forEach((card, index) => {
       const cardEl = document.createElement("div");
       cardEl.className = "workshop-card";
-      cardEl.onclick = () => openWorkshopModal(card); 
+      
+      // Update Click to use index tracking
+      cardEl.onclick = () => {
+          currentCardIndex = index;
+          openWorkshopModal(index); 
+      };
 
       const img = document.createElement("img");
       img.src = card.image;
@@ -1388,8 +1392,11 @@ async function renderWorkshop() {
 
 const workshopModal = document.getElementById("workshopModal");
 
-function openWorkshopModal(card) {
-  if (!card) return;
+// REFACTORED: Now accepts an index and pulls from cache
+function openWorkshopModal(index) {
+  if (index < 0 || index >= workshopCardsCache.length) return;
+  
+  const card = workshopCardsCache[index];
 
   document.getElementById("modalCardImage").src = card.image;
   document.getElementById("modalCardName").textContent = card.name;
@@ -1465,6 +1472,38 @@ function openWorkshopModal(card) {
 
   document.getElementById("workshopModal").style.display = "block";
 }
+
+// NEW: Navigation Function
+function navigateModal(direction) {
+  if (workshopCardsCache.length === 0) return;
+
+  currentCardIndex += direction;
+
+  // Infinite loop logic
+  if (currentCardIndex < 0) {
+    currentCardIndex = workshopCardsCache.length - 1;
+  } else if (currentCardIndex >= workshopCardsCache.length) {
+    currentCardIndex = 0;
+  }
+
+  openWorkshopModal(currentCardIndex);
+}
+
+// Attach Event Listeners for Navigation
+const prevBtn = document.getElementById('modalPrevBtn');
+const nextBtn = document.getElementById('modalNextBtn');
+
+if(prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); navigateModal(-1); };
+if(nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); navigateModal(1); };
+
+// Optional: Keyboard support
+document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById("workshopModal");
+    if (modal.style.display === "block") {
+      if (e.key === "ArrowLeft") navigateModal(-1);
+      if (e.key === "ArrowRight") navigateModal(1);
+    }
+});
 
 function closeWorkshopModal() {
   workshopModal.style.display = "none";
@@ -1547,4 +1586,3 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
-
