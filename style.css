@@ -1177,35 +1177,37 @@ body {
   font-weight: bold;
 }
 
-/* === Navigation Arrows === */
+/* Wrapper to hold content + arrows */
+.sv-modal-wrapper {
+  position: relative;
+  width: 1014px;
+  max-width: 95vw;
+  margin: 24px auto; /* Centers the whole wrapper */
+  pointer-events: none; /* Allows clicks in empty space to pass through to close the modal */
+}
+
+/* Update the existing content class to fit the wrapper */
+.workshop-modal-content.sv-theme {
+  margin: 0; /* Remove margin, the wrapper handles it now */
+  width: 100%;
+  pointer-events: auto; /* Re-enable clicks on the card itself */
+}
+
+/* Update Arrow Styling */
 .sv-nav-arrow {
-  position: absolute;
-  top: 50%;
-  width: 60px; 
-  cursor: pointer;
-  z-index: 1001; /* Ensure they sit on top of everything */
-  transition: transform 0.2s ease;
+  /* Ensure arrows are clickable */
+  pointer-events: auto; 
 }
 
-/* Hover effect */
-.sv-nav-arrow:hover {
-  transform: scale(1.1);
+/* Adjust positions to push them further into the black space */
+.sv-arrow-left { 
+  left: -90px; 
+}
+.sv-arrow-right { 
+  right: -90px; 
 }
 
-.sv-nav-arrow.prev {
-  left: -80px;
-}
-
-.sv-nav-arrow.next { 
-  right: -80px; 
-}
-
-/* IMPORTANT: Ensure the modal content box allows things to hang outside */
-.workshop-modal-content {
-  overflow: visible !important; 
-}
-
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .workshop-modal-content.sv-theme { width: 95%; }
   .sv-body { flex-direction: column; align-items: center; }
   .sv-theme .modal-image-col, .sv-theme .modal-info-col { width: 100%; padding: 15px; margin-left: 0; }
@@ -1215,4 +1217,5 @@ body {
   .sv-arrow-left { left: 10px; }
   .sv-arrow-right { right: 10px; }
 }
+
 
