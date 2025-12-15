@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* === Load custom fonts (kept from your original) === */
+    /* === Load custom fonts === */
     @font-face { font-family: 'Memento'; src: url('font/Memento-SemiBold.ttf') format('truetype'); }
     @font-face { font-family: 'NotoSans'; src: url('font/NotoSansJP-Regular.ttf') format('truetype'); }
     @font-face { font-family: 'Roboto'; src: url('font/Roboto-Regular.ttf') format('truetype'); }
@@ -18,20 +18,11 @@
   </style>
 
   <style>
-    /* NEW ADDED CODE: Definitive Fix for Mobile Panning */
-    
-    /* Prevents screen scrolling/panning when touching/dragging the main art preview block */
-    .preview-block {
-      touch-action: none; 
-      user-select: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-    }
-
-    /* Prevents screen scrolling/panning when touching/dragging the smaller crest/faith art containers */
+    /* Mobile Panning Fixes */
+    .preview-block,
     .crest-art-container,
     .faith-art-container {
-      touch-action: none;
+      touch-action: none; 
       user-select: none;
       -webkit-user-select: none;
       -moz-user-select: none;
@@ -63,8 +54,7 @@
           <header>
             <h1>Shadowverse: Worlds Beyond Card Generator</h1>
             <p class="subheader">
-              V1.6.2 — May not work on all browsers, probably works in Chrome/Firefox.
-              Enable JavaScript or this website will explode!
+              V1.6.3
             </p>
 
             <p class="subheader">
@@ -296,6 +286,9 @@
   <div id="workshopModal" class="modal">
     <div class="modal-content workshop-modal-content sv-theme">
       
+      <img id="modalPrevBtn" class="sv-nav-arrow sv-arrow-left" src="assets/misc/arrow_left.png" alt="Previous">
+      <img id="modalNextBtn" class="sv-nav-arrow sv-arrow-right" src="assets/misc/arrow_right.png" alt="Next">
+
       <div class="sv-modal-header">
         <h2 id="modalCardName">Card Name</h2>
         <span class="close-modal" onclick="closeWorkshopModal()">&times;</span>
@@ -319,10 +312,6 @@
         </div>
   
       </div>
-      
-      <div class="sv-nav-arrow sv-arrow-left">&lt;</div>
-      <div class="sv-nav-arrow sv-arrow-right">&gt;</div>
-  
     </div>
   </div>
 
@@ -367,5 +356,3 @@
   </script>
 </body>
 </html>
-
-
