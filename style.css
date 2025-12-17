@@ -215,35 +215,35 @@ button:hover, .upload-btn:hover { background: #444; }
 
 /* Desktop: Position absolute in corners */
 @media (min-width: 981px) {
-  .mobile-nav-row {
-    display: contents; /* Removes wrapper effect on desktop so absolute positioning works */
+  .nav-row {
+    display: contents; /* Allows download button to behave as direct child of top-buttons */
   }
   .nav-img-btn.nav-balance {
     position: absolute;
     top: 40px;
-    left: 50px; 
+    left: 50px; /* Moved further from edge */
   }
   .nav-img-btn.nav-workshop {
     position: absolute;
     top: 40px;
-    right: 50px; 
+    right: 50px; /* Moved further from edge */
   }
 }
 
 /* Mobile/Tablet: Integrated flow */
 @media (max-width: 980px) {
-  .mobile-nav-row {
+  .nav-row {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 15px;
     width: 100%;
-    order: 2; /* Ensures grouping if flex column is used */
   }
   .nav-img-btn {
     position: static;
     height: 45px;
   }
+  /* top-buttons stays flex-direction:row until 640px, where it becomes column */
 }
 
 @media (max-width: 640px) {
@@ -251,7 +251,11 @@ button:hover, .upload-btn:hover { background: #444; }
     flex-direction: column;
     gap: 12px;
   }
+  .nav-row {
+    order: 3; /* Ensure it stays at bottom of stack if needed */
+  }
 }
+
 
 /* --------------------------
    Layout grid
