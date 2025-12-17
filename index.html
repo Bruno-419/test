@@ -47,9 +47,7 @@
       </section>
 
       <section class="app-page" id="page-home">
-        <img src="assets/misc/balance_adjustments.png" class="nav-img-btn nav-top-left" onclick="navigateTo('balance')" alt="Balance Adjustments">
-        <img src="assets/misc/workshop.png" class="nav-img-btn nav-top-right" onclick="navigateTo('workshop')" alt="Workshop">
-
+        
         <div class="page-content">
           <header>
             <h1>Shadowverse: Worlds Beyond Card Generator</h1>
@@ -67,7 +65,13 @@
                 <input type="file" id="artUpload" accept="image/*">
               </label>
               <button id="previewBtn" type="button">Preview</button>
-              <button id="downloadBtn" type="button">Download</button>
+              
+              <div class="nav-row">
+                <img src="assets/misc/balance_adjustments.png" class="nav-img-btn nav-balance" onclick="navigateTo('balance')" alt="Balance Adjustments">
+                <button id="downloadBtn" type="button">Download</button>
+                <img src="assets/misc/workshop.png" class="nav-img-btn nav-workshop" onclick="navigateTo('workshop')" alt="Workshop">
+              </div>
+
             </div>
           </header>
 
