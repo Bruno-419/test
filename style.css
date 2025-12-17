@@ -198,6 +198,66 @@ button {
 button:hover, .upload-btn:hover { background: #444; }
 
 /* --------------------------
+   Nav Images & Buttons
+   -------------------------- */
+
+.nav-img-btn {
+  cursor: pointer;
+  transition: transform 0.2s, filter 0.2s;
+  width: auto;
+  max-height: 50px; 
+  z-index: 20;
+}
+.nav-img-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+/* Desktop: Position absolute in corners */
+@media (min-width: 981px) {
+  .nav-row {
+    display: contents; /* Allows download button to behave as direct child of top-buttons */
+  }
+  .nav-img-btn.nav-balance {
+    position: absolute;
+    top: 40px;
+    left: 50px; /* Moved further from edge */
+  }
+  .nav-img-btn.nav-workshop {
+    position: absolute;
+    top: 40px;
+    right: 50px; /* Moved further from edge */
+  }
+}
+
+/* Mobile/Tablet: Integrated flow */
+@media (max-width: 980px) {
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+  }
+  .nav-img-btn {
+    position: static;
+    height: 45px;
+  }
+  /* top-buttons stays flex-direction:row until 640px, where it becomes column */
+}
+
+@media (max-width: 640px) {
+  .top-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .nav-row {
+    order: 3; /* Ensure it stays at bottom of stack if needed */
+  }
+}
+
+
+/* --------------------------
    Layout grid
    -------------------------- */
 .layout {
@@ -839,20 +899,6 @@ body {
   box-shadow: 0 6px 10px rgba(0,0,0,0.4);
 }
 
-/* NEW CLASS: for image navigation buttons */
-.nav-img-btn {
-  cursor: pointer;
-  transition: transform 0.2s, filter 0.2s;
-  width: auto;
-  max-height: 50px; /* Adjust based on image size preference */
-  z-index: 10;
-}
-
-.nav-img-btn:hover {
-  transform: scale(1.05);
-  filter: brightness(1.2);
-}
-
 .nav-top-left {
   position: absolute;
   top: 0;
@@ -880,9 +926,9 @@ body {
   .nav-top-left, .nav-top-right {
     position: static;
     display: block;
-    width: auto; /* Changed from 100% to auto so images don't stretch */
+    width: auto; 
     max-width: 100%;
-    margin: 0 auto 10px auto; /* Center them */
+    margin: 0 auto 10px auto; 
     text-align: center;
   }
 }
