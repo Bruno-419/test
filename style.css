@@ -817,6 +817,7 @@ body {
   margin-top: 20px;
 }
 
+/* Nav styles */
 .nav-btn {
   background: #2b2b2b;
   color: #ddd;
@@ -836,6 +837,20 @@ body {
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 6px 10px rgba(0,0,0,0.4);
+}
+
+/* NEW CLASS: for image navigation buttons */
+.nav-img-btn {
+  cursor: pointer;
+  transition: transform 0.2s, filter 0.2s;
+  width: auto;
+  max-height: 50px; /* Adjust based on image size preference */
+  z-index: 10;
+}
+
+.nav-img-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
 }
 
 .nav-top-left {
@@ -865,8 +880,9 @@ body {
   .nav-top-left, .nav-top-right {
     position: static;
     display: block;
-    width: 100%;
-    margin-bottom: 10px;
+    width: auto; /* Changed from 100% to auto so images don't stretch */
+    max-width: 100%;
+    margin: 0 auto 10px auto; /* Center them */
     text-align: center;
   }
 }
@@ -1243,6 +1259,3 @@ body {
   .sv-arrow-left { left: -10px; }
   .sv-arrow-right { right: -10px; }
 }
-
-
-
