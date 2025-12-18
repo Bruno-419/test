@@ -38,7 +38,9 @@
         <div class="page-content">
           <header>
             <h1>Balance Adjustments</h1>
-            <img src="assets/misc/balance_adjustments.png" class="nav-img-btn nav-top-right" onclick="navigateTo('home')" alt="Back to Generator">
+            <div class="side-nav right" onclick="navigateTo('home')">
+               <img src="assets/misc/balance_adjustments.png" alt="Back">
+            </div>
           </header>
           <div class="placeholder-content">
             <p>Balance adjustment tools coming soon...</p>
@@ -50,6 +52,14 @@
         
         <div class="page-content">
           <header>
+            <div class="side-nav left" onclick="navigateTo('balance')">
+              <img src="assets/misc/balance_adjustments.png" alt="Balance">
+            </div>
+
+            <div class="side-nav right" onclick="navigateTo('workshop')">
+              <img src="assets/misc/workshop.png" alt="Workshop">
+            </div>
+
             <h1>Shadowverse: Worlds Beyond Card Generator</h1>
             <p class="subheader">
               V1.6.3
@@ -65,11 +75,7 @@
                 <input type="file" id="artUpload" accept="image/*">
               </label>
               
-              <div class="center-controls">
-                <img src="assets/misc/balance_adjustments.png" class="nav-img-btn nav-balance" onclick="navigateTo('balance')" alt="Balance Adjustments">
-                <button id="previewBtn" type="button">Preview</button>
-                <img src="assets/misc/workshop.png" class="nav-img-btn nav-workshop" onclick="navigateTo('workshop')" alt="Workshop">
-              </div>
+              <button id="previewBtn" type="button">Preview</button>
 
               <button id="downloadBtn" type="button">Download</button>
             </div>
@@ -268,10 +274,12 @@
       <section class="app-page" id="page-workshop">
         <div class="page-content">
           <header>
+            <div class="side-nav left" onclick="navigateTo('home')">
+              <img src="assets/misc/workshop.png" alt="Back">
+            </div>
+
             <h1>Workshop</h1>
             <p class="subheader">Your saved card history is stored locally in your browser.</p>
-            
-            <img src="assets/misc/workshop.png" class="nav-img-btn nav-top-left" onclick="navigateTo('home')" alt="Back to Generator">
             
             <button class="nav-btn nav-right" style="background:#522;" onclick="clearWorkshop()">Clear History</button>
           </header>
