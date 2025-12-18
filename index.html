@@ -38,7 +38,7 @@
         <div class="page-content">
           <header>
             <h1>Balance Adjustments</h1>
-            <button class="nav-btn nav-right" onclick="navigateTo('home')">Back to Generator &rarr;</button>
+            <img src="assets/misc/balance_adjustments.png" class="nav-img-btn nav-top-right" onclick="navigateTo('home')" alt="Back to Generator">
           </header>
           <div class="placeholder-content">
             <p>Balance adjustment tools coming soon...</p>
@@ -64,14 +64,14 @@
                 Upload Art
                 <input type="file" id="artUpload" accept="image/*">
               </label>
-              <button id="previewBtn" type="button">Preview</button>
               
-              <div class="nav-row">
+              <div class="center-controls">
                 <img src="assets/misc/balance_adjustments.png" class="nav-img-btn nav-balance" onclick="navigateTo('balance')" alt="Balance Adjustments">
-                <button id="downloadBtn" type="button">Download</button>
+                <button id="previewBtn" type="button">Preview</button>
                 <img src="assets/misc/workshop.png" class="nav-img-btn nav-workshop" onclick="navigateTo('workshop')" alt="Workshop">
               </div>
 
+              <button id="downloadBtn" type="button">Download</button>
             </div>
           </header>
 
@@ -270,7 +270,9 @@
           <header>
             <h1>Workshop</h1>
             <p class="subheader">Your saved card history is stored locally in your browser.</p>
-            <button class="nav-btn nav-left" onclick="navigateTo('home')">&larr; Back to Generator</button>
+            
+            <img src="assets/misc/workshop.png" class="nav-img-btn nav-top-left" onclick="navigateTo('home')" alt="Back to Generator">
+            
             <button class="nav-btn nav-right" style="background:#522;" onclick="clearWorkshop()">Clear History</button>
           </header>
           
