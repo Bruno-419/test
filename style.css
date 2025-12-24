@@ -1214,6 +1214,49 @@ body {
   right: -150px; 
 }
 
+/* Find or add these classes in style.css */
+
+/* Update the grid to accommodate smaller, image-only cards */
+.workshop-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: flex-start; /* Align to left, or use center */
+  padding: 10px;
+}
+
+/* Set the card container to roughly 35% of the original 729px width */
+.workshop-card {
+  width: 255px;  /* 729px * 0.35 ≈ 255px */
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 12px; /* Matches card corners */
+  position: relative;
+  background: transparent; /* Remove background color */
+  border: none; /* Remove border */
+}
+
+/* Ensure the image fills the 255px container */
+.workshop-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5); /* Add depth since text is gone */
+}
+
+/* Hover effect for better UX */
+.workshop-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+  z-index: 5;
+}
+
+/* Ensure card names are definitely hidden if they exist in HTML */
+.card-name {
+  display: none !important;
+}
+
 /* 5. Mobile Adjustment */
 @media (max-width: 1200px) {
   /* On smaller screens, move arrows inside or to the edge */
@@ -1306,3 +1349,4 @@ body {
 .search-results-list li:hover span.card-id-preview {
   color: #eee;
 }
+
