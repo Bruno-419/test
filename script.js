@@ -1376,12 +1376,14 @@ async function renderWorkshop() {
       img.src = card.image;
       img.loading = "lazy";
 
+      /*
       const nameDiv = document.createElement("div");
       nameDiv.className = "card-name";
       nameDiv.textContent = card.name || "Unnamed Card";
+      cardEl.appendChild(nameDiv);
+      */
 
       cardEl.appendChild(img);
-      cardEl.appendChild(nameDiv);
       grid.appendChild(cardEl);
     });
   } catch (err) {
@@ -1702,3 +1704,4 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
