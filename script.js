@@ -1586,3 +1586,119 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
+// ------------------------------------
+// OFFICIAL CARDS SEARCH FUNCTIONALITY
+// ------------------------------------
+let officialCards = [];
+
+async function fetchOfficialCards() {
+  try {
+    // Assuming cards.txt is at cards/cards.txt relative to the HTML
+    const response = await fetch('cards.txt');
+    if (!response.ok) {
+      console.warn("Could not fetch cards.txt");
+      return;
+    }
+    const text = await response.text();
+    parseOfficialCards(text);
+  } catch (err) {
+    console.error("Error fetching card database:", err);
+  }
+}
+
+function parseOfficialCards(fullText) {
+  // Pattern to find "Card Name: ...", "Card ID: ..."
+  // We'll split the file by the "====================..." separators first
+  const sections = fullText.split(/={10,}/);
+  
+  officialCards = [];
+
+  sections.forEach(section => {
+    // Basic extraction
+    const nameMatch = section.match(/Card Name:\s*(.+)/);
+    const idMatch = section.match(/Card ID:\s*(\d+)/);
+    
+    if (nameMatch && idMatch) {
+      const name = nameMatch[1].trim();
+      const id = idMatch[1].trim();
+      
+      officialCards.push({ name, id, fullText: section });
+    }
+  });
+
+  // Sort alphabetically by name
+  officialCards.sort((a, b) => a.name.localeCompare(b.name));
+  console.log(`Loaded ${officialCards.length} official cards.`);
+}
+
+function setupSearch(inputId, resultsId) {
+  const input = document.getElementById(inputId);
+  const resultsContainer = document.getElementById(resultsId);
+
+  if (!input || !resultsContainer) return;
+
+  // On Input
+  input.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    if (query.length === 0) {
+      resultsContainer.style.display = 'none';
+      return;
+    }
+
+    const matches = officialCards.filter(card => 
+      card.name.toLowerCase().includes(query) || card.id.includes(query)
+    );
+
+    renderResults(matches, resultsContainer, input);
+  });
+
+  // Hide when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!input.contains(e.target) && !resultsContainer.contains(e.target)) {
+      resultsContainer.style.display = 'none';
+    }
+  });
+  
+  // Show results again on focus if text exists
+  input.addEventListener('focus', () => {
+      if (input.value.trim().length > 0) {
+          input.dispatchEvent(new Event('input'));
+      }
+  });
+}
+
+function renderResults(matches, container, inputField) {
+  container.innerHTML = '';
+  
+  if (matches.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+
+  // Populate list
+  matches.forEach(card => {
+    const li = document.createElement('li');
+    // Highlight match in name if possible
+    li.innerHTML = `${card.name} <span class="card-id-preview">ID: ${card.id}</span>`;
+    
+    li.onclick = () => {
+      inputField.value = card.name;
+      container.style.display = 'none';
+      // In the future, this is where you'd trigger loading the card details
+      console.log("Selected card:", card); 
+    };
+    
+    container.appendChild(li);
+  });
+
+  container.style.display = 'block';
+}
+
+// Initialize Search on Load
+document.addEventListener("DOMContentLoaded", () => {
+  fetchOfficialCards().then(() => {
+    setupSearch('balanceSearchInput', 'balanceSearchResults');
+    setupSearch('workshopSearchInput', 'workshopSearchResults');
+  });
+});
