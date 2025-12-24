@@ -1397,12 +1397,6 @@ function openWorkshopModal(index) {
   if (index < 0 || index >= workshopCardsCache.length) return;
   
   const card = workshopCardsCache[index];
-  
-  // Ensure nav buttons are visible for workshop navigation
-  const prevBtn = document.getElementById('modalPrevBtn');
-  const nextBtn = document.getElementById('modalNextBtn');
-  if(prevBtn) prevBtn.style.display = 'block';
-  if(nextBtn) nextBtn.style.display = 'block';
 
   document.getElementById("modalCardImage").src = card.image;
   document.getElementById("modalCardName").textContent = card.name;
@@ -1427,8 +1421,20 @@ function openWorkshopModal(index) {
   const container = document.getElementById("modalTextContainer");
   container.innerHTML = ""; 
 
-  // Use the shared formatting function
-  const formatText = (text) => formatCardText(text);
+  const formatText = (text) => {
+    if (!text) return "";
+    
+    const keywords = ["Fanfare", "Last Words", "Evolve", "Super-Evolve", "Strike", "Clash", "Storm", "Rush", "Ward", "Bane", "Drain"];
+    const regex = new RegExp(`^(${keywords.join("|")})(.*)`, "gm"); 
+    
+    let html = text.replace(/\n/g, "<br>");
+    
+    keywords.forEach(kw => {
+      html = html.replace(new RegExp(`${kw}:`, 'g'), `<span class="sv-keyword">${kw}:</span>`);
+    });
+
+    return html;
+  };
 
   if (card.text.card) {
     const p = document.createElement("div");
@@ -1582,14 +1588,13 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
 });
 
 // ------------------------------------
-// OFFICIAL CARDS LOGIC & PARSING
+// OFFICIAL CARDS SEARCH FUNCTIONALITY
 // ------------------------------------
 let officialCards = [];
 
 async function fetchOfficialCards() {
   try {
     // Assuming cards.txt is at cards/cards.txt relative to the HTML
-    // (Ensure the path matches your actual file structure)
     const response = await fetch('cards.txt');
     if (!response.ok) {
       console.warn("Could not fetch cards.txt");
@@ -1603,109 +1608,28 @@ async function fetchOfficialCards() {
 }
 
 function parseOfficialCards(fullText) {
-  const cards = [];
-  // Split by the big separator "==========..."
-  const sections = fullText.split(/={30,}/); 
+  // Pattern to find "Card Name: ...", "Card ID: ..."
+  // We'll split the file by the "====================..." separators first
+  const sections = fullText.split(/={10,}/);
+  
+  officialCards = [];
 
   sections.forEach(section => {
+    // Basic extraction
     const nameMatch = section.match(/Card Name:\s*(.+)/);
     const idMatch = section.match(/Card ID:\s*(\d+)/);
-    
-    // Extract text content: Everything after the separator line "--------"
-    // The separator divides headers from body
-    const bodySplit = section.split(/-{30,}/); 
     
     if (nameMatch && idMatch) {
       const name = nameMatch[1].trim();
       const id = idMatch[1].trim();
-      // Body is usually the second part
-      let body = bodySplit.length > 1 ? bodySplit.slice(1).join("----------").trim() : "";
       
-      // Clean up tags if present in the text body
-      body = body.replace(/\/g, "");
-
-      cards.push({ name, id, body });
+      officialCards.push({ name, id, fullText: section });
     }
   });
 
-  officialCards = cards.sort((a, b) => a.name.localeCompare(b.name));
+  // Sort alphabetically by name
+  officialCards.sort((a, b) => a.name.localeCompare(b.name));
   console.log(`Loaded ${officialCards.length} official cards.`);
-}
-
-/**
- * Shared function to format card text with keywords highlighted.
- * Used by both Workshop modal and Official card modal.
- */
-function formatCardText(text) {
-  if (!text) return "";
-  const keywords = ["Fanfare", "Last Words", "Evolve", "Super-Evolve", "Strike", "Clash", "Storm", "Rush", "Ward", "Bane", "Drain", "Necromancy", "Earth Rite", "Enhance", "Union Burst", "Skybound Art", "Super Skybound Art"];
-  let html = text.replace(/\n/g, "<br>");
-  
-  keywords.forEach(kw => {
-    // Regex looks for Keyword followed by colon or space-colon, or just the keyword at start of line
-    const regex = new RegExp(`(^|\\s|>)(${kw})(:|\\s)`, "gm");
-    html = html.replace(regex, '$1<span class="sv-keyword">$2</span>$3');
-  });
-  
-  // Clean up specific tags for display (or you could style them instead)
-  html = html.replace(/<\/?(ev|sev|add)>/g, "");
-  
-  return html;
-}
-
-function openOfficialModal(card) {
-  const modal = document.getElementById("workshopModal");
-  const img = document.getElementById("modalCardImage");
-  const name = document.getElementById("modalCardName");
-  const meta = document.getElementById("modalMetaString");
-  const container = document.getElementById("modalTextContainer");
-  const prevBtn = document.getElementById('modalPrevBtn');
-  const nextBtn = document.getElementById('modalNextBtn');
-
-  // Hide nav buttons for official cards since search results aren't a linear list
-  if(prevBtn) prevBtn.style.display = 'none';
-  if(nextBtn) nextBtn.style.display = 'none';
-
-  // Set Content
-  // Assuming images are in 'cards' folder named by ID
-  img.src = `cards/${card.id}.png`; 
-  
-  // Fallback if image fails to load
-  img.onerror = () => { img.src = "assets/misc/placeholder.png"; }; 
-  
-  name.textContent = card.name;
-  meta.innerHTML = `<span class="sv-gold-label">ID:</span> ${card.id} <span class="sv-meta-separator">|</span> <span class="sv-gold-label">Official Card</span>`;
-
-  // Parsing the body text
-  container.innerHTML = "";
-  
-  // The body uses "----------" to separate sections (Base / Evolve / Token)
-  const sections = card.body.split("----------");
-  
-  sections.forEach((sectionText, index) => {
-    const cleanText = sectionText.trim();
-    if (!cleanText || cleanText === "-") return;
-
-    // Determine label/type based on tags or content
-    let label = "";
-    if (cleanText.includes("<ev>") || cleanText.includes("Evolve:")) label = "Evolve";
-    else if (cleanText.includes("<sev>") || cleanText.includes("Super-Evolve")) label = "Super-Evolve";
-    else if (cleanText.includes("<add>") || cleanText.includes("Crest")) label = "Token / Crest";
-    
-    // Add separator if it's not the first block
-    if (index > 0 || label) {
-       const hr = document.createElement("hr");
-       hr.className = "sv-divider";
-       container.appendChild(hr);
-    }
-
-    const p = document.createElement("div");
-    p.className = "sv-text-block";
-    p.innerHTML = formatCardText(cleanText);
-    container.appendChild(p);
-  });
-
-  modal.style.display = "block";
 }
 
 function setupSearch(inputId, resultsId) {
@@ -1755,12 +1679,14 @@ function renderResults(matches, container, inputField) {
   // Populate list
   matches.forEach(card => {
     const li = document.createElement('li');
+    // Highlight match in name if possible
     li.innerHTML = `${card.name} <span class="card-id-preview">ID: ${card.id}</span>`;
     
     li.onclick = () => {
-      inputField.value = ""; // Clear input or keep it? Clearing feels cleaner after selection.
+      inputField.value = card.name;
       container.style.display = 'none';
-      openOfficialModal(card); 
+      // In the future, this is where you'd trigger loading the card details
+      console.log("Selected card:", card); 
     };
     
     container.appendChild(li);
