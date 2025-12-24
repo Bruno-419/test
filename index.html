@@ -37,19 +37,26 @@
       <section class="app-page" id="page-balance">
         <div class="page-content">
           <header>
-            <h1>Balance Changes</h1>
+            <h1>Balance Adjustments</h1>
             <div class="side-nav right" onclick="navigateTo('home')">
                <img src="assets/misc/balance_adjustments.png" alt="Back">
             </div>
           </header>
+
+          <div class="search-section">
+            <div class="search-wrapper">
+              <input type="text" id="balanceSearchInput" class="card-search-input" placeholder="Search for a card...">
+              <ul id="balanceSearchResults" class="search-results-list"></ul>
+            </div>
+          </div>
+
           <div class="placeholder-content">
-            <p>Balance change tools coming soon...</p>
+            <p>Select a card from the search bar above to begin adjustments.</p>
           </div>
         </div>
       </section>
 
       <section class="app-page" id="page-home">
-        
         <div class="page-content">
           <header>
             <div class="side-nav left" onclick="navigateTo('balance')">
@@ -283,6 +290,13 @@
             
             <button class="nav-btn nav-right" style="background:#522;" onclick="clearWorkshop()">Clear History</button>
           </header>
+
+          <div class="search-section">
+            <div class="search-wrapper">
+              <input type="text" id="workshopSearchInput" class="card-search-input" placeholder="Search official cards database...">
+              <ul id="workshopSearchResults" class="search-results-list"></ul>
+            </div>
+          </div>
           
           <div id="workshopGrid" class="workshop-grid">
             <p class="placeholder-text">No cards generated yet. Create and download a card to see it here!</p>
@@ -374,4 +388,3 @@
   </script>
 </body>
 </html>
-
