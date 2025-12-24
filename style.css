@@ -1242,13 +1242,11 @@ body {
   height: auto;
   display: block;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5); /* Add depth since text is gone */
 }
 
 /* Hover effect for better UX */
 .workshop-card:hover {
   transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.7);
   z-index: 5;
 }
 
@@ -1349,4 +1347,5 @@ body {
 .search-results-list li:hover span.card-id-preview {
   color: #eee;
 }
+
 
