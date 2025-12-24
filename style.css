@@ -1019,7 +1019,7 @@ body {
 }
 
 .sv-modal-header {
-  background: linear-gradient(to bottom, #2b3342, #1f242f);
+  background: radial-gradient(circle at center, #33465b 0%, #222a39 100%);
   padding: 15px 0;
   border-bottom: 1px solid #000;
   position: relative;
@@ -1046,7 +1046,7 @@ body {
 }
 
 .sv-meta-bar {
-  background: #000;
+  background: #0c0d0f;
   height: 47px;           
   display: flex;          
   align-items: center;    
@@ -1079,7 +1079,7 @@ body {
   display: flex;
   align-items: flex-start;
   padding: 30px;
-  background: radial-gradient(circle at center, #232935 0%, #161a22 100%);
+  background: linear-gradient(to bottom, #181c20, #232f3c);
   flex: 1;          
   overflow-y: auto; 
 }
@@ -1106,8 +1106,9 @@ body {
   text-align: center;
 }
 .sv-evolve-btn {
-  background: linear-gradient(to bottom, #2d4f68, #1a2e3d);
-  border: 1px solid #4a6fa5;
+  background: linear-gradient(to bottom, #315a73, #233f52);
+  border: 1px solid #e7cd9c;
+  border-radius: 0;
   color: #fff;
   font-family: 'Memento', serif;
   padding: 8px 30px;
@@ -1127,6 +1128,7 @@ body {
   
   /* Requested Appearance */
   background-color: #242527; 
+  border: 1px solid #4b473e;
   border-radius: 0; /* Straight edges */
   
   /* Standard Box Styles */
@@ -1347,5 +1349,6 @@ body {
 .search-results-list li:hover span.card-id-preview {
   color: #eee;
 }
+
 
 
