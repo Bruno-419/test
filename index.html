@@ -35,13 +35,14 @@
     <div id="app-carousel">
 
       <section class="app-page" id="page-balance">
+        <div class="side-nav right" onclick="navigateTo('home')">
+            <img src="assets/misc/balance_adjustments.png" alt="Back">
+        </div>
+
         <div class="page-content">
           <header>
             <h1>Balance Adjustments</h1>
-            <div class="side-nav right" onclick="navigateTo('home')">
-               <img src="assets/misc/balance_adjustments.png" alt="Back">
-            </div>
-          </header>
+            </header>
 
           <div class="search-section">
             <div class="search-wrapper">
@@ -57,16 +58,16 @@
       </section>
 
       <section class="app-page" id="page-home">
+        <div class="side-nav left" onclick="navigateTo('balance')">
+            <img src="assets/misc/balance_adjustments.png" alt="Balance">
+        </div>
+
+        <div class="side-nav right" onclick="navigateTo('workshop')">
+            <img src="assets/misc/workshop.png" alt="Workshop">
+        </div>
+
         <div class="page-content">
           <header>
-            <div class="side-nav left" onclick="navigateTo('balance')">
-              <img src="assets/misc/balance_adjustments.png" alt="Balance">
-            </div>
-
-            <div class="side-nav right" onclick="navigateTo('workshop')">
-              <img src="assets/misc/workshop.png" alt="Workshop">
-            </div>
-
             <h1>Shadowverse: Worlds Beyond Card Generator</h1>
             <p class="subheader">
               V1.6.3
@@ -279,12 +280,12 @@
       </section>
 
       <section class="app-page" id="page-workshop">
+        <div class="side-nav left" onclick="navigateTo('home')">
+            <img src="assets/misc/workshop.png" alt="Back">
+        </div>
+
         <div class="page-content">
           <header>
-            <div class="side-nav left" onclick="navigateTo('home')">
-              <img src="assets/misc/workshop.png" alt="Back">
-            </div>
-
             <h1>Workshop</h1>
             <p class="subheader">Your saved card history is stored locally in your browser.</p>
             
