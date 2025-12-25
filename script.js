@@ -1392,45 +1392,12 @@ async function renderWorkshop() {
   }
 }
 
-// ==========================================
-// MODAL LOGIC UPDATES
-// ==========================================
-
 const workshopModal = document.getElementById("workshopModal");
 
-// 1. REFACTOR: Make formatText reusable globally
-function formatModalText(text) {
-  if (!text) return "";
-  
-  // Clean up source tags from cards.txt (e.g., )
-  let cleanText = text.replace(/\/g, "").trim();
-
-  const keywords = ["Fanfare", "Last Words", "Evolve", "Super-Evolve", "Strike", "Clash", "Storm", "Rush", "Ward", "Bane", "Drain", "Earth Rite", "Necromancy", "Spellboost", "Union Burst", "Skybound Art", "Super Skybound Art", "Enhance", "Crystallize", "Accelerate"];
-  
-  // Highlight keywords
-  // We use a specific regex to capture the keyword at the start of lines or sentences
-  // Note: This is a basic highlighter. 
-  let html = cleanText.replace(/\n/g, "<br>");
-  
-  keywords.forEach(kw => {
-    // Replace "Keyword:" with bolded/colored span
-    html = html.replace(new RegExp(`${kw}:`, 'g'), `<span class="sv-keyword">${kw}:</span>`);
-    // Handle "Keyword" as standalone (like "Rush" or "Ward") if it appears on its own line
-    html = html.replace(new RegExp(`^${kw}$`, 'gm'), `<span class="sv-keyword">${kw}</span>`);
-    html = html.replace(new RegExp(`> ${kw}`, 'gm'), `> <span class="sv-keyword">${kw}</span>`); // After line break
-  });
-
-  return html;
-}
-
-// 2. EXISTING: Workshop Modal (Populates from Local Storage/Cache)
+// REFACTORED: Now accepts an index and pulls from cache
 function openWorkshopModal(index) {
   if (index < 0 || index >= workshopCardsCache.length) return;
   
-  // Show Nav Arrows for Workshop
-  document.getElementById('modalPrevBtn').style.display = "block";
-  document.getElementById('modalNextBtn').style.display = "block";
-
   const card = workshopCardsCache[index];
 
   document.getElementById("modalCardImage").src = card.image;
@@ -1449,22 +1416,38 @@ function openWorkshopModal(index) {
   `;
   
   const metaContainer = document.getElementById("modalMetaString");
-  if (metaContainer) metaContainer.innerHTML = metaHTML;
+  if (metaContainer) {
+      metaContainer.innerHTML = metaHTML;
+  }
   
   const container = document.getElementById("modalTextContainer");
   container.innerHTML = ""; 
 
-  // Base Text
+  const formatText = (text) => {
+    if (!text) return "";
+    
+    const keywords = ["Fanfare", "Last Words", "Evolve", "Super-Evolve", "Strike", "Clash", "Storm", "Rush", "Ward", "Bane", "Drain"];
+    const regex = new RegExp(`^(${keywords.join("|")})(.*)`, "gm"); 
+    
+    let html = text.replace(/\n/g, "<br>");
+    
+    keywords.forEach(kw => {
+      html = html.replace(new RegExp(`${kw}:`, 'g'), `<span class="sv-keyword">${kw}:</span>`);
+    });
+
+    return html;
+  };
+
   if (card.text.card) {
     const p = document.createElement("div");
     p.className = "sv-text-block";
-    p.innerHTML = formatModalText(card.text.card);
+    p.innerHTML = formatText(card.text.card);
     container.appendChild(p);
   }
 
   const isFollower = card.type === "Follower";
-  const extras = [];
 
+  const extras = [];
   if (isFollower && card.text.evolve) extras.push({ label: "Evolve", text: card.text.evolve });
   if (isFollower && card.text.superEvolve) extras.push({ label: "Super-Evolve", text: card.text.superEvolve });
   
@@ -1484,173 +1467,136 @@ function openWorkshopModal(index) {
 
     const p = document.createElement("div");
     p.className = "sv-text-block";
-    // Add header for the section
-    const labelDiv = document.createElement("div");
-    labelDiv.className = "info-label"; 
-    labelDiv.textContent = item.label;
-    p.appendChild(labelDiv);
-
-    const contentSpan = document.createElement("span");
-    contentSpan.innerHTML = formatModalText(item.text);
-    p.appendChild(contentSpan);
-
+    let htmlContent = formatText(item.text);
+    p.innerHTML = htmlContent;
     container.appendChild(p);
   });
 
-  workshopModal.style.display = "block";
+  document.getElementById("workshopModal").style.display = "block";
 }
 
-// 3. NEW: Official Card Parser
-function parseOfficialCardText(fullText) {
-  // Remove the Header part (Name/ID) which is before the first separator
-  const bodyStart = fullText.indexOf("--------------------------------");
-  if (bodyStart === -1) return { base: fullText, evolve: null, superEvolve: null };
+// NEW: Navigation Function
+function navigateModal(direction) {
+  if (workshopCardsCache.length === 0) return;
 
-  let rawBody = fullText.substring(bodyStart + 32).trim();
+  currentCardIndex += direction;
 
-  const result = {
-    base: "",
-    evolve: null,
-    superEvolve: null,
-    crest: null,
-    faith: null
-  };
-
-  // Extract Crest/Faith first as they are usually tagged with <add> and specific keywords
-  // (Simplified regex for this specific dataset structure)
-  if (rawBody.includes("Crest\n\n<add>")) {
-    const parts = rawBody.split("Crest\n\n<add>");
-    rawBody = parts[0]; // Keep everything before
-    let special = parts[1].split("</add>")[0];
-    result.crest = special.trim();
+  // Infinite loop logic
+  if (currentCardIndex < 0) {
+    currentCardIndex = workshopCardsCache.length - 1;
+  } else if (currentCardIndex >= workshopCardsCache.length) {
+    currentCardIndex = 0;
   }
+
+  openWorkshopModal(currentCardIndex);
+}
+
+// Attach Event Listeners for Navigation
+const prevBtn = document.getElementById('modalPrevBtn');
+const nextBtn = document.getElementById('modalNextBtn');
+
+if(prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); navigateModal(-1); };
+if(nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); navigateModal(1); };
+
+// Optional: Keyboard support
+document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById("workshopModal");
+    if (modal.style.display === "block") {
+      if (e.key === "ArrowLeft") navigateModal(-1);
+      if (e.key === "ArrowRight") navigateModal(1);
+    }
+});
+
+function closeWorkshopModal() {
+  workshopModal.style.display = "none";
+}
+
+window.addEventListener("click", (e) => {
+  if (e.target === workshopModal) {
+    closeWorkshopModal();
+  }
+});
+
+document.addEventListener("DOMContentLoaded", renderWorkshop);
+
+document.getElementById("downloadBtn").addEventListener("click", async () => { 
+  const btn = document.getElementById("downloadBtn");
+  const originalText = btn.textContent;
   
-  if (rawBody.includes("Faith\n\n<add>")) {
-    const parts = rawBody.split("Faith\n\n<add>");
-    rawBody = parts[0];
-    let special = parts[1].split("</add>")[0];
-    result.faith = special.trim();
-  }
+  btn.textContent = "Processing...";
+  btn.disabled = true;
 
-  // Extract Super Evolve <sev>
-  if (rawBody.includes("<sev>")) {
-    const sevStart = rawBody.indexOf("<sev>");
-    const sevEnd = rawBody.indexOf("</sev>");
-    result.superEvolve = rawBody.substring(sevStart + 5, sevEnd).trim();
-    // Remove it from rawBody
-    rawBody = rawBody.substring(0, sevStart) + rawBody.substring(sevEnd + 6);
-  }
+  try {
+    await document.fonts.ready;
+    await Promise.all([
+        document.fonts.load("60px 'Memento'"),
+        document.fonts.load("60px 'Sv_numbers'"),
+        document.fonts.load("30px 'NotoSans'"),
+        document.fonts.load("30px 'Roboto'")
+    ]);
 
-  // Extract Evolve <ev>
-  if (rawBody.includes("<ev>")) {
-    const evStart = rawBody.indexOf("<ev>");
-    const evEnd = rawBody.indexOf("</ev>");
-    result.evolve = rawBody.substring(evStart + 4, evEnd).trim();
-    // Remove it from rawBody
-    rawBody = rawBody.substring(0, evStart) + rawBody.substring(evEnd + 5);
-  }
-
-  // Whatever is left is mostly the base text. 
-  // We need to clean up "----------" separators that might be left hanging.
-  rawBody = rawBody.replace(/----------/g, "").trim();
-  result.base = rawBody;
-
-  return result;
-}
-
-// 4. NEW: Open Modal for Official Cards
-function openOfficialModal(card) {
-  // Hide Nav Arrows (No Next/Prev for search results)
-  document.getElementById('modalPrevBtn').style.display = "none";
-  document.getElementById('modalNextBtn').style.display = "none";
-
-  // Image Source: cards/{ID}.png
-  document.getElementById("modalCardImage").src = `cards/${card.id}.png`;
-  document.getElementById("modalCardImage").onerror = function() {
-    this.src = "assets/misc/card_back.png"; // Fallback if image missing
-  };
-
-  document.getElementById("modalCardName").textContent = card.name;
-
-  // Since text file doesn't have Trait/Class/Illustrator explicitly parsed yet, use placeholder
-  // Or parse them if added to the text file later.
-  const metaContainer = document.getElementById("modalMetaString");
-  if (metaContainer) {
-    metaContainer.innerHTML = `<span class="sv-gold-label">ID:</span> ${card.id}`;
-  }
-  
-  const container = document.getElementById("modalTextContainer");
-  container.innerHTML = ""; 
-
-  // Parse text
-  const parsed = parseOfficialCardText(card.fullText);
-
-  // 1. Base Text
-  if (parsed.base) {
-    const p = document.createElement("div");
-    p.className = "sv-text-block";
-    p.innerHTML = formatModalText(parsed.base);
-    container.appendChild(p);
-  }
-
-  // 2. Evolve
-  if (parsed.evolve) {
-    const hr = document.createElement("hr");
-    hr.className = "sv-divider";
-    container.appendChild(hr);
+    const wasChecked = saveCardOnlyCheckbox.checked;
     
-    const p = document.createElement("div");
-    p.className = "sv-text-block";
-    p.innerHTML = `<div class="info-label" style="color:#d6a629;">Evolve</div>` + formatModalText(parsed.evolve);
-    container.appendChild(p);
-  }
-
-  // 3. Super Evolve
-  if (parsed.superEvolve) {
-    const hr = document.createElement("hr");
-    hr.className = "sv-divider";
-    container.appendChild(hr);
+    saveCardOnlyCheckbox.checked = true;
+    await drawCard();
+    const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); 
     
-    const p = document.createElement("div");
-    p.className = "sv-text-block";
-    p.innerHTML = `<div class="info-label" style="color:#8229d6;">Super-Evolve</div>` + formatModalText(parsed.superEvolve);
-    container.appendChild(p);
+    const cardMetadata = {
+      id: Date.now(),
+      image: workshopImageBase64,
+      name: nameInput.value.trim() || "Unnamed Card",
+      trait: traitInput.value.trim(),
+      class: classSelect.value,
+      type: typeSelect.value,
+      rarity: raritySelect.value,
+      illustrator: document.getElementById("illustratorName").value.trim(),
+      names: {
+        crest: document.getElementById("crestName").value.trim(),
+        faith: document.getElementById("faithName").value.trim()
+      },
+      text: {
+        card: textInputs.card.value.trim(),
+        evolve: textInputs.evolve.value.trim(),
+        superEvolve: textInputs.superEvolve.value.trim(),
+        crest: textInputs.crest.value.trim(),
+        faith: textInputs.faith.value.trim()
+      }
+    };
+
+    try {
+      await saveToWorkshop(cardMetadata);
+      await renderWorkshop();
+    } catch (dbError) {
+      console.warn("Failed to save to workshop history (IndexedDB error):", dbError);
+    }
+
+    if (!wasChecked) {
+      saveCardOnlyCheckbox.checked = false;
+      await drawCard(); 
+    }
+
+    const downloadLink = document.createElement("a");
+    downloadLink.download = `${(nameInput.value.trim() || "card")}.png`;
+    downloadLink.href = canvas.toDataURL("image/png", 1.0); 
+    downloadLink.click();
+    
+  } catch (err) {
+    console.error("Download failed:", err);
+    alert("Error: Could not save image. Try again.");
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
   }
-
-  // 4. Crest / Faith
-  if (parsed.crest) {
-    const hr = document.createElement("hr");
-    hr.className = "sv-divider";
-    container.appendChild(hr);
-    const p = document.createElement("div");
-    p.className = "sv-text-block";
-    p.innerHTML = `<div class="info-label">Crest</div>` + formatModalText(parsed.crest);
-    container.appendChild(p);
-  }
-
-  if (parsed.faith) {
-    const hr = document.createElement("hr");
-    hr.className = "sv-divider";
-    container.appendChild(hr);
-    const p = document.createElement("div");
-    p.className = "sv-text-block";
-    p.innerHTML = `<div class="info-label">Faith</div>` + formatModalText(parsed.faith);
-    container.appendChild(p);
-  }
-
-  workshopModal.style.display = "block";
-}
-
-// [ ... Existing Navigation and Event Listener code ... ]
-
+});
 
 // ------------------------------------
-// OFFICIAL CARDS SEARCH FUNCTIONALITY (UPDATED)
+// OFFICIAL CARDS SEARCH FUNCTIONALITY
 // ------------------------------------
 let officialCards = [];
 
 async function fetchOfficialCards() {
   try {
+    // Assuming cards.txt is at cards/cards.txt relative to the HTML
     const response = await fetch('cards.txt');
     if (!response.ok) {
       console.warn("Could not fetch cards.txt");
@@ -1664,11 +1610,14 @@ async function fetchOfficialCards() {
 }
 
 function parseOfficialCards(fullText) {
+  // Pattern to find "Card Name: ...", "Card ID: ..."
+  // We'll split the file by the "====================..." separators first
   const sections = fullText.split(/={10,}/);
   
   officialCards = [];
 
   sections.forEach(section => {
+    // Basic extraction
     const nameMatch = section.match(/Card Name:\s*(.+)/);
     const idMatch = section.match(/Card ID:\s*(\d+)/);
     
@@ -1680,17 +1629,18 @@ function parseOfficialCards(fullText) {
     }
   });
 
+  // Sort alphabetically by name
   officialCards.sort((a, b) => a.name.localeCompare(b.name));
   console.log(`Loaded ${officialCards.length} official cards.`);
 }
 
-// UPDATED: setupSearch now takes an onSelect callback
-function setupSearch(inputId, resultsId, onSelectCallback) {
+function setupSearch(inputId, resultsId) {
   const input = document.getElementById(inputId);
   const resultsContainer = document.getElementById(resultsId);
 
   if (!input || !resultsContainer) return;
 
+  // On Input
   input.addEventListener('input', (e) => {
     const query = e.target.value.toLowerCase().trim();
     if (query.length === 0) {
@@ -1702,15 +1652,17 @@ function setupSearch(inputId, resultsId, onSelectCallback) {
       card.name.toLowerCase().includes(query) || card.id.includes(query)
     );
 
-    renderResults(matches, resultsContainer, input, onSelectCallback);
+    renderResults(matches, resultsContainer, input);
   });
 
+  // Hide when clicking outside
   document.addEventListener('click', (e) => {
     if (!input.contains(e.target) && !resultsContainer.contains(e.target)) {
       resultsContainer.style.display = 'none';
     }
   });
   
+  // Show results again on focus if text exists
   input.addEventListener('focus', () => {
       if (input.value.trim().length > 0) {
           input.dispatchEvent(new Event('input'));
@@ -1718,8 +1670,7 @@ function setupSearch(inputId, resultsId, onSelectCallback) {
   });
 }
 
-// UPDATED: renderResults now accepts callback
-function renderResults(matches, container, inputField, onSelectCallback) {
+function renderResults(matches, container, inputField) {
   container.innerHTML = '';
   
   if (matches.length === 0) {
@@ -1727,18 +1678,17 @@ function renderResults(matches, container, inputField, onSelectCallback) {
     return;
   }
 
+  // Populate list
   matches.forEach(card => {
     const li = document.createElement('li');
+    // Highlight match in name if possible
     li.innerHTML = `${card.name} <span class="card-id-preview">ID: ${card.id}</span>`;
     
     li.onclick = () => {
       inputField.value = card.name;
       container.style.display = 'none';
-      
-      // Execute the specific behavior for this search bar
-      if (onSelectCallback) {
-        onSelectCallback(card);
-      }
+      // In the future, this is where you'd trigger loading the card details
+      console.log("Selected card:", card); 
     };
     
     container.appendChild(li);
@@ -1747,20 +1697,11 @@ function renderResults(matches, container, inputField, onSelectCallback) {
   container.style.display = 'block';
 }
 
-// Initialize Search on Load with Callbacks
+// Initialize Search on Load
 document.addEventListener("DOMContentLoaded", () => {
   fetchOfficialCards().then(() => {
-    
-    // 1. Balance Page Search: Opens the "Official Card" Modal
-    setupSearch('balanceSearchInput', 'balanceSearchResults', (card) => {
-      openOfficialModal(card);
-    });
-
-    // 2. Workshop Search: (Currently mostly decorative or could fill the form)
-    setupSearch('workshopSearchInput', 'workshopSearchResults', (card) => {
-      // For now, maybe just log it or auto-fill form? 
-      // Keeping original behavior (log) unless specified otherwise.
-      console.log("Workshop DB selected:", card);
-    });
+    setupSearch('balanceSearchInput', 'balanceSearchResults');
+    setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
