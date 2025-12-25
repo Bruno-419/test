@@ -1394,6 +1394,51 @@ async function renderWorkshop() {
 
 const workshopModal = document.getElementById("workshopModal");
 
+// Helper to format text for HTML (Modal) matching Canvas logic
+function formatWorkshopHTML(text) {
+  if (!text) return "";
+
+  // 1. Escape HTML entities first to prevent XSS and conflicts
+  let html = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // 2. Restore supported custom tags that were just escaped
+  // We allow: <c>...</c>
+  html = html
+    .replace(/&lt;c&gt;/g, "<c>")
+    .replace(/&lt;\/c&gt;/g, "</c>");
+
+  // 3. Handle Evolve/Super-Evolve start-of-line highlighting (Mirrors Canvas logic)
+  if (html.startsWith("Evolve")) {
+    html = html.replace(/^Evolve/, '<span class="sv-keyword">Evolve</span>');
+  }
+  if (html.startsWith("Super-Evolve")) {
+    html = html.replace(/^Super-Evolve/, '<span class="sv-keyword">Super-Evolve</span>');
+  }
+
+  // 4. Highlight standard keywords (Using the global HIGHLIGHT_REGEX)
+  // We use $1 to preserve the matched keyword
+  html = html.replace(HIGHLIGHT_REGEX, '<span class="sv-keyword">$1</span>');
+
+  // 5. Apply formatting codes
+  // Bold (**text**)
+  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  // Italic (_text_)
+  html = html.replace(/_(.*?)_/g, '<i>$1</i>');
+  // Color (<c>text</c>)
+  html = html.replace(/<c>(.*?)<\/c>/g, '<span style="color:#f3d87d">$1</span>');
+  
+  // 6. Dividers (----------)
+  html = html.replace(/----------/g, '<hr class="sv-divider">');
+
+  // 7. Newlines
+  html = html.replace(/\n/g, '<br>');
+
+  return html;
+}
+
 // REFACTORED: Now accepts an index and pulls from cache
 function openWorkshopModal(index) {
   if (index < 0 || index >= workshopCardsCache.length) return;
@@ -1423,52 +1468,44 @@ function openWorkshopModal(index) {
   const container = document.getElementById("modalTextContainer");
   container.innerHTML = ""; 
 
-  const formatText = (text) => {
-    if (!text) return "";
-    
-    const keywords = ["Fanfare", "Last Words", "Evolve", "Super-Evolve", "Strike", "Clash", "Storm", "Rush", "Ward", "Bane", "Drain"];
-    const regex = new RegExp(`^(${keywords.join("|")})(.*)`, "gm"); 
-    
-    let html = text.replace(/\n/g, "<br>");
-    
-    keywords.forEach(kw => {
-      html = html.replace(new RegExp(`${kw}:`, 'g'), `<span class="sv-keyword">${kw}:</span>`);
-    });
-
-    return html;
-  };
-
+  // --- Main Card Text ---
   if (card.text.card) {
     const p = document.createElement("div");
     p.className = "sv-text-block";
-    p.innerHTML = formatText(card.text.card);
+    p.innerHTML = formatWorkshopHTML(card.text.card);
     container.appendChild(p);
   }
 
   const isFollower = card.type === "Follower";
 
+  // Collect extras
   const extras = [];
-  if (isFollower && card.text.evolve) extras.push({ label: "Evolve", text: card.text.evolve });
-  if (isFollower && card.text.superEvolve) extras.push({ label: "Super-Evolve", text: card.text.superEvolve });
+  if (isFollower && card.text.evolve) extras.push(card.text.evolve);
+  if (isFollower && card.text.superEvolve) extras.push(card.text.superEvolve);
   
-  if (card.names.crest || card.text.crest) {
-    const label = `Crest (${card.names.crest || "Unnamed"})`;
-    extras.push({ label: label, text: card.text.crest });
+  // For Crest/Faith, we might want to include the Name if it exists, 
+  // but strictly following the generator, we usually just render the text block.
+  // If you want to prepend the Name, you can concatenate it here.
+  if (card.text.crest) {
+    let txt = card.text.crest;
+    if(card.names.crest) txt = `Crest (${card.names.crest})\n` + txt;
+    extras.push(txt);
   }
-  if (card.names.faith || card.text.faith) {
-    const label = `Faith (${card.names.faith || "Unnamed"})`;
-    extras.push({ label: label, text: card.text.faith });
+  if (card.text.faith) {
+    let txt = card.text.faith;
+    if(card.names.faith) txt = `Faith (${card.names.faith})\n` + txt;
+    extras.push(txt);
   }
 
-  extras.forEach(item => {
-    const hr = document.createElement("hr");
-    hr.className = "sv-divider";
-    container.appendChild(hr);
-
+  // Render extras without forcing <hr> between them
+  extras.forEach(text => {
+    // Note: We removed the automatic creation of <hr class="sv-divider"> here.
+    // Dividers now only appear if "----------" is in the text string.
+    
     const p = document.createElement("div");
     p.className = "sv-text-block";
-    let htmlContent = formatText(item.text);
-    p.innerHTML = htmlContent;
+    // Apply styling
+    p.innerHTML = formatWorkshopHTML(text);
     container.appendChild(p);
   });
 
@@ -1704,4 +1741,5 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
