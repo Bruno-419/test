@@ -1398,19 +1398,18 @@ const workshopModal = document.getElementById("workshopModal");
 function formatWorkshopHTML(text) {
   if (!text) return "";
 
-  // 1. Escape HTML entities first to prevent XSS and conflicts
+  // 1. Escape HTML entities
   let html = text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-  // 2. Restore supported custom tags that were just escaped
-  // We allow: <c>...</c>
+  // 2. Restore supported custom tags
   html = html
     .replace(/&lt;c&gt;/g, "<c>")
     .replace(/&lt;\/c&gt;/g, "</c>");
 
-  // 3. Handle Evolve/Super-Evolve start-of-line highlighting (Mirrors Canvas logic)
+  // 3. Handle Evolve/Super-Evolve start-of-line highlighting
   if (html.startsWith("Evolve")) {
     html = html.replace(/^Evolve/, '<span class="sv-keyword">Evolve</span>');
   }
@@ -1418,22 +1417,20 @@ function formatWorkshopHTML(text) {
     html = html.replace(/^Super-Evolve/, '<span class="sv-keyword">Super-Evolve</span>');
   }
 
-  // 4. Highlight standard keywords (Using the global HIGHLIGHT_REGEX)
-  // We use $1 to preserve the matched keyword
+  // 4. Highlight standard keywords
   html = html.replace(HIGHLIGHT_REGEX, '<span class="sv-keyword">$1</span>');
 
   // 5. Apply formatting codes
-  // Bold (**text**)
-  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-  // Italic (_text_)
-  html = html.replace(/_(.*?)_/g, '<i>$1</i>');
-  // Color (<c>text</c>)
-  html = html.replace(/<c>(.*?)<\/c>/g, '<span style="color:#f3d87d">$1</span>');
+  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); // Bold
+  html = html.replace(/_(.*?)_/g, '<i>$1</i>');       // Italic
+  html = html.replace(/<c>(.*?)<\/c>/g, '<span style="color:#f3d87d">$1</span>'); // Color
   
   // 6. Dividers (----------)
-  html = html.replace(/----------/g, '<hr class="sv-divider">');
+  // UPDATED: Consumes the optional newline (\n?) immediately following the divider
+  // to prevent an extra line break from appearing after the line.
+  html = html.replace(/----------\n?/g, '<hr class="sv-divider">');
 
-  // 7. Newlines
+  // 7. Newlines (Convert remaining newlines to <br>)
   html = html.replace(/\n/g, '<br>');
 
   return html;
@@ -1468,7 +1465,7 @@ function openWorkshopModal(index) {
   const container = document.getElementById("modalTextContainer");
   container.innerHTML = ""; 
 
-  // --- Main Card Text ---
+  // 1. Render Main Card Text
   if (card.text.card) {
     const p = document.createElement("div");
     p.className = "sv-text-block";
@@ -1478,14 +1475,11 @@ function openWorkshopModal(index) {
 
   const isFollower = card.type === "Follower";
 
-  // Collect extras
+  // 2. Collect Extras (Evolve, Super-Evolve, Crest, Faith)
   const extras = [];
   if (isFollower && card.text.evolve) extras.push(card.text.evolve);
   if (isFollower && card.text.superEvolve) extras.push(card.text.superEvolve);
   
-  // For Crest/Faith, we might want to include the Name if it exists, 
-  // but strictly following the generator, we usually just render the text block.
-  // If you want to prepend the Name, you can concatenate it here.
   if (card.text.crest) {
     let txt = card.text.crest;
     if(card.names.crest) txt = `Crest (${card.names.crest})\n` + txt;
@@ -1497,14 +1491,18 @@ function openWorkshopModal(index) {
     extras.push(txt);
   }
 
-  // Render extras without forcing <hr> between them
+  // 3. Insert Structural Divider
+  // If we have Main Card Text AND at least one Extra field, insert a divider between them.
+  if (card.text.card && extras.length > 0) {
+    const hr = document.createElement("hr");
+    hr.className = "sv-divider";
+    container.appendChild(hr);
+  }
+
+  // 4. Render Extras
   extras.forEach(text => {
-    // Note: We removed the automatic creation of <hr class="sv-divider"> here.
-    // Dividers now only appear if "----------" is in the text string.
-    
     const p = document.createElement("div");
     p.className = "sv-text-block";
-    // Apply styling
     p.innerHTML = formatWorkshopHTML(text);
     container.appendChild(p);
   });
@@ -1741,5 +1739,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
