@@ -1375,7 +1375,6 @@ body {
 .sv-sub-header img {
   width: 34px;
   height: 34px;
-  display: block;
 }
 
 .sv-sub-header span {
@@ -1390,3 +1389,4 @@ body {
   font-size: 19px; /* Ensure content matches the new standard */
   color: #e0e0e0;
 }
+
