@@ -1279,7 +1279,9 @@ const DB_VERSION = 1;
 
 // NEW: Global variables to track workshop navigation state
 let workshopCardsCache = []; 
+let visibleCardsCache = []; // New cache for filtered results
 let currentCardIndex = -1;
+let currentClassFilter = "All"; // Default filter
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -1354,19 +1356,32 @@ async function renderWorkshop() {
   grid.innerHTML = ""; 
 
   try {
+    // 1. Get fresh data
     const data = await getWorkshopData();
-    workshopCardsCache = data; // Cache data for navigation
+    workshopCardsCache = data; 
 
-    if (data.length === 0) {
-      grid.innerHTML = '<p class="placeholder-text">No cards generated yet. Create and download a card to see it here!</p>';
+    // 2. Apply Filter
+    if (currentClassFilter === "All") {
+      visibleCardsCache = data;
+    } else {
+      visibleCardsCache = data.filter(card => card.class === currentClassFilter);
+    }
+
+    if (visibleCardsCache.length === 0) {
+      if (data.length === 0) {
+        grid.innerHTML = '<p class="placeholder-text">No cards generated yet. Create and download a card to see it here!</p>';
+      } else {
+        grid.innerHTML = `<p class="placeholder-text">No ${currentClassFilter} cards found.</p>`;
+      }
       return;
     }
 
-    data.forEach((card, index) => {
+    // 3. Render only visible cards
+    visibleCardsCache.forEach((card, index) => {
       const cardEl = document.createElement("div");
       cardEl.className = "workshop-card";
       
-      // Update Click to use index tracking
+      // Update Click to use index tracking based on VISIBLE cache
       cardEl.onclick = () => {
           currentCardIndex = index;
           openWorkshopModal(index); 
@@ -1376,13 +1391,6 @@ async function renderWorkshop() {
       img.src = card.image;
       img.loading = "lazy";
 
-      /*
-      const nameDiv = document.createElement("div");
-      nameDiv.className = "card-name";
-      nameDiv.textContent = card.name || "Unnamed Card";
-      cardEl.appendChild(nameDiv);
-      */
-
       cardEl.appendChild(img);
       grid.appendChild(cardEl);
     });
@@ -1391,6 +1399,22 @@ async function renderWorkshop() {
     grid.innerHTML = '<p class="placeholder-text" style="color:#d55;">Error loading workshop history.</p>';
   }
 }
+
+// Setup Filter Button Listeners
+document.addEventListener("DOMContentLoaded", () => {
+  const filterBtns = document.querySelectorAll(".filter-btn");
+  filterBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      // UI Update
+      filterBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      
+      // Logic Update
+      currentClassFilter = btn.dataset.filter;
+      renderWorkshop();
+    });
+  });
+});
 
 const workshopModal = document.getElementById("workshopModal");
 
@@ -1438,7 +1462,7 @@ function formatWorkshopHTML(text) {
 
 // REFACTORED: Now accepts an index and pulls from cache
 function openWorkshopModal(index) {
-  if (index < 0 || index >= workshopCardsCache.length) return;
+  if (index < 0 || index >= visibleCardsCache.length) return;
   
   const card = workshopCardsCache[index];
 
@@ -1549,14 +1573,14 @@ function openWorkshopModal(index) {
 
 // NEW: Navigation Function
 function navigateModal(direction) {
-  if (workshopCardsCache.length === 0) return;
+  if (visibleCardsCache.length === 0) return;
 
   currentCardIndex += direction;
 
   // Infinite loop logic
   if (currentCardIndex < 0) {
-    currentCardIndex = workshopCardsCache.length - 1;
-  } else if (currentCardIndex >= workshopCardsCache.length) {
+    currentCardIndex = visibleCardsCache.length - 1;
+  } else if (currentCardIndex >= visibleCardsCache.length) {
     currentCardIndex = 0;
   }
 
@@ -1776,6 +1800,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
