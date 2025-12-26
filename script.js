@@ -1506,7 +1506,6 @@ function openWorkshopModal(index) {
   }
 
   // 5. Render Crest / Faith (New Sub-box Structure)
-  // Helper to create the sub-box
   const createSubBox = (type, name, text) => {
     const wrapper = document.createElement("div");
     wrapper.className = "sv-sub-box";
@@ -1514,14 +1513,14 @@ function openWorkshopModal(index) {
     const header = document.createElement("div");
     header.className = "sv-sub-header";
 
-    // Icon
+    // Icon - removing explicit width/height to let it use default dimensions
     const img = document.createElement("img");
-    img.src = `assets/misc/${type.toLowerCase()}.png`; // Expects 'crest.png' or 'faith.png'
+    img.src = `assets/misc/${type.toLowerCase()}.png`; 
     img.alt = type;
     
-    // Title
+    // Title - now uses the same font logic as standard text via CSS
     const titleSpan = document.createElement("span");
-    titleSpan.textContent = name || type; // Use custom name or default to Type (Crest/Faith)
+    titleSpan.textContent = name || type;
 
     header.appendChild(img);
     header.appendChild(titleSpan);
@@ -1776,6 +1775,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
