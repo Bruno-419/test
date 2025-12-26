@@ -1384,7 +1384,10 @@ body {
 }
 
 .sv-sub-header img {
-  /* Default dimensions: no fixed width/height enforced beyond layout flow */
+  max-width: 40px;
+  max-height: 44px;
+  width: auto;
+  height: auto;
   display: block;
   border: none;
   filter: none;
@@ -1404,3 +1407,4 @@ body {
   font-size: 19px;
   color: #e0e0e0;
 }
+
