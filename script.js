@@ -1475,37 +1475,74 @@ function openWorkshopModal(index) {
 
   const isFollower = card.type === "Follower";
 
-  // 2. Collect Extras (Evolve, Super-Evolve, Crest, Faith)
-  const extras = [];
-  if (isFollower && card.text.evolve) extras.push(card.text.evolve);
-  if (isFollower && card.text.superEvolve) extras.push(card.text.superEvolve);
-  
-  if (card.text.crest) {
-    let txt = card.text.crest;
-    if(card.names.crest) txt = `Crest (${card.names.crest})\n` + txt;
-    extras.push(txt);
-  }
-  if (card.text.faith) {
-    let txt = card.text.faith;
-    if(card.names.faith) txt = `Faith (${card.names.faith})\n` + txt;
-    extras.push(txt);
-  }
+  // 2. Identify presence of extras to determine if divider is needed
+  const hasEvolve = isFollower && card.text.evolve;
+  const hasSuperEvolve = isFollower && card.text.superEvolve;
+  const hasCrest = !!card.text.crest;
+  const hasFaith = !!card.text.faith;
 
-  // 3. Insert Structural Divider
-  // If we have Main Card Text AND at least one Extra field, insert a divider between them.
-  if (card.text.card && extras.length > 0) {
+  const hasAnyExtra = hasEvolve || hasSuperEvolve || hasCrest || hasFaith;
+
+  // 3. Insert Structural Divider between Card Text and Extras
+  if (card.text.card && hasAnyExtra) {
     const hr = document.createElement("hr");
     hr.className = "sv-divider";
     container.appendChild(hr);
   }
 
-  // 4. Render Extras
-  extras.forEach(text => {
+  // 4. Render Evolve / Super-Evolve (Standard Text Blocks)
+  if (hasEvolve) {
     const p = document.createElement("div");
     p.className = "sv-text-block";
-    p.innerHTML = formatWorkshopHTML(text);
+    p.innerHTML = formatWorkshopHTML(card.text.evolve);
     container.appendChild(p);
-  });
+  }
+
+  if (hasSuperEvolve) {
+    const p = document.createElement("div");
+    p.className = "sv-text-block";
+    p.innerHTML = formatWorkshopHTML(card.text.superEvolve);
+    container.appendChild(p);
+  }
+
+  // 5. Render Crest / Faith (New Sub-box Structure)
+  // Helper to create the sub-box
+  const createSubBox = (type, name, text) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "sv-sub-box";
+
+    const header = document.createElement("div");
+    header.className = "sv-sub-header";
+
+    // Icon
+    const img = document.createElement("img");
+    img.src = `assets/misc/${type.toLowerCase()}.png`; // Expects 'crest.png' or 'faith.png'
+    img.alt = type;
+    
+    // Title
+    const titleSpan = document.createElement("span");
+    titleSpan.textContent = name || type; // Use custom name or default to Type (Crest/Faith)
+
+    header.appendChild(img);
+    header.appendChild(titleSpan);
+
+    const content = document.createElement("div");
+    content.className = "sv-sub-content";
+    content.innerHTML = formatWorkshopHTML(text);
+
+    wrapper.appendChild(header);
+    wrapper.appendChild(content);
+
+    return wrapper;
+  };
+
+  if (hasCrest) {
+    container.appendChild(createSubBox("Crest", card.names.crest, card.text.crest));
+  }
+
+  if (hasFaith) {
+    container.appendChild(createSubBox("Faith", card.names.faith, card.text.faith));
+  }
 
   document.getElementById("workshopModal").style.display = "block";
 }
@@ -1739,6 +1776,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
