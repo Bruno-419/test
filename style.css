@@ -1124,7 +1124,7 @@ body {
   
   /* Requested Positioning: Lowered by 55px */
   margin-top: 55px;
-  margin-left: 20px; /* Keep spacing from image */
+  margin-left: 56px; /* Keep spacing from image */
   
   /* Requested Appearance */
   background-color: #242527; 
@@ -1429,4 +1429,5 @@ body {
   border-color: #2aa48a;
   box-shadow: 0 0 10px rgba(42, 164, 138, 0.4);
 }
+
 
