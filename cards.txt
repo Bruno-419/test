@@ -1,5 +1,10 @@
 Card Name: Deepwood Bounty
 Card ID: 90011310
+Cost: 0
+Class: Forestcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Restore 1 defense to your leader.
 
@@ -7,13 +12,39 @@ Restore 1 defense to your leader.
 
 Card Name: Knight
 Card ID: 90021110
+Cost: 0
+Attack: 1
+Defense: 1
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: Officer
 --------------------------------
 -
 
 ==================================================
 
+Card Name: Glittering Gold
+Card ID: 90021350
+Cost: 0
+Class: Swordcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
+--------------------------------
+Select a Mode to activate.
+1. Draw a card.
+2. Deal 2 damage to a random enemy follower.
+
+==================================================
+
 Card Name: Fangs of Ardent Destruction
 Card ID: 90044320
+Cost: 0
+Class: Dragoncraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Deal 1 damage to all followers.
 
@@ -21,6 +52,13 @@ Deal 1 damage to all followers.
 
 Card Name: Skeleton
 Card ID: 90051110
+Cost: 0
+Attack: 1
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: Departed
 --------------------------------
 -
 
@@ -28,6 +66,11 @@ Card ID: 90051110
 
 Card Name: Scream Diffusion
 Card ID: 90054310
+Cost: 0
+Class: Abysscraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Summon 2 copies of Rulenye & Valnareik and give them Rush.
 
@@ -35,6 +78,11 @@ Summon 2 copies of Rulenye & Valnareik and give them Rush.
 
 Card Name: Wings of Desire
 Card ID: 90054320
+Cost: 0
+Class: Abysscraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Select an allied Rulenye & Valnareik on the field and give it Storm.
 
@@ -42,6 +90,11 @@ Select an allied Rulenye & Valnareik on the field and give it Storm.
 
 Card Name: Awed and Inspired
 Card ID: 10461210
+Cost: 0
+Class: Havencraft
+Type: Amulet
+Rarity: Bronze
+Trait: -
 --------------------------------
 Engage (2): Destroy this card. Select an allied follower on the field and transform it into an Awed and Inspired. Draw a card.
 
@@ -49,6 +102,13 @@ Engage (2): Destroy this card. Select an allied follower on the field and transf
 
 Card Name: Puppet
 Card ID: 90071110
+Cost: 0
+Attack: 1
+Defense: 1
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: Puppetry
 --------------------------------
 Rush
 At the end of your opponent's turn, destroy this card.
@@ -57,13 +117,41 @@ At the end of your opponent's turn, destroy this card.
 
 Card Name: Twinblade Goblin
 Card ID: 10201110
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Neutral
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: If there's a super-evolved allied follower on the field, select an enemy follower on the field and deal it 4 damage.
 
 ==================================================
 
+Card Name: Monster Litterateur
+Card ID: 10501110
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Neutral
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Fanfare: If there's another 1-base-cost allied follower on the field, give this follower +1/+1.
+
+==================================================
+
 Card Name: Goblin
 Card ID: 90001110
+Cost: 1
+Attack: 1
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 -
 
@@ -71,6 +159,13 @@ Card ID: 90001110
 
 Card Name: Servant of Cocytus
 Card ID: 90004120
+Cost: 1
+Attack: 13
+Defense: 13
+Class: Neutral
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 -
 
@@ -78,13 +173,39 @@ Card ID: 90004120
 
 Card Name: Great Testimony
 Card ID: 90004320
+Cost: 1
+Class: Neutral
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Select an enemy follower on the field and destroy it.
 
 ==================================================
 
+Card Name: World of Games
+Card ID: 10503210
+Cost: 1
+Class: Neutral
+Type: Amulet
+Rarity: Gold
+Trait: -
+--------------------------------
+Countdown (5)
+Whenever you play another card, if there's a card on the field other than it with the same base cost, advance this amulet's count by 1.
+Last Words: Draw 2 cards.
+
+==================================================
+
 Card Name: May, Journey Elf
 Card ID: 10012110
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Combo (3) - Select an enemy follower on the field and deal it 3 damage.
 
@@ -92,6 +213,13 @@ Fanfare: Combo (3) - Select an enemy follower on the field and deal it 3 damage.
 
 Card Name: Good Fairy of the Pond
 Card ID: 10112120
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Last Words: Add a Fairy to your hand.
 
@@ -99,6 +227,13 @@ Last Words: Add a Fairy to your hand.
 
 Card Name: Fairy
 Card ID: 90011110
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: Pixie
 --------------------------------
 Rush
 
@@ -106,6 +241,11 @@ Rush
 
 Card Name: Bug Alert
 Card ID: 10012310
+Cost: 1
+Class: Forestcraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Select an allied card on the field and return it to hand. Deal 2 damage to a random enemy follower.
 
@@ -113,6 +253,11 @@ Select an allied card on the field and return it to hand. Deal 2 damage to a ran
 
 Card Name: Fairy Convocation
 Card ID: 10111310
+Cost: 1
+Class: Forestcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Add 2 copies of Fairy to your hand.
 
@@ -120,6 +265,11 @@ Add 2 copies of Fairy to your hand.
 
 Card Name: Ambush from Above
 Card ID: 10212310
+Cost: 1
+Class: Forestcraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Do this 1 time: "Deal 2 damage to a random enemy follower." Combo (3) - Do it 2 times instead.
 
@@ -127,6 +277,11 @@ Do this 1 time: "Deal 2 damage to a random enemy follower." Combo (3) - Do it 2 
 
 Card Name: Eradicating Arrow
 Card ID: 10313310
+Cost: 1
+Class: Forestcraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Do this X times: "Give a random enemy follower on the field -0/-1." X is your Combo.
 
@@ -134,11 +289,15 @@ Do this X times: "Give a random enemy follower on the field -0/-1." X is your Co
 
 Card Name: Starry Sky
 Card ID: 10412310
+Cost: 1
+Class: Forestcraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Deal 2 damage to a random enemy follower. Combo (5) - Gain Crest: Starry Sky.
 
 Crest
-
 <add>Countdown (1)
 Last Words: Deal 1 damage to the enemy leader. Add a Starry Sky to your hand.</add>
 
@@ -146,6 +305,11 @@ Last Words: Deal 1 damage to the enemy leader. Add a Starry Sky to your hand.</a
 
 Card Name: Bramble Burst
 Card ID: 90014310
+Cost: 1
+Class: Forestcraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Select an enemy follower on the field or the enemy leader and deal it 3 damage.
 
@@ -153,6 +317,13 @@ Select an enemy follower on the field or the enemy leader and deal it 3 damage.
 
 Card Name: Flashstep Quickblader
 Card ID: 10021110
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Storm
 
@@ -160,6 +331,13 @@ Storm
 
 Card Name: Luminous Commander
 Card ID: 10122110
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: Luminous
 --------------------------------
 Whenever an allied Officer follower enters the field, give this follower +1/+0 until the end of the turn.
 ----------
@@ -169,6 +347,13 @@ Whenever an allied Officer follower enters the field, give this follower +1/+0 u
 
 Card Name: Steelclad Knight
 Card ID: 90021120
+Cost: 1
+Attack: 2
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: Officer
 --------------------------------
 -
 
@@ -176,6 +361,11 @@ Card ID: 90021120
 
 Card Name: Returning Slash
 Card ID: 10323310
+Cost: 1
+Class: Swordcraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Fuse: Loot cards
 ----------
@@ -185,6 +375,11 @@ Deal 2 damage to a random enemy follower. Add a Gilded Blade to your hand. If yo
 
 Card Name: Gilded Blade
 Card ID: 90021310
+Cost: 1
+Class: Swordcraft
+Type: Spell
+Rarity: Bronze
+Trait: Loot
 --------------------------------
 Select an enemy follower on the field or the enemy leader and deal it 1 damage.
 
@@ -192,6 +387,11 @@ Select an enemy follower on the field or the enemy leader and deal it 1 damage.
 
 Card Name: Gilded Goblet
 Card ID: 90021320
+Cost: 1
+Class: Swordcraft
+Type: Spell
+Rarity: Bronze
+Trait: Loot
 --------------------------------
 Restore 2 defense to your leader.
 
@@ -199,6 +399,11 @@ Restore 2 defense to your leader.
 
 Card Name: Gilded Boots
 Card ID: 90021330
+Cost: 1
+Class: Swordcraft
+Type: Spell
+Rarity: Bronze
+Trait: Loot
 --------------------------------
 Select an allied follower on the field and give it +1/+0 and Rush.
 
@@ -206,6 +411,11 @@ Select an allied follower on the field and give it +1/+0 and Rush.
 
 Card Name: Gilded Necklace
 Card ID: 90021340
+Cost: 1
+Class: Swordcraft
+Type: Spell
+Rarity: Bronze
+Trait: Loot
 --------------------------------
 Select an allied follower on the field and give it +0/+1 and Ward.
 
@@ -213,6 +423,11 @@ Select an allied follower on the field and give it +0/+1 and Ward.
 
 Card Name: Remnant of Hollowness
 Card ID: 90024310
+Cost: 1
+Class: Swordcraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Deal 4 damage split between all enemies.
 
@@ -220,6 +435,11 @@ Deal 4 damage split between all enemies.
 
 Card Name: Lair of Usurpation
 Card ID: 10322210
+Cost: 1
+Class: Swordcraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Engage: Destroy this card. Select a Mode to activate.
 1. Add a Gilded Blade and Gilded Necklace to your hand.
@@ -229,6 +449,13 @@ Engage: Destroy this card. Select a Mode to activate.
 
 Card Name: Suframare, Wandering Tutor
 Card ID: 10431120
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 At the end of your turn, spellboost your hand X times. X is this follower's attack.
 ----------
@@ -236,8 +463,36 @@ At the end of your turn, spellboost your hand X times. X is this follower's atta
 
 ==================================================
 
+Card Name: Lhynkal, Wandering Fool
+Card ID: 10534110
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Fanfare: Gain Crest: Lhynkal, Wandering Fool.
+----------
+Rush
+----------
+<sev>Super-Evolve: Add 10 copies of Lhynkal, Wandering Fool to your deck.</sev>
+
+Crest
+<add>Whenever an allied Lhynkal, Wandering Fool enters the field, reduce the enemy leader's max defense by 2.</add>
+
+==================================================
+
 Card Name: Clay Golem
 Card ID: 90031110
+Cost: 1
+Attack: 2
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: Golem
 --------------------------------
 -
 
@@ -245,6 +500,13 @@ Card ID: 90031110
 
 Card Name: Onion Patch
 Card ID: 90032110
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Rush
 Strike: Spellboost your hand.
@@ -253,6 +515,11 @@ Strike: Spellboost your hand.
 
 Card Name: Foresight
 Card ID: 10031310
+Cost: 1
+Class: Runecraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Draw a card.
 
@@ -260,6 +527,11 @@ Draw a card.
 
 Card Name: Stormy Blast
 Card ID: 10131320
+Cost: 1
+Class: Runecraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 X starts at 2.
 On Spellboost: Increase X by 1.
@@ -268,8 +540,28 @@ Select an enemy follower on the field and deal it X damage.
 
 ==================================================
 
+Card Name: Kitty Cunning
+Card ID: 10532310
+Cost: 1
+Class: Runecraft
+Type: Spell
+Rarity: Silver
+Trait: -
+--------------------------------
+Earth Rite (2) - Activate 2 random abilities from the following.
+1. Summon a Clay Golem.
+2. Restore 2 defense to your leader.
+3. Gain 3 earth sigils.
+
+==================================================
+
 Card Name: Looking Smart!
 Card ID: 90033310
+Cost: 1
+Class: Runecraft
+Type: Spell
+Rarity: Gold
+Trait: Mysteria
 --------------------------------
 Draw 2 cards. Deal 2 damage to a random enemy follower.
 
@@ -277,6 +569,11 @@ Draw 2 cards. Deal 2 damage to a random enemy follower.
 
 Card Name: Ars Magna
 Card ID: 90034320
+Cost: 1
+Class: Runecraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Select an enemy and deal it 2 damage. Restore 1 defense to your leader.
 
@@ -284,6 +581,11 @@ Select an enemy and deal it 2 damage. Restore 1 defense to your leader.
 
 Card Name: Witch's New Brew
 Card ID: 10031210
+Cost: 1
+Class: Runecraft
+Type: Amulet
+Rarity: Bronze
+Trait: Earth Sigil
 --------------------------------
 Fanfare: Draw a card.
 ----------
@@ -295,6 +597,11 @@ Engage (1): Gain an earth sigil.
 
 Card Name: Magic Sediment
 Card ID: 90031210
+Cost: 1
+Class: Runecraft
+Type: Amulet
+Rarity: Bronze
+Trait: Earth Sigil
 --------------------------------
 Earth Sigil
 ----------
@@ -304,6 +611,13 @@ Engage (1): Gain an earth sigil.
 
 Card Name: Soaring Ivory Dragon
 Card ID: 10241120
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: If you're in Overflow, draw a card.
 ----------
@@ -313,6 +627,13 @@ Rush
 
 Card Name: Fire Drake Whelp
 Card ID: 90041110
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Intimidate
 
@@ -320,6 +641,11 @@ Intimidate
 
 Card Name: Strike of the Dragonewt
 Card ID: 10041310
+Cost: -1
+Class: Dragoncraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select an enemy follower on the field and deal it 2 damage. If you're in Overflow, deal 4 damage instead.
 
@@ -327,6 +653,11 @@ Select an enemy follower on the field and deal it 2 damage. If you're in Overflo
 
 Card Name: Ferocious Flame
 Card ID: 10343310
+Cost: 1
+Class: Dragoncraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Select an allied follower on the field and deal it 1 damage. Deal 3 damage to a random enemy follower. If you're in Overflow, draw a Dragoncraft follower.
 
@@ -334,6 +665,11 @@ Select an allied follower on the field and deal it 1 damage. Deal 3 damage to a 
 
 Card Name: Fan of Otohime
 Card ID: 10143210
+Cost: 1
+Class: Dragoncraft
+Type: Amulet
+Rarity: Gold
+Trait: -
 --------------------------------
 Engage (3): Summon an Otohime's Bodyguard. Select a card in your hand and discard it.
 
@@ -341,6 +677,11 @@ Engage (3): Summon an Otohime's Bodyguard. Select a card in your hand and discar
 
 Card Name: Pyrewyrm Blade
 Card ID: 10242210
+Cost: 1
+Class: Dragoncraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Engage (1): Destroy this card. Select an allied follower on the field and give it +1/+1 and " Last Words: Summon a Pyrewyrm Blade."
 
@@ -348,6 +689,13 @@ Engage (1): Destroy this card. Select an allied follower on the field and give i
 
 Card Name: Lilith, Enchanting Succubus
 Card ID: 10052110
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Last Words: Add a Bat to your hand.
 
@@ -355,6 +703,13 @@ Last Words: Add a Bat to your hand.
 
 Card Name: Cultivator of Malice
 Card ID: 10251120
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Last Words: Add a Ghost to your hand.
 
@@ -362,6 +717,13 @@ Last Words: Add a Ghost to your hand.
 
 Card Name: Bat
 Card ID: 90051120
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Drain
 
@@ -369,6 +731,13 @@ Drain
 
 Card Name: Ghost
 Card ID: 90051130
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: Departed
 --------------------------------
 Storm
 When this card leaves the field, banish it.
@@ -378,6 +747,13 @@ At the end of your turn, banish this card.
 
 Card Name: Mimi, Right Paw Hellhound
 Card ID: 90054110
+Cost: 1
+Attack: 2
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Rush
 Last Words: Deal 2 damage to the enemy leader.
@@ -386,6 +762,13 @@ Last Words: Deal 2 damage to the enemy leader.
 
 Card Name: Coco, Left Paw Hellhound
 Card ID: 90054120
+Cost: 1
+Attack: 1
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Rush
 Last Words: Restore 2 defense to your leader.
@@ -394,6 +777,11 @@ Last Words: Restore 2 defense to your leader.
 
 Card Name: Reaper's Deathslash
 Card ID: 10151310
+Cost: 1
+Class: Abysscraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select an allied and enemy follower on the field and destroy them.
 
@@ -401,6 +789,13 @@ Select an allied and enemy follower on the field and destroy them.
 
 Card Name: Tikoh, Asclepian Surgeon
 Card ID: 10463110
+Cost: 1
+Attack: 0
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Whenever you Engage an amulet, restore 1 defense to your leader.
 ----------
@@ -408,8 +803,31 @@ Whenever you Engage an amulet, restore 1 defense to your leader.
 
 ==================================================
 
+Card Name: Bouquet Believer
+Card ID: 10561120
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Enhance (4): Draw a card. Give this follower Bane.
+----------
+During your turn, whenever you draw a card, give this follower Rush.
+
+==================================================
+
 Card Name: Holy Cavalier
 Card ID: 90064110
+Cost: 1
+Attack: 1
+Defense: 2
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Ward
 
@@ -417,6 +835,11 @@ Ward
 
 Card Name: Divine Guard
 Card ID: 10262310
+Cost: 1
+Class: Havencraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Select an allied follower on the field with Ward and give it +0/+1. Deal X damage to a random enemy follower. X is the selected follower's defense.
 
@@ -424,6 +847,11 @@ Select an allied follower on the field with Ward and give it +0/+1. Deal X damag
 
 Card Name: Winged Statue
 Card ID: 10062210
+Cost: 1
+Class: Havencraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Countdown (4)
 Last Words: Summon a Holy Falcon.
@@ -434,6 +862,11 @@ Engage (1): Advance this amulet's count by 1.
 
 Card Name: Serene Sanctuary
 Card ID: 10161210
+Cost: 1
+Class: Havencraft
+Type: Amulet
+Rarity: Bronze
+Trait: -
 --------------------------------
 Countdown (3)
 Last Words: Draw 2 cards.
@@ -444,6 +877,13 @@ Engage (1): Advance this amulet's count by 1.
 
 Card Name: Elise, Electrifying Inventor
 Card ID: 10171110
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Last Words: Add a Gear of Remembrance to your hand.
 
@@ -451,6 +891,13 @@ Last Words: Add a Gear of Remembrance to your hand.
 
 Card Name: Puppet Cat
 Card ID: 10271120
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: If there's a super-evolved allied follower on the field, add a Puppet to your hand and give it +3/+0.
 ----------
@@ -460,6 +907,13 @@ Rush
 
 Card Name: Enhanced Puppet
 Card ID: 90071120
+Cost: 1
+Attack: 3
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: Puppetry
 --------------------------------
 Rush
 At the end of your opponent's turn, destroy this card.
@@ -468,6 +922,13 @@ At the end of your opponent's turn, destroy this card.
 
 Card Name: Doll Slayer
 Card ID: 90072130
+Cost: 1
+Attack: 1
+Defense: 1
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: Puppetry
 --------------------------------
 Ambush
 Last Words: Summon a Vier, Heart Slayer.
@@ -476,6 +937,11 @@ Last Words: Summon a Vier, Heart Slayer.
 
 Card Name: Artifact Recharge
 Card ID: 10171320
+Cost: 1
+Class: Portalcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Add a Gear of Ambition and Gear of Remembrance to your hand.
 
@@ -483,13 +949,59 @@ Add a Gear of Ambition and Gear of Remembrance to your hand.
 
 Card Name: Flight of Icarus
 Card ID: 10272310
+Cost: 1
+Class: Portalcraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Select an Artifact follower in your hand and give it Rush and " Last Words: Draw a card."
 
 ==================================================
 
+Card Name: Light of the Dewdrop
+Card ID: 10571310
+Cost: 1
+Class: Portalcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
+--------------------------------
+Draw a card.
+
+==================================================
+
+Card Name: Resurrection Tuner
+Card ID: 10572310
+Cost: 1
+Class: Portalcraft
+Type: Spell
+Rarity: Silver
+Trait: -
+--------------------------------
+Select a card in your hand and discard it. Add a copy each of 2 random differently named allied followers destroyed this match to your hand without revealing them.
+
+==================================================
+
+Card Name: Sincerity of the Dewdrop
+Card ID: 10573310
+Cost: 1
+Class: Portalcraft
+Type: Spell
+Rarity: Gold
+Trait: -
+--------------------------------
+Select a card on the field and transform it into an Imari's Little Buddies.
+
+==================================================
+
 Card Name: Melodious Monody
 Card ID: 90074310
+Cost: 1
+Class: Portalcraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Select an allied card on the field and destroy it. Deal 4 damage to a random enemy follower.
 
@@ -497,6 +1009,11 @@ Select an allied card on the field and destroy it. Deal 4 damage to a random ene
 
 Card Name: Gear of Ambition
 Card ID: 90071210
+Cost: 1
+Class: Portalcraft
+Type: Amulet
+Rarity: Bronze
+Trait: Artifact
 --------------------------------
 Fuse: Artifact amulets
 When you Fuse to this card, transform it into a Striker Artifact.
@@ -507,6 +1024,11 @@ Can't be played.
 
 Card Name: Gear of Remembrance
 Card ID: 90071220
+Cost: 1
+Class: Portalcraft
+Type: Amulet
+Rarity: Bronze
+Trait: Artifact
 --------------------------------
 Fuse: Artifact amulets
 When you Fuse to this card, transform it into a Fortifier Artifact.
@@ -517,6 +1039,13 @@ Can't be played.
 
 Card Name: Indomitable Fighter
 Card ID: 10001110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Enhance (4): Give this follower +3/+3.
 
@@ -524,6 +1053,13 @@ Enhance (4): Give this follower +3/+3.
 
 Card Name: Leah, Bellringer Angel
 Card ID: 10001120
+Cost: 2
+Attack: 0
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Ward
 Last Words: Draw a card.
@@ -534,6 +1070,13 @@ Last Words: Draw a card.
 
 Card Name: Ruby, Greedy Cherub
 Card ID: 10101110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select a card in your hand and return it to deck. Draw a card.
 
@@ -541,6 +1084,13 @@ Fanfare: Select a card in your hand and return it to deck. Draw a card.
 
 Card Name: Phildau, Lionheart Ward
 Card ID: 10103110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 <ev>Evolve: Select an enemy follower on the field and destroy it.</ev>
 
@@ -548,6 +1098,13 @@ Card ID: 10103110
 
 Card Name: Cheretta, Angelic Maid
 Card ID: 10202110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: If you've unlocked super-evolution, give this follower +0/+3.
 ----------
@@ -557,6 +1114,13 @@ Ward
 
 Card Name: Hnikar & Jafnhar, Firestorm Duo
 Card ID: 10203120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Enhance (5): Evolve this follower.
 ----------
@@ -566,6 +1130,13 @@ Last Words: If this follower is evolved, deal 4 damage to a random enemy followe
 
 Card Name: Inspirational One
 Card ID: 10302110
+Cost: 2
+Attack: 1
+Defense: 3
+Class: Neutral
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Activates in hand. When an enemy follower super-evolves, give this follower Bane.
 ----------
@@ -575,6 +1146,13 @@ Ward
 
 Card Name: Vyrn, Bestest Pal
 Card ID: 10401120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: If you've unlocked super-evolution, evolve this follower.
 
@@ -582,6 +1160,13 @@ Fanfare: If you've unlocked super-evolution, evolve this follower.
 
 Card Name: Lyria, Skydestined
 Card ID: 10403120
+Cost: 2
+Attack: 1
+Defense: 1
+Class: Neutral
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Enhance (8): Draw a follower that costs 7 or more. Recover 7 play points.
 ----------
@@ -591,6 +1176,11 @@ Barrier
 
 Card Name: Dark Side
 Card ID: 10201310
+Cost: 2
+Class: Neutral
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select a follower on the field and give it +2/-2.
 
@@ -598,6 +1188,11 @@ Select a follower on the field and give it +2/-2.
 
 Card Name: Detective's Lens
 Card ID: 10001210
+Cost: 2
+Class: Neutral
+Type: Amulet
+Rarity: Bronze
+Trait: -
 --------------------------------
 Engage: Destroy this card. Select an enemy follower on the field and remove Ward from it.
 
@@ -605,6 +1200,13 @@ Engage: Destroy this card. Select an enemy follower on the field and remove Ward
 
 Card Name: Fairy Tamer
 Card ID: 10011110
+Cost: 2
+Attack: 1
+Defense: 1
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Add 2 copies of Fairy to your hand.
 
@@ -612,6 +1214,13 @@ Fanfare: Add 2 copies of Fairy to your hand.
 
 Card Name: Stray Beastman
 Card ID: 10011120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Increase your Combo by 1.
 
@@ -619,6 +1228,13 @@ Fanfare: Increase your Combo by 1.
 
 Card Name: Fay Twinkletoes
 Card ID: 10111110
+Cost: 2
+Attack: 2
+Defense: 1
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Combo (3) - Give all other allied followers on the field +1/+1.
 
@@ -626,6 +1242,13 @@ Fanfare: Combo (3) - Give all other allied followers on the field +1/+1.
 
 Card Name: Baby Carbuncle
 Card ID: 10112130
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select another allied card on the field and return it to hand.
 ----------
@@ -635,6 +1258,13 @@ Fanfare: Select another allied card on the field and return it to hand.
 
 Card Name: Lily, Crystalian Innocence
 Card ID: 10113110
+Cost: 2
+Attack: 1
+Defense: 3
+Class: Forestcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Combo (3) - Select an enemy follower on the field and set its defense to 1.
 ----------
@@ -644,6 +1274,13 @@ Fanfare: Combo (3) - Select an enemy follower on the field and set its defense t
 
 Card Name: Fairy Fencer
 Card ID: 10212120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Activates in hand. Whenever an allied follower super-evolves, set the cost of this card to 1.
 ----------
@@ -653,6 +1290,13 @@ Fanfare: Add a Fairy to your hand.
 
 Card Name: Devotee of Unkilling
 Card ID: 10311110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and give it -0/-1.
 ----------
@@ -662,6 +1306,13 @@ Fanfare: Select an enemy follower on the field and give it -0/-1.
 
 Card Name: Bearer of the Fairy Blade
 Card ID: 10311120
+Cost: 2
+Attack: 1
+Defense: 3
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Whenever an allied Pixie follower enters the field, give this follower +1/+0.
 
@@ -669,6 +1320,13 @@ Whenever an allied Pixie follower enters the field, give this follower +1/+0.
 
 Card Name: Chloe, What a Gal
 Card ID: 10412110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Enhance (8): Select a follower in your hand and summon it. Return this card to hand.
 
@@ -676,6 +1334,13 @@ Enhance (8): Select a follower in your hand and summon it. Return this card to h
 
 Card Name: Ewiyar, Wind Personified
 Card ID: 10414110
+Cost: 2
+Attack: 2
+Defense: 1
+Class: Forestcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Skybound Art - Recover 1 evolution point.
 ----------
@@ -683,8 +1348,59 @@ Rush
 
 ==================================================
 
+Card Name: Prudent Tanuki
+Card ID: 10511110
+Cost: 2
+Attack: 1
+Defense: 3
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Ambush
+----------
+<ev>Evolve: Draw a card.</ev>
+
+==================================================
+
+Card Name: Flowering Friendship
+Card ID: 10512110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+Fanfare: Combo (5) - Summon a Flowering Friendship and evolve it and this follower.
+
+==================================================
+
+Card Name: Wolfraud, Skybound Hanged Man
+Card ID: 10514110
+Cost: 2
+Attack: 1
+Defense: 1
+Class: Forestcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Fanfare: Give this follower +X/+X. X is your Combo.
+----------
+<ev>Evolve: Discard your hand. Add an exact copy each of 5 random cards in your opponent's deck to your hand without revealing them.</ev>
+
+==================================================
+
 Card Name: Garden's Allure
 Card ID: 10213310
+Cost: 2
+Class: Forestcraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Fuse: Forestcraft cards
 ----------
@@ -694,6 +1410,11 @@ Draw a card. If you've Fused to this card, draw 2 instead.
 
 Card Name: Bestial Swipe
 Card ID: 10311310
+Cost: 2
+Class: Forestcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select an enemy follower on the field and deal it 4 damage. Combo (3) - Draw a card.
 
@@ -701,6 +1422,11 @@ Select an enemy follower on the field and deal it 4 damage. Combo (3) - Draw a c
 
 Card Name: Comet Drive
 Card ID: 10411310
+Cost: 2
+Class: Forestcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select an enemy follower on the field and deal it 4 damage. If there's an evolved allied follower on the field, draw a card.
 
@@ -708,6 +1434,11 @@ Select an enemy follower on the field and deal it 4 damage. If there's an evolve
 
 Card Name: Alfheimr
 Card ID: 10413310
+Cost: 2
+Class: Forestcraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Select a Mode to activate. Super Skybound Art - Activate all of them instead.
 1. Draw a card. Restore 1 defense to your leader.
@@ -716,8 +1447,25 @@ Select a Mode to activate. Super Skybound Art - Activate all of them instead.
 
 ==================================================
 
+Card Name: Flight of the Swarmpetal
+Card ID: 10511310
+Cost: 2
+Class: Forestcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
+--------------------------------
+Deal 3 damage split between all enemy followers. Add a Fairy to your hand.
+
+==================================================
+
 Card Name: Wild Profusion
 Card ID: 10011210
+Cost: 2
+Class: Forestcraft
+Type: Amulet
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Add a Fairy to your hand.
 ----------
@@ -728,6 +1476,11 @@ Whenever an allied Pixie follower enters the field, deal 1 damage to a random en
 
 Card Name: Lambent Cairn
 Card ID: 10112210
+Cost: 2
+Class: Forestcraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Add a Fairy to your hand. Combo (3) - Add a Deepwood Bounty to your hand.
 ----------
@@ -737,6 +1490,13 @@ Engage: Destroy this card. Select an allied follower on the field and give it +1
 
 Card Name: Royal Coachwoman
 Card ID: 10022110
+Cost: 2
+Attack: 1
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Last Words: Summon a Knight.
 
@@ -744,6 +1504,13 @@ Last Words: Summon a Knight.
 
 Card Name: Ignominious Samurai
 Card ID: 10121150
+Cost: 2
+Attack: 2
+Defense: 1
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: If you've unlocked super-evolution, give this follower Bane.
 ----------
@@ -753,6 +1520,13 @@ Rush
 
 Card Name: Luminous Lancetrooper
 Card ID: 10122130
+Cost: 2
+Attack: 1
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: Luminous
 --------------------------------
 Fanfare: Summon a Knight.
 ----------
@@ -762,6 +1536,13 @@ Whenever an allied Officer follower enters the field, give it Rush.
 
 Card Name: Shinobi Squirrel
 Card ID: 10122140
+Cost: 2
+Attack: 2
+Defense: 1
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Ambush
 ----------
@@ -771,6 +1552,13 @@ Ambush
 
 Card Name: Seria, Gunslinger Maid
 Card ID: 10221110
+Cost: 2
+Attack: 2
+Defense: 1
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Deal 1 damage to 2 random enemy followers.
 
@@ -778,6 +1566,13 @@ Fanfare: Deal 1 damage to 2 random enemy followers.
 
 Card Name: Prim, Princess's Picnic
 Card ID: 10223120
+Cost: 2
+Attack: 1
+Defense: 1
+Class: Swordcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Add a Nonja, Silent Maid to your hand.
 ----------
@@ -789,6 +1584,13 @@ Ambush
 
 Card Name: Devotee of Usurpation
 Card ID: 10321110
+Cost: 2
+Attack: 2
+Defense: 1
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Add a Gilded Boots to your hand.
 ----------
@@ -798,6 +1600,13 @@ Last Words: Add a Gilded Goblet to your hand.
 
 Card Name: Supplicant of Usurpation
 Card ID: 10322110
+Cost: 2
+Attack: 1
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Add a Gilded Necklace to your hand.
 ----------
@@ -807,6 +1616,13 @@ Last Words: Add a Gilded Blade to your hand.
 
 Card Name: Randall, Feet Fighter
 Card ID: 10421110
+Cost: 2
+Attack: 3
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Enhance (5): Give this follower Storm.
 
@@ -814,6 +1630,13 @@ Enhance (5): Give this follower Storm.
 
 Card Name: Nonja, Silent Maid
 Card ID: 90023110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Gold
+Trait: Officer
 --------------------------------
 Fanfare: If there's an allied Prim, Princess's Picnic on the field, give this follower +1/+1 and Bane.
 ----------
@@ -823,6 +1646,11 @@ Ward
 
 Card Name: Way of the Maid
 Card ID: 10021310
+Cost: 2
+Class: Swordcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select a card in your hand and return it to deck. Draw 2 Swordcraft followers.
 
@@ -830,6 +1658,11 @@ Select a card in your hand and return it to deck. Draw 2 Swordcraft followers.
 
 Card Name: Lucrative Deal
 Card ID: 10221310
+Cost: 2
+Class: Swordcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Draw 2 cards. Your opponent draws a card.
 
@@ -837,6 +1670,11 @@ Draw 2 cards. Your opponent draws a card.
 
 Card Name: Band of Battle Princesses
 Card ID: 10222310
+Cost: 2
+Class: Swordcraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Deal 4 damage to a random enemy follower.
 Enhance (4): Deal damage to 3 random enemy followers instead.
@@ -845,13 +1683,50 @@ Enhance (4): Deal damage to 3 random enemy followers instead.
 
 Card Name: Shield Bash
 Card ID: 10321310
+Cost: 2
+Class: Swordcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select an allied follower on the field and give it Ward. Deal 4 damage to a random enemy follower.
 
 ==================================================
 
+Card Name: Extravagance of the Goldbloom
+Card ID: 10521310
+Cost: 2
+Class: Swordcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
+--------------------------------
+Select a spell in your hand and discard it. Do this 2 times: "Deal 3 damage to a random enemy follower."
+
+==================================================
+
+Card Name: Serenity's Shield
+Card ID: 10522310
+Cost: 2
+Class: Swordcraft
+Type: Spell
+Rarity: Silver
+Trait: -
+--------------------------------
+Summon 2 copies of Knight.
+Enhance (4): Summon 4 instead.
+
+==================================================
+
 Card Name: Apprentice Astrologer
 Card ID: 10131120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select a card in your hand and return it to deck. Draw a card. Gain an earth sigil.
 
@@ -859,6 +1734,13 @@ Fanfare: Select a card in your hand and return it to deck. Draw a card. Gain an 
 
 Card Name: Ms. Miranda, Adored Academic
 Card ID: 10132110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: Mysteria
 --------------------------------
 Fanfare: Spellboost your hand.
 ----------
@@ -868,6 +1750,13 @@ Fanfare: Spellboost your hand.
 
 Card Name: Penelope, Potions Prodigy
 Card ID: 10133120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Gain 2 earth sigils.
 ----------
@@ -877,6 +1766,13 @@ Fanfare: Gain 2 earth sigils.
 
 Card Name: Melvie, Adoring Witch
 Card ID: 10231110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Add a Witch's New Brew to your hand. If there's a super-evolved allied follower on the field, gain 2 earth sigils.
 
@@ -884,6 +1780,13 @@ Fanfare: Add a Witch's New Brew to your hand. If there's a super-evolved allied 
 
 Card Name: Arcane Archivist
 Card ID: 10231120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select a card in your hand and return it to deck. Draw a spell.
 
@@ -891,6 +1794,13 @@ Fanfare: Select a card in your hand and return it to deck. Draw a spell.
 
 Card Name: Devotee of Truth
 Card ID: 10331110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: If this card's cost isn't 2, restore 3 defense to your leader.
 
@@ -898,6 +1808,13 @@ Fanfare: If this card's cost isn't 2, restore 3 defense to your leader.
 
 Card Name: Velharia, Heir to Truth
 Card ID: 10334110
+Cost: 2
+Attack: 1
+Defense: 1
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Draw a card.
 ----------
@@ -908,6 +1825,13 @@ Fanfare: Draw a card.
 
 Card Name: Paper Shikigami
 Card ID: 90031130
+Cost: 2
+Attack: 2
+Defense: 1
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: Shikigami
 --------------------------------
 Rush
 Last Words: Spellboost your hand.
@@ -916,6 +1840,11 @@ Last Words: Spellboost your hand.
 
 Card Name: Truth Summons
 Card ID: 10031320
+Cost: 2
+Class: Runecraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Summon a Clay Golem.
 
@@ -923,6 +1852,11 @@ Summon a Clay Golem.
 
 Card Name: Radiant Rainbow
 Card ID: 10131310
+Cost: 2
+Class: Runecraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select a card in your hand with On Spellboost and spellboost it. Draw a card.
 
@@ -930,11 +1864,15 @@ Select a card in your hand with On Spellboost and spellboost it. Draw a card.
 
 Card Name: Pascale's Dance
 Card ID: 10233310
+Cost: 2
+Class: Runecraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Gain an earth sigil. Gain Crest: Pascale's Dance.
 
 Crest
-
 <add>Countdown (1)
 At the end of your turn, draw a card. Earth Rite (10) - Double the attack and defense of all allied followers on the field.</add>
 
@@ -942,6 +1880,11 @@ At the end of your turn, draw a card. Earth Rite (10) - Double the attack and de
 
 Card Name: Illusory Conjuration
 Card ID: 10333310
+Cost: 2
+Class: Runecraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Select a follower in your hand and increase its cost by 1. Destroy a random enemy follower.
 
@@ -949,13 +1892,37 @@ Select a follower in your hand and increase its cost by 1. Destroy a random enem
 
 Card Name: Alchemic Flare
 Card ID: 10433310
+Cost: 2
+Class: Runecraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Select an enemy follower on the field and deal it 4 damage. Gain an earth sigil. Skybound Art - Deal 2 damage to the enemy leader.
 
 ==================================================
 
+Card Name: Metamorphosis of the Dawnblossom
+Card ID: 10531310
+Cost: 2
+Class: Runecraft
+Type: Spell
+Rarity: Bronze
+Trait: -
+--------------------------------
+Select a card in your hand and discard it. Draw 2 cards.
+
+==================================================
+
 Card Name: Searing Firenewt
 Card ID: 10041110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and deal it 1 damage.
 
@@ -963,6 +1930,13 @@ Fanfare: Select an enemy follower on the field and deal it 1 damage.
 
 Card Name: Little Dragon Nanny
 Card ID: 10141140
+Cost: 2
+Attack: 1
+Defense: 1
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Summon a Fire Drake Whelp.
 ----------
@@ -972,6 +1946,13 @@ Fanfare: Summon a Fire Drake Whelp.
 
 Card Name: Intent Dragonewt Princess
 Card ID: 10242110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: If there's a super-evolved allied follower on the field, draw 2 cards.
 
@@ -979,6 +1960,13 @@ Fanfare: If there's a super-evolved allied follower on the field, draw 2 cards.
 
 Card Name: Filene, Whitefrost Bloom
 Card ID: 10244110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: If you're in Overflow, add a Whitefrost Whisper to your hand.
 ----------
@@ -990,6 +1978,13 @@ Bane
 
 Card Name: Devotee of Disdain
 Card ID: 10341110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 During your turn, whenever this follower takes damage but isn't destroyed, draw a Dragoncraft follower.
 
@@ -997,6 +1992,13 @@ During your turn, whenever this follower takes damage but isn't destroyed, draw 
 
 Card Name: Mari, Meg's Bestie
 Card ID: 10441120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Activates in hand. Whenever a 3-base-cost allied follower super-evolves, set the cost of this card to 0 until the end of the turn.
 ----------
@@ -1004,8 +2006,46 @@ At the end of your turn, give a random super-evolved allied follower on the fiel
 
 ==================================================
 
+Card Name: Springwell Steward
+Card ID: 10541110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+<ev>Evolve: Select an enemy follower on the field and deal it 5 damage.</ev>
+<sev>Super-Evolve: Select 2 instead.</sev>
+
+==================================================
+
+Card Name: Jellyfish Dancer
+Card ID: 10542120
+Cost: 2
+Attack: 2
+Defense: 1
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+Fanfare: Add a Majestic Megalorca to your hand.
+----------
+Whenever an allied Marine follower enters the field, give this follower Rush and Bane.
+
+==================================================
+
 Card Name: Majestic Megalorca
 Card ID: 90041130
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: Marine
 --------------------------------
 Rush
 
@@ -1013,6 +2053,11 @@ Rush
 
 Card Name: Call of the Megalorca
 Card ID: 10241310
+Cost: 2
+Class: Dragoncraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Summon a Majestic Megalorca. If you're in Overflow, draw a Call of the Megalorca.
 
@@ -1020,11 +2065,15 @@ Summon a Majestic Megalorca. If you're in Overflow, draw a Call of the Megalorca
 
 Card Name: Crescent Tube Ride
 Card ID: 10441310
+Cost: 2
+Class: Dragoncraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Gain Crest: Crescent Tube Ride.
 
 Crest
-
 <add>Countdown (4)
 At the end of your turn, give a random allied follower on the field +1/+1.</add>
 
@@ -1032,13 +2081,35 @@ At the end of your turn, give a random allied follower on the field +1/+1.</add>
 
 Card Name: Maximum Love Bomb
 Card ID: 10442310
+Cost: 2
+Class: Dragoncraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Select an enemy follower on the field, deal it 3 damage, and give it "Can't attack followers or leaders" until the end of your opponent's turn.
 
 ==================================================
 
+Card Name: Sloth of the Crestpetal
+Card ID: 10543310
+Cost: 2
+Class: Dragoncraft
+Type: Spell
+Rarity: Gold
+Trait: -
+--------------------------------
+Do this 2 times: "Deal 2 damage to a random enemy follower." If you're in Overflow, deal 2 damage to the enemy leader.
+
+==================================================
+
 Card Name: Nation of Disdain
 Card ID: 10342210
+Cost: 2
+Class: Dragoncraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Countdown (4)
 ----------
@@ -1048,6 +2119,13 @@ Engage (1): Deal 1 damage to all followers.
 
 Card Name: Devious Lesser Mummy
 Card ID: 10051130
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Necromancy (4) - Give this follower Storm.
 
@@ -1055,6 +2133,13 @@ Fanfare: Necromancy (4) - Give this follower Storm.
 
 Card Name: Nameless Demon
 Card ID: 10151120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 <ev>Evolve: Summon 2 copies of Bat.</ev>
 
@@ -1062,6 +2147,13 @@ Card ID: 10151120
 
 Card Name: Mino, Shrewd Reaper
 Card ID: 10152110
+Cost: 2
+Attack: 2
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Enhance (4): Give this follower Rush and Bane.
 ----------
@@ -1071,6 +2163,13 @@ Last Words: Add a Skeleton to your hand.
 
 Card Name: Beryl, Nightmare Incarnate
 Card ID: 10152120
+Cost: 2
+Attack: 3
+Defense: 3
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Deal 3 damage to your leader.
 ----------
@@ -1080,6 +2179,13 @@ Fanfare: Deal 3 damage to your leader.
 
 Card Name: Orthrus, Hellhound Blader
 Card ID: 10153120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Add 2 shadows to your cemetery.
 ----------
@@ -1091,6 +2197,13 @@ Ward
 
 Card Name: Spirited Gravekeeper
 Card ID: 10352120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Enhance (7): Reanimate (5) and Reanimate (3).
 
@@ -1098,13 +2211,19 @@ Enhance (7): Reanimate (5) and Reanimate (3).
 
 Card Name: Sham-Nacha, Heir to Entwining
 Card ID: 10354110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: Encroacher
 --------------------------------
 Fanfare: Reduce the faith of Faith: Sham-Nacha, Heir to Entwining by 10 to give it "Increase the number of Mode s you can select by 1."
 ----------
 <sev>Super-Evolve: Select an enemy follower on the field, destroy it, and add a copy of it to your hand.</sev>
 
 Faith
-
 <add>Faith starts at 0.
 ----------
 Whenever you select Mode s, increase faith by 1.</add>
@@ -1113,6 +2232,13 @@ Whenever you select Mode s, increase faith by 1.</add>
 
 Card Name: Almeida, Headstrong Miner
 Card ID: 10451110
+Cost: 2
+Attack: 3
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Enhance (4): Evolve this follower and give it +1/+1.
 ----------
@@ -1120,8 +2246,31 @@ Rush
 
 ==================================================
 
+Card Name: Support Wolf
+Card ID: 10551110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Enhance (6): Give this follower +0/+6, Bane, and Barrier.
+----------
+Rush
+
+==================================================
+
 Card Name: One-Tailed Fox
 Card ID: 90054130
+Cost: 2
+Attack: 2
+Defense: 3
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Rush
 Ward
@@ -1131,6 +2280,11 @@ Last Words: Give a random allied Ginsetsu & Yuzuki, Twin Calamities on the field
 
 Card Name: Chaos Cyclone
 Card ID: 10051310
+Cost: 2
+Class: Abysscraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select a Mode to activate.
 1. Draw a follower.
@@ -1140,6 +2294,11 @@ Select a Mode to activate.
 
 Card Name: Soul Predation
 Card ID: 10052310
+Cost: 2
+Class: Abysscraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Select an allied follower on the field and destroy it. Draw 2 cards.
 
@@ -1147,6 +2306,11 @@ Select an allied follower on the field and destroy it. Draw 2 cards.
 
 Card Name: Rage of Serpents
 Card ID: 10153310
+Cost: 2
+Class: Abysscraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Select an enemy follower on the field or the enemy leader and deal it 3 damage. Deal 2 damage to your leader.
 
@@ -1154,6 +2318,11 @@ Select an enemy follower on the field or the enemy leader and deal it 3 damage. 
 
 Card Name: Ghastly Soiree
 Card ID: 10251310
+Cost: 2
+Class: Abysscraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Add a Ghost, Skeleton, and Rotting Zombie to your hand.
 
@@ -1161,6 +2330,11 @@ Add a Ghost, Skeleton, and Rotting Zombie to your hand.
 
 Card Name: Winged Servants
 Card ID: 10252310
+Cost: 2
+Class: Abysscraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Summon 2 copies of Bat.
 
@@ -1168,18 +2342,67 @@ Summon 2 copies of Bat.
 
 Card Name: Valiant Edge
 Card ID: 10451310
+Cost: 2
+Class: Abysscraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Deal 2 damage to your leader. Gain Crest: Valiant Edge.
 
 Crest
-
 <add>Countdown (2)
 At the end of your turn, deal 2 damage to a random enemy follower and restore 1 defense to your leader.</add>
 
 ==================================================
 
+Card Name: Valor of the Nightblossom
+Card ID: 10551310
+Cost: 2
+Class: Abysscraft
+Type: Spell
+Rarity: Bronze
+Trait: -
+--------------------------------
+Select an enemy follower on the field and deal it 5 damage. Add a Valor of the Nightblossom to your deck.
+
+==================================================
+
+Card Name: Tyrannical Fists
+Card ID: 10552310
+Cost: 2
+Class: Abysscraft
+Type: Spell
+Rarity: Silver
+Trait: -
+--------------------------------
+Deal 3 damage to all leaders with the lowest defense.
+
+==================================================
+
+Card Name: Rigor of the Nightblossom
+Card ID: 10553310
+Cost: 2
+Class: Abysscraft
+Type: Spell
+Rarity: Gold
+Trait: -
+--------------------------------
+Gain Crest: Rigor of the Nightblossom.
+
+Crest
+<add>Countdown (2)
+At the end of your turn, draw a card. Then, if you have at least 4 cards with the same cost in your hand, summon a Skeleton and give it Ward.</add>
+
+==================================================
+
 Card Name: Castle of Entwining
 Card ID: 10352210
+Cost: 2
+Class: Abysscraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate.
 1. Draw a card.
@@ -1191,6 +2414,13 @@ Engage (1): Destroy this card. Replicate the effects of this card's Fanfare abil
 
 Card Name: Fox of Purity
 Card ID: 10061120
+Cost: 2
+Attack: 1
+Defense: 3
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Ward
 
@@ -1198,6 +2428,13 @@ Ward
 
 Card Name: Mainyu, Darkdweller
 Card ID: 10161140
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Aura
 Whenever you Engage an amulet, give this follower +1/+0 until the end of the turn.
@@ -1206,6 +2443,13 @@ Whenever you Engage an amulet, give this follower +1/+0 until the end of the tur
 
 Card Name: Sarissa, Luxspear Al-mi'raj
 Card ID: 10162110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Whenever an allied follower with Ward is destroyed, give this follower +1/+1.
 ----------
@@ -1215,6 +2459,13 @@ Whenever an allied follower with Ward is destroyed, give this follower +1/+1.
 
 Card Name: Damus, Oracle of Malice
 Card ID: 10261120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and give it "At the end of your turn, destroy this card."
 
@@ -1222,11 +2473,17 @@ Fanfare: Select an enemy follower on the field and give it "At the end of your t
 
 Card Name: Devotee of Repose
 Card ID: 10361110
+Cost: 2
+Attack: 0
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Gain Crest: Devotee of Repose.
 
 Crest
-
 <add>Countdown (4)
 At the end of your turn, if allied followers didn't attack this turn, give a random allied follower on your field -2/-0 and Ward.</add>
 
@@ -1234,6 +2491,13 @@ At the end of your turn, if allied followers didn't attack this turn, give a ran
 
 Card Name: Knight of the Holy Order
 Card ID: 10361120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Ward
 Whenever this follower is given + attack or defense on the field, restore 1 defense to your leader.
@@ -1242,6 +2506,13 @@ Whenever this follower is given + attack or defense on the field, restore 1 defe
 
 Card Name: Lamretta, Sisterly Shepherd
 Card ID: 10461120
+Cost: 2
+Attack: 1
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 At the end of your turn, if this follower is evolved, deal 2 damage to all followers.
 ----------
@@ -1251,6 +2522,11 @@ At the end of your turn, if this follower is evolved, deal 2 damage to all follo
 
 Card Name: Torrent of Despair
 Card ID: 90064310
+Cost: 2
+Class: Havencraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Banish a random enemy follower from the field. Delay the counts of all your crests by 1.
 
@@ -1258,6 +2534,11 @@ Banish a random enemy follower from the field. Delay the counts of all your cres
 
 Card Name: Darkhaven Grace
 Card ID: 10162210
+Cost: 2
+Class: Havencraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Engage (1): Select an allied follower on the field and give it +1/+1. Restore 1 defense to your leader.
 
@@ -1265,6 +2546,11 @@ Engage (1): Select an allied follower on the field and give it +1/+1. Restore 1 
 
 Card Name: Pact of the Beast Princess
 Card ID: 10163210
+Cost: 2
+Class: Havencraft
+Type: Amulet
+Rarity: Gold
+Trait: -
 --------------------------------
 Countdown (2)
 Last Words: Summon a Holyflame Tiger.
@@ -1275,13 +2561,37 @@ Engage (1): Advance this amulet's count by 1.
 
 Card Name: Luminous Censer
 Card ID: 10261210
+Cost: 2
+Class: Havencraft
+Type: Amulet
+Rarity: Bronze
+Trait: -
 --------------------------------
 Engage (1): Destroy this card. Restore 4 defense to your leader.
 
 ==================================================
 
+Card Name: Protective Shell
+Card ID: 10562210
+Cost: 2
+Class: Havencraft
+Type: Amulet
+Rarity: Silver
+Trait: -
+--------------------------------
+Engage: Destroy this card. Draw X cards. X is the number of allied followers on the field with Ward.
+
+==================================================
+
 Card Name: Puppet Lancer
 Card ID: 10071120
+Cost: 2
+Attack: 2
+Defense: 1
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Add an Enhanced Puppet to your hand.
 
@@ -1289,6 +2599,13 @@ Fanfare: Add an Enhanced Puppet to your hand.
 
 Card Name: Electric Whip Lass
 Card ID: 10072110
+Cost: 2
+Attack: 1
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Add a Gear of Remembrance to your hand.
 
@@ -1296,6 +2613,13 @@ Fanfare: Add a Gear of Remembrance to your hand.
 
 Card Name: Ironheart Hunter
 Card ID: 10171130
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Add a Gear of Ambition to your hand.
 ----------
@@ -1305,6 +2629,13 @@ Fanfare: Add a Gear of Ambition to your hand.
 
 Card Name: Lovestruck Puppeteer
 Card ID: 10172120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Add a Puppet to your hand.
 ----------
@@ -1314,6 +2645,13 @@ Fanfare: Add a Puppet to your hand.
 
 Card Name: Vier, Heart Slayer
 Card ID: 10272110
+Cost: 2
+Attack: 1
+Defense: 1
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select a Puppetry follower in your hand and transform it into a Doll Slayer.
 ----------
@@ -1323,6 +2661,13 @@ Bane
 
 Card Name: Carnelia, Ember of Darkness
 Card ID: 10273110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Add a Gear of Remembrance to your hand.
 ----------
@@ -1332,6 +2677,13 @@ Fanfare: Add a Gear of Remembrance to your hand.
 
 Card Name: Supplicant of Destruction
 Card ID: 10372110
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select another allied card on the field. If you selected one, destroy it and deal 2 damage to a random enemy follower.
 ----------
@@ -1341,6 +2693,13 @@ Fanfare: Select another allied card on the field. If you selected one, destroy i
 
 Card Name: Tsubasa, Blazing Gearcyclist
 Card ID: 10471120
+Cost: 2
+Attack: 3
+Defense: 1
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Increase the Skybound Art gauges of all cards in your hand by 1.
 ----------
@@ -1350,13 +2709,72 @@ Rush
 
 Card Name: Isaac, Congenial Engineer
 Card ID: 10471130
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Last Words: Add a Striker Artifact to your hand.
 
 ==================================================
 
+Card Name: Lunar Bunny
+Card ID: 10572120
+Cost: 2
+Attack: 1
+Defense: 1
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+Ward
+When you play a spell, evolve this follower.
+
+==================================================
+
+Card Name: Imari, Dewdrop
+Card ID: 10574120
+Cost: 2
+Attack: 2
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Fanfare: Select a card in your hand and discard it. Draw a spell.
+----------
+Whenever you play a spell, if this follower is evolved, summon an Imari's Little Buddies.
+----------
+<sev>Super-Evolve: Draw 2 differently named 1-cost spells.</sev>
+
+==================================================
+
+Card Name: Imari's Little Buddies
+Card ID: 90074140
+Cost: 2
+Attack: 3
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Rush
+
+==================================================
+
 Card Name: Stream of Life
 Card ID: 10172310
+Cost: 2
+Class: Portalcraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Select an enemy follower on the field and deal it 3 damage. Add a Gear of Remembrance to your hand.
 
@@ -1364,6 +2782,11 @@ Select an enemy follower on the field and deal it 3 damage. Add a Gear of Rememb
 
 Card Name: Devastating Soprano
 Card ID: 10373310
+Cost: 2
+Class: Portalcraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Select an allied card on the field and destroy it. Summon a White Psalm, New Revelation.
 
@@ -1371,6 +2794,11 @@ Select an allied card on the field and destroy it. Summon a White Psalm, New Rev
 
 Card Name: Puppet Theater
 Card ID: 10072210
+Cost: 2
+Class: Portalcraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Add a Puppet to your hand.
 ----------
@@ -1381,6 +2809,11 @@ At the end of your turn, add a Puppet to your hand.
 
 Card Name: Artifact Catapult
 Card ID: 10271210
+Cost: 2
+Class: Portalcraft
+Type: Amulet
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Add a Gear of Ambition to your hand.
 ----------
@@ -1390,6 +2823,11 @@ Engage (3): Destroy this card. Select an Artifact follower in your hand that cos
 
 Card Name: Wasteland of Destruction
 Card ID: 10372210
+Cost: 2
+Class: Portalcraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select another allied card on the field. If you selected one, destroy it and draw 2 cards.
 ----------
@@ -1399,6 +2837,13 @@ Last Words: Draw a card.
 
 Card Name: Arriet, Luxminstrel
 Card ID: 10002110
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Neutral
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 <ev>Evolve: Restore 2 defense to your leader.</ev>
 <sev>Super-Evolve: Restore 4 defense instead.</sev>
@@ -1407,6 +2852,13 @@ Card ID: 10002110
 
 Card Name: Vigilant Detective
 Card ID: 10101120
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Neutral
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Last Words: Add a Detective's Lens to your hand.
 
@@ -1414,6 +2866,13 @@ Last Words: Add a Detective's Lens to your hand.
 
 Card Name: Apollo, Heaven's Envoy
 Card ID: 10102110
+Cost: 3
+Attack: 1
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Deal 1 damage to all enemy followers.
 ----------
@@ -1423,19 +2882,32 @@ Fanfare: Deal 1 damage to all enemy followers.
 
 Card Name: Grimnir, Heavenly Gale
 Card ID: 10204120
+Cost: 3
+Attack: 2
+Defense: 3
+Class: Neutral
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Gain Crest: Grimnir, Heavenly Gale.
 ----------
 Ward
 
 Crest
-
 <add>At the end of your turn, if there's a super-evolved allied follower on the field, deal 2 damage to all enemy followers.</add>
 
 ==================================================
 
 Card Name: Dogged One
 Card ID: 10303110
+Cost: 3
+Attack: 3
+Defense: 1
+Class: Neutral
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Activates in hand. When an enemy follower super-evolves, give this follower Storm.
 ----------
@@ -1445,6 +2917,13 @@ Rush
 
 Card Name: Gilnelise, Voracity Manifest
 Card ID: 10304120
+Cost: 3
+Attack: 0
+Defense: 3
+Class: Neutral
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select another follower on the field and give it +2/-2. If both players have 10 max play points, add a Sweetness of Voracity to your hand.
 ----------
@@ -1456,6 +2935,13 @@ Drain
 
 Card Name: Yuni, Cosmic Legacy
 Card ID: 10402110
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Neutral
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Aura
 At the end of your turn, restore 1 defense to all allies.
@@ -1464,6 +2950,11 @@ At the end of your turn, restore 1 defense to all allies.
 
 Card Name: Seraphic Tidings
 Card ID: 10102310
+Cost: 3
+Class: Neutral
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Draw 2 cards.
 
@@ -1471,6 +2962,11 @@ Draw 2 cards.
 
 Card Name: Adventurers' Guild
 Card ID: 10002210
+Cost: 3
+Class: Neutral
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Draw a follower.
 ----------
@@ -1480,15 +2976,27 @@ Engage: Destroy this card. Select an allied follower on the field and give it Ru
 
 Card Name: Tablet of Tribulations
 Card ID: 10303210
+Cost: 3
+Class: Neutral
+Type: Amulet
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Banish all duplicates from your deck.
 ----------
-Engage: Draw a card.
+Engage (1): Draw a card.
 
 ==================================================
 
 Card Name: Capricious Sprite
 Card ID: 10111120
+Cost: 3
+Attack: 1
+Defense: 1
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Summon a Fairy. Add a Fairy to your hand.
 ----------
@@ -1498,6 +3006,13 @@ Fanfare: Summon a Fairy. Add a Fairy to your hand.
 
 Card Name: Workin' Grasshopper
 Card ID: 10111140
+Cost: 3
+Attack: 2
+Defense: 1
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Draw an X-cost follower. X is your Combo.
 
@@ -1505,6 +3020,13 @@ Fanfare: Draw an X-cost follower. X is your Combo.
 
 Card Name: Killer Rhinoceroach
 Card ID: 10113140
+Cost: 3
+Attack: 0
+Defense: 2
+Class: Forestcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Give this follower +X/+0. X is your Combo.
 ----------
@@ -1514,6 +3036,13 @@ Storm
 
 Card Name: Amataz, Origin Blader
 Card ID: 10114130
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Forestcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Give this follower +X/+X. X is the number of Pixie followers in your hand.
 ----------
@@ -1525,20 +3054,80 @@ Ward
 
 Card Name: Wildheart
 Card ID: 10211110
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Rush
 
 ==================================================
 
+Card Name: Miroku, Swarmpetal
+Card ID: 10514120
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Forestcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Fanfare: Select a Mode to activate.
+1. Add 2 copies of Fairy to your hand.
+2. Recover 2 play points.
+3. Deal 3 damage split between all enemy followers.
+----------
+<ev>Evolve: Replicate the effects of this card's Fanfare ability.</ev>
+
+==================================================
+
 Card Name: Fragrantwood Whispers
 Card ID: 10112310
+Cost: 3
+Class: Forestcraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Add a Deepwood Bounty to your hand. Draw a card.
 
 ==================================================
 
+Card Name: Quiet Encouragement
+Card ID: 10512310
+Cost: 3
+Class: Forestcraft
+Type: Spell
+Rarity: Silver
+Trait: -
+--------------------------------
+Deal 1 damage to all enemies. Combo (3) - Deal 2 damage instead.
+
+==================================================
+
+Card Name: Grace of the Swarmpetal
+Card ID: 10513310
+Cost: 3
+Class: Forestcraft
+Type: Spell
+Rarity: Gold
+Trait: -
+--------------------------------
+Draw X cards. X is your Combo.
+
+==================================================
+
 Card Name: Godwood Staff
 Card ID: 10113210
+Cost: 3
+Class: Forestcraft
+Type: Amulet
+Rarity: Gold
+Trait: -
 --------------------------------
 At the end of your turn, Combo (3) - Draw a card.
 ----------
@@ -1548,6 +3137,11 @@ Engage: Destroy this card. Select another allied card on the field and return it
 
 Card Name: Hamlet of Unkilling
 Card ID: 10312210
+Cost: 3
+Class: Forestcraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select a card in your hand and discard it. Draw 2 cards.
 ----------
@@ -1557,6 +3151,13 @@ Engage: Destroy this card. Select an enemy follower on the field and give it -0/
 
 Card Name: Rusty, Luxcard Trickster
 Card ID: 10022120
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 <sev>Super-Evolve: Draw all copies of Rusty, Luxcard Trickster and give them Storm.</sev>
 
@@ -1564,6 +3165,13 @@ Card ID: 10022120
 
 Card Name: Ian, Lovebound Knight
 Card ID: 10121110
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select another allied follower on the field and give it +1/+1.
 ----------
@@ -1573,6 +3181,13 @@ Ward
 
 Card Name: Lyrala, Luminous Potionwright
 Card ID: 10121130
+Cost: 3
+Attack: 1
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: Luminous
 --------------------------------
 Fanfare: Summon a Steelclad Knight.
 ----------
@@ -1582,6 +3197,13 @@ Whenever an allied Officer follower enters the field, restore 1 defense to your 
 
 Card Name: Hound of War
 Card ID: 10121140
+Cost: 3
+Attack: 4
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Enhance (6): Summon 2 copies of Hound of War.
 ----------
@@ -1591,6 +3213,13 @@ Rush
 
 Card Name: Valse, Silent Sniper
 Card ID: 10123120
+Cost: 3
+Attack: 2
+Defense: 1
+Class: Swordcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and deal it 5 damage.
 Enhance (6): Give this follower +2/+2 and Ambush.
@@ -1599,13 +3228,19 @@ Enhance (6): Give this follower +2/+2 and Ambush.
 
 Card Name: Kagemitsu, Enduring Warrior
 Card ID: 10124130
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Last Words: Gain Crest: Kagemitsu, Enduring Warrior.
 ----------
 <sev>Super-Evolve: Give this follower Storm.</sev>
 
 Crest
-
 <add>Countdown (2)
 Last Words: Summon a Kagemitsu, Enduring Warrior.</add>
 
@@ -1613,6 +3248,13 @@ Last Words: Summon a Kagemitsu, Enduring Warrior.</add>
 
 Card Name: Gelt, Intrepid Vice-Captain
 Card ID: 10222110
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Ward
 At the end of your turn, if there's a super-evolved allied follower on the field, give all allied followers on the field +1/+1.
@@ -1621,6 +3263,13 @@ At the end of your turn, if there's a super-evolved allied follower on the field
 
 Card Name: Rosé, Princess Knight
 Card ID: 10223110
+Cost: 3
+Attack: 3
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Enhance (5): Draw a Swordcraft follower that costs 2 or less and set its cost to 0.
 ----------
@@ -1631,13 +3280,19 @@ Follower Strike: If the opposing follower is damaged, destroy it.
 
 Card Name: Octrice, Hollowness Manifest
 Card ID: 10324120
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Gain Crest: Octrice, Hollowness Manifest.
 ----------
 <ev>Evolve: Add a Gilded Blade and Gilded Necklace to your hand.</ev>
 
 Crest
-
 <add>Countdown (8)
 Whenever you play or Fuse a Loot card, advance this crest's count by 1.
 Last Words: Add a Remnant of Hollowness to your hand.</add>
@@ -1646,6 +3301,13 @@ Last Words: Add a Remnant of Hollowness to your hand.</add>
 
 Card Name: Arthur, Staunch Dragon
 Card ID: 10421120
+Cost: 3
+Attack: 2
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Ward
 ----------
@@ -1655,6 +3317,13 @@ Ward
 
 Card Name: Mordred, Illusory Lion
 Card ID: 10421130
+Cost: 3
+Attack: 2
+Defense: 1
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Storm
 ----------
@@ -1664,13 +3333,41 @@ Storm
 
 Card Name: Feather, Bombastic Brawler
 Card ID: 10422120
+Cost: 3
+Attack: 5
+Defense: 4
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 -
 
 ==================================================
 
+Card Name: Smoke-Shrouded Beauty
+Card ID: 10521120
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Fanfare: If you have at least 2 spells in your hand, give this follower +1/+1 and Ward.
+----------
+<ev>Evolve: Add a Glittering Gold to your hand.</ev>
+
+==================================================
+
 Card Name: Ironcrown Majesty
 Card ID: 10122310
+Cost: 3
+Class: Swordcraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Select a Mode to activate.
 1. Summon a Steelclad Knight and Knight.
@@ -1678,8 +3375,28 @@ Select a Mode to activate.
 
 ==================================================
 
+Card Name: Splendor of the Goldbloom
+Card ID: 10523310
+Cost: 3
+Class: Swordcraft
+Type: Spell
+Rarity: Gold
+Trait: -
+--------------------------------
+Add 2 copies of Glittering Gold to your hand.
+Enhance (5): Add 4 instead.
+
+==================================================
+
 Card Name: Dazzling Runeknight
 Card ID: 10031110
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate.
 1. Spellboost your hand 2 times.
@@ -1689,6 +3406,13 @@ Fanfare: Select a Mode to activate.
 
 Card Name: Owl Summoner
 Card ID: 10131130
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Gain an earth sigil.
 ----------
@@ -1698,6 +3422,13 @@ Fanfare: Gain an earth sigil.
 
 Card Name: Owen, Mysterian Swordsman
 Card ID: 10233110
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Gold
+Trait: Mysteria
 --------------------------------
 Ward
 Clash: Spellboost your hand.
@@ -1708,6 +3439,13 @@ Clash: Spellboost your hand.
 
 Card Name: Congregant of Truth
 Card ID: 10333110
+Cost: 3
+Attack: 3
+Defense: 1
+Class: Runecraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: If this card's cost isn't 3, summon 2 exact copies of it.
 ----------
@@ -1719,6 +3457,13 @@ Rush
 
 Card Name: Philosophia, Cryptic Sophist
 Card ID: 10431110
+Cost: 3
+Attack: 1
+Defense: 4
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Draw a spell.
 
@@ -1726,19 +3471,32 @@ Fanfare: Draw a spell.
 
 Card Name: Elmott, Remembrance Aflame
 Card ID: 10433110
+Cost: 3
+Attack: 2
+Defense: 1
+Class: Runecraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field, remove all abilities from it, and deal it 3 damage.
 ----------
 <sev>Super-Evolve: Gain Crest: Elmott, Remembrance Aflame.</sev>
 
 Crest
-
 <add>At the start of your turn, deal 1 damage to the enemy leader.</add>
 
 ==================================================
 
 Card Name: Wamdus, Water Personified
 Card ID: 10434110
+Cost: 3
+Attack: 0
+Defense: 1
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 On Spellboost: Give this follower +1/+1.
 ----------
@@ -1750,8 +3508,31 @@ Fanfare: Spellboost your hand.
 
 ==================================================
 
+Card Name: Terraforming Wizard
+Card ID: 10531110
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Fanfare: Gain 2 earth sigils.
+----------
+<sev>Super-Evolve: Summon 2 copies of Guardian Golem.</sev>
+
+==================================================
+
 Card Name: Guardian Golem
 Card ID: 90031120
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: Golem
 --------------------------------
 Ward
 
@@ -1759,6 +3540,13 @@ Ward
 
 Card Name: Demonic Shikigami
 Card ID: 90031140
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: Shikigami
 --------------------------------
 Rush
 Last Words: Spellboost your hand.
@@ -1767,6 +3555,13 @@ Last Words: Spellboost your hand.
 
 Card Name: Anne's Summoning
 Card ID: 90034130
+Cost: 3
+Attack: 5
+Defense: 5
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: Mysteria
 --------------------------------
 Rush
 Ward
@@ -1776,6 +3571,11 @@ At the end of your opponent's turn, destroy this card.
 
 Card Name: Sagelight Teachings
 Card ID: 10132310
+Cost: 3
+Class: Runecraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Select a Mode to activate.
 1. Gain 4 earth sigils.
@@ -1786,6 +3586,11 @@ Select a Mode to activate.
 
 Card Name: Homework Time!
 Card ID: 10133310
+Cost: 3
+Class: Runecraft
+Type: Spell
+Rarity: Gold
+Trait: Mysteria
 --------------------------------
 X starts at 0.
 On Spellboost: Increase X by 1. Then, if X is at least 5, transform this card into a Looking Smart!
@@ -1796,6 +3601,11 @@ Draw 2 cards.
 
 Card Name: Flames of Chaos
 Card ID: 10232310
+Cost: 3
+Class: Runecraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 X starts at 0.
 On Spellboost: Increase X by 1.
@@ -1806,6 +3616,11 @@ Deal X damage split between all enemy followers.
 
 Card Name: Institute of Truth
 Card ID: 10332210
+Cost: 3
+Class: Runecraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Countdown (5)
 Whenever you play a follower whose cost has been changed, draw a card and advance this amulet's count by 1.
@@ -1816,6 +3631,13 @@ Engage: Select a follower in your hand, increase its cost by 1, and give it +1/+
 
 Card Name: Eyfa, Windrider
 Card ID: 10142120
+Cost: 3
+Attack: 2
+Defense: 1
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: If you're in Overflow, give this follower Intimidate.
 ----------
@@ -1825,6 +3647,13 @@ Storm
 
 Card Name: Zell, Windreader
 Card ID: 10142130
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 <sev>Super-Evolve: Select another allied follower on the field and give it Storm.</sev>
 
@@ -1832,6 +3661,13 @@ Card ID: 10142130
 
 Card Name: Liu Feng, Goldennote Ward
 Card ID: 10143120
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Dragoncraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: If you're in Overflow, evolve this follower.
 ----------
@@ -1841,6 +3677,13 @@ Fanfare: If you're in Overflow, evolve this follower.
 
 Card Name: Ocean Rider
 Card ID: 10342120
+Cost: 3
+Attack: 1
+Defense: 1
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Summon a Majestic Megalorca. If you're in Overflow, summon 2 instead.
 ----------
@@ -1850,6 +3693,13 @@ Whenever an allied Marine follower enters the field, give it Ward.
 
 Card Name: Joel, Wave Chaser
 Card ID: 10441110
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Ward
 Aura
@@ -1858,6 +3708,13 @@ Aura
 
 Card Name: Meg, Girl Next Door
 Card ID: 10443110
+Cost: 3
+Attack: 2
+Defense: 1
+Class: Dragoncraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Skybound Art - Super-evolve this follower.
 ----------
@@ -1865,8 +3722,34 @@ Whenever a 2-base-cost allied follower enters the field, give this follower Ward
 
 ==================================================
 
+Card Name: Yube, Crestpetal
+Card ID: 10544120
+Cost: 3
+Attack: 1
+Defense: 2
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Fanfare: Summon a Majestic Megalorca.
+----------
+<ev>Evolve: Select a card in your hand and discard it. Gain Crest: Yube, Crestpetal.</ev>
+
+Crest
+<add>Whenever an allied Marine follower attacks, give it +1/+0 until the end of the turn and, once on each of your turns, add a Majestic Megalorca to your hand.</add>
+
+==================================================
+
 Card Name: Otohime's Bodyguard
 Card ID: 90043110
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Dragoncraft
+Type: Follower
+Rarity: Gold
+Trait: Marine
 --------------------------------
 Storm
 Ward
@@ -1875,6 +3758,11 @@ Ward
 
 Card Name: Dragonsign
 Card ID: 10042310
+Cost: 3
+Class: Dragoncraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Gain 1 max play point. Then, if you have 10 max play points, draw a card.
 
@@ -1882,6 +3770,11 @@ Gain 1 max play point. Then, if you have 10 max play points, draw a card.
 
 Card Name: Goldennote Melody
 Card ID: 10142310
+Cost: 3
+Class: Dragoncraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Draw 2 cards. If you're in Overflow, restore 2 defense to your leader.
 
@@ -1889,13 +3782,35 @@ Draw 2 cards. If you're in Overflow, restore 2 defense to your leader.
 
 Card Name: Raging Lightning
 Card ID: 10341310
+Cost: 3
+Class: Dragoncraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Deal 5 damage to all followers with the highest defense. If you're in Overflow, deal 3 damage to all leaders with the highest defense.
 
 ==================================================
 
+Card Name: Blade of the Crestpetal
+Card ID: 10541310
+Cost: 3
+Class: Dragoncraft
+Type: Spell
+Rarity: Bronze
+Trait: -
+--------------------------------
+Draw a follower. Deal X damage to a random enemy follower. X is the cost of the card you drew.
+
+==================================================
+
 Card Name: Whitefrost Whisper
 Card ID: 90044310
+Cost: 3
+Class: Dragoncraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Select a Mode to activate.
 1. Destroy all damaged enemy followers.
@@ -1905,6 +3820,13 @@ Select a Mode to activate.
 
 Card Name: Night Fiend
 Card ID: 10051120
+Cost: 3
+Attack: 4
+Defense: 3
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Deal 1 damage to your leader.
 
@@ -1912,6 +3834,13 @@ Fanfare: Deal 1 damage to your leader.
 
 Card Name: Aryll, Moonstruck Vampire
 Card ID: 10151110
+Cost: 3
+Attack: 1
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Summon a Bat.
 ----------
@@ -1921,6 +3850,13 @@ Whenever an allied Bat enters the field, give it Storm and deal 1 damage to your
 
 Card Name: Little Miss Bonemancer
 Card ID: 10151130
+Cost: 3
+Attack: 1
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Last Words: Summon 2 copies of Skeleton.
 
@@ -1928,11 +3864,17 @@ Last Words: Summon 2 copies of Skeleton.
 
 Card Name: Balto, Dusk Bounty Hunter
 Card ID: 10153140
+Cost: 3
+Attack: 3
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Gain Crest: Balto, Dusk Bounty Hunter.
 
 Crest
-
 <add>Countdown (4)
 At the end of your turn, deal 1 damage to both leaders.</add>
 
@@ -1940,6 +3882,13 @@ At the end of your turn, deal 1 damage to both leaders.</add>
 
 Card Name: Vuella, the Blastwing
 Card ID: 10252110
+Cost: 3
+Attack: 2
+Defense: 4
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Rush
 Whenever another allied follower super-evolves, give it and this follower +2/+0.
@@ -1948,6 +3897,13 @@ Whenever another allied follower super-evolves, give it and this follower +2/+0.
 
 Card Name: Laura, Cruel Commander
 Card ID: 10253110
+Cost: 3
+Attack: 3
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Select another allied follower on the field and give it Bane.
 ----------
@@ -1957,6 +3913,13 @@ Fanfare: Select another allied follower on the field and give it Bane.
 
 Card Name: Devotee of Entwining
 Card ID: 10351110
+Cost: 3
+Attack: 1
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate.
 1. Deal 1 damage to all enemy followers.
@@ -1968,6 +3931,13 @@ Fanfare: Select a Mode to activate.
 
 Card Name: Satyr, Open-Hearted Rover
 Card ID: 10452120
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: If there's an evolved allied follower on the field, evolve this follower.
 ----------
@@ -1977,6 +3947,13 @@ Aura
 
 Card Name: Baal, Elemental Resonance
 Card ID: 10452130
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate.
 1. Give this follower and another random allied follower on the field +1/+1.
@@ -1984,8 +3961,31 @@ Fanfare: Select a Mode to activate.
 
 ==================================================
 
+Card Name: Fickle Necromancer
+Card ID: 10552110
+Cost: 3
+Attack: 1
+Defense: 1
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+Fanfare: Summon a Ghost and Skeleton.
+----------
+<ev>Evolve: Summon a Rotting Zombie.</ev>
+
+==================================================
+
 Card Name: Rotting Zombie
 Card ID: 90051140
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: Departed
 --------------------------------
 Last Words: Summon a Rotting Zombie and remove Last Words from it.
 
@@ -1993,8 +3993,13 @@ Last Words: Summon a Rotting Zombie and remove Last Words from it.
 
 Card Name: Screaming and Loathing
 Card ID: 10353310
+Cost: 3
+Class: Abysscraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
-Select 2 Mode s to activate.
+Select 2 Modes to activate.
 1. Recover 1 play point.
 2. Draw a follower.
 3. Draw a 3-cost spell.
@@ -2004,6 +4009,11 @@ Select 2 Mode s to activate.
 
 Card Name: Shadowcrypt Memorial
 Card ID: 10152210
+Cost: 3
+Class: Abysscraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Add 2 shadows to your cemetery.
 ----------
@@ -2013,6 +4023,13 @@ Engage: Destroy this card. Summon 2 copies of Ghost.
 
 Card Name: Angelic Prism Priestess
 Card ID: 10161110
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Draw an amulet.
 ----------
@@ -2022,6 +4039,13 @@ Fanfare: Draw an amulet.
 
 Card Name: Holy Shieldmaiden
 Card ID: 10161120
+Cost: 3
+Attack: 2
+Defense: 1
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Ward
 Barrier
@@ -2030,6 +4054,13 @@ Barrier
 
 Card Name: Cleric of Crushing
 Card ID: 10261110
+Cost: 3
+Attack: 2
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Ward
 ----------
@@ -2039,6 +4070,13 @@ Ward
 
 Card Name: Colette, Barrage Exorcist
 Card ID: 10262110
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Do this 1 time: "Deal 2 damage to a random enemy follower." If there are at least 2 allied amulets on the field, do it 2 times instead.
 
@@ -2046,13 +4084,19 @@ Fanfare: Do this 1 time: "Deal 2 damage to a random enemy follower." If there ar
 
 Card Name: Supplicant of Repose
 Card ID: 10362110
+Cost: 3
+Attack: 1
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Gain Crest: Supplicant of Repose.
 ----------
 Ward
 
 Crest
-
 <add>Countdown (4)
 At the end of your turn, if allied followers didn't attack this turn, restore 1 defense to your leader.</add>
 
@@ -2060,6 +4104,13 @@ At the end of your turn, if allied followers didn't attack this turn, restore 1 
 
 Card Name: Troue, Heroic Visionary
 Card ID: 10461110
+Cost: 3
+Attack: 2
+Defense: 1
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Storm
 Whenever you Engage an amulet, give this follower Drain.
@@ -2068,6 +4119,13 @@ Whenever you Engage an amulet, give this follower Drain.
 
 Card Name: Galleon, Earth Personified
 Card ID: 10464110
+Cost: 3
+Attack: 5
+Defense: 5
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Ward
 Can't attack followers or leaders.
@@ -2075,15 +4133,57 @@ At the end of your turn, if you've unlocked super-evolution, evolve a random une
 
 ==================================================
 
+Card Name: Prescient Priestess
+Card ID: 10561110
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Fanfare: Select an enemy follower on the field and deal it 2 damage.
+----------
+Ward
+----------
+<ev>Evolve: Replicate the effects of this card's Fanfare ability.</ev>
+
+==================================================
+
 Card Name: Holy Falcon
 Card ID: 90061110
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Storm
 
 ==================================================
 
+Card Name: Malice of the Mistbloom
+Card ID: 10561310
+Cost: 3
+Class: Havencraft
+Type: Spell
+Rarity: Bronze
+Trait: -
+--------------------------------
+Return a random card from your hand to deck. Draw 3 cards.
+
+==================================================
+
 Card Name: Dose of Holiness
 Card ID: 10162220
+Cost: 3
+Class: Havencraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Engage: Destroy this card. Select an enemy follower on the field and deal it 4 damage. Restore 1 defense to your leader.
 
@@ -2091,6 +4191,11 @@ Engage: Destroy this card. Select an enemy follower on the field and deal it 4 d
 
 Card Name: Temple of Repose
 Card ID: 10362210
+Cost: 3
+Class: Havencraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Countdown (4)
 Last Words: Restore 2 defense to your leader. Give your leader Barrier.
@@ -2101,6 +4206,11 @@ Engage: Advance this amulet's count by X. X is the number of crests you have.
 
 Card Name: Winged Lion Statue
 Card ID: 10362220
+Cost: 3
+Class: Havencraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Countdown (3)
 Last Words: Summon a Holy Falcon and Holyflame Tiger.
@@ -2111,6 +4221,11 @@ Engage (1): Advance this amulet's count by 1.
 
 Card Name: De La Fille's Gleaming Gems
 Card ID: 10463210
+Cost: 3
+Class: Havencraft
+Type: Amulet
+Rarity: Gold
+Trait: -
 --------------------------------
 Engage: Destroy this card. Select a Mode to activate.
 1. Destroy a random enemy follower.
@@ -2118,8 +4233,29 @@ Engage: Destroy this card. Select a Mode to activate.
 
 ==================================================
 
+Card Name: Resolve of the Mistbloom
+Card ID: 10563210
+Cost: 3
+Class: Havencraft
+Type: Amulet
+Rarity: Gold
+Trait: -
+--------------------------------
+Fanfare: Select an enemy follower on the field and deal it 5 damage.
+----------
+Engage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.
+
+==================================================
+
 Card Name: Kitty Cannoneer
 Card ID: 10071110
+Cost: 3
+Attack: 3
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Add a Gear of Ambition to your hand.
 ----------
@@ -2129,6 +4265,13 @@ Rush
 
 Card Name: Medical-Grade Assassin
 Card ID: 10171140
+Cost: 3
+Attack: 2
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Add an Enhanced Puppet to your hand.
 ----------
@@ -2138,6 +4281,13 @@ Once on each of your turns, when an allied Puppetry follower enters the field, g
 
 Card Name: Miriam, the Resolute
 Card ID: 10173110
+Cost: 3
+Attack: 2
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.
 ----------
@@ -2147,13 +4297,19 @@ Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.
 
 Card Name: Eudie, Maiden Reborn
 Card ID: 10174110
+Cost: 3
+Attack: 3
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Draw a card.
 ----------
 <ev>Evolve: Gain Crest: Eudie, Maiden Reborn.</ev>
 
 Crest
-
 <add>Countdown (3)
 At the end of your turn, if you have 5 cards or less in your hand, draw a card. If you have at least 6, restore 1 defense to your leader.</add>
 
@@ -2161,6 +4317,13 @@ At the end of your turn, if you have 5 cards or less in your hand, draw a card. 
 
 Card Name: Axia, Heir to Destruction
 Card ID: 10374110
+Cost: 3
+Attack: 2
+Defense: 4
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Ward
 Can't be destroyed by abilities.
@@ -2171,6 +4334,13 @@ Can't be destroyed by abilities.
 
 Card Name: Sho, Reborn Night King
 Card ID: 10471110
+Cost: 3
+Attack: 2
+Defense: 1
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: If you've unlocked super-evolution, give this follower Barrier.
 ----------
@@ -2178,8 +4348,41 @@ Storm
 
 ==================================================
 
+Card Name: Slaus, Revolving Wheel of Fortune
+Card ID: 10574110
+Cost: 3
+Attack: 0
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Ambush
+At the end of your turn, if this follower is evolved, give your opponent Crest: Slaus, Revolving Wheel of Fortune and banish this card.
+At the start of your turn, activate a random ability that hasn't been activated yet from the following.
+1. Reduce the cost of all cards in your hand by 1 until the end of the turn.
+2. Give all allied followers on the field +2/+2.
+3. Restore 3 defense to your leader.
+
+Crest
+<add>Countdown (3)
+At the start of your turn, activate a random ability that hasn't been activated yet from the following.
+1. Increase the cost of all cards in your hand by 1 until the end of the turn.
+2. Give all allied followers on the field -2/-2.
+3. Deal 3 damage to your leader.</add>
+
+==================================================
+
 Card Name: Striker Artifact
 Card ID: 90072110
+Cost: 3
+Attack: 5
+Defense: 1
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: Artifact
 --------------------------------
 Fuse: Artifact cards
 When you Fuse to this card, transform it based on the total cost of the cards fused.
@@ -2193,6 +4396,13 @@ Rush
 
 Card Name: Fortifier Artifact
 Card ID: 90072120
+Cost: 3
+Attack: 1
+Defense: 5
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: Artifact
 --------------------------------
 Fuse: Artifact cards
 When you Fuse to this card, transform it based on the total cost of the cards fused.
@@ -2206,6 +4416,13 @@ Ward
 
 Card Name: Lloyd
 Card ID: 90074120
+Cost: 3
+Attack: 1
+Defense: 6
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: Puppetry
 --------------------------------
 Ward
 Your opponent can't select anything other than this card for abilities.
@@ -2214,6 +4431,13 @@ Your opponent can't select anything other than this card for abilities.
 
 Card Name: Victoria
 Card ID: 90074130
+Cost: 3
+Attack: 6
+Defense: 1
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: Puppetry
 --------------------------------
 Rush
 Follower Strike: Deal X damage to the opposing follower. X is this follower's attack.
@@ -2222,6 +4446,11 @@ Follower Strike: Deal X damage to the opposing follower. X is this follower's at
 
 Card Name: Puppet Shield
 Card ID: 10171310
+Cost: 3
+Class: Portalcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Summon 2 copies of Enhanced Puppet.
 
@@ -2229,6 +4458,11 @@ Summon 2 copies of Enhanced Puppet.
 
 Card Name: Stone Breaker
 Card ID: 10472310
+Cost: 3
+Class: Portalcraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Do this 6 times: "Deal 1 damage to a random enemy follower."
 
@@ -2236,6 +4470,11 @@ Do this 6 times: "Deal 1 damage to a random enemy follower."
 
 Card Name: White Psalm, New Revelation
 Card ID: 90074210
+Cost: 3
+Class: Portalcraft
+Type: Amulet
+Rarity: Legendary
+Trait: -
 --------------------------------
 Countdown (1)
 Last Words: Restore 1 defense to your leader. Summon a Black Psalm, New Revelation.
@@ -2244,6 +4483,11 @@ Last Words: Restore 1 defense to your leader. Summon a Black Psalm, New Revelati
 
 Card Name: Black Psalm, New Revelation
 Card ID: 90074220
+Cost: 3
+Class: Portalcraft
+Type: Amulet
+Rarity: Legendary
+Trait: -
 --------------------------------
 Countdown (1)
 Last Words: Deal 1 damage to the enemy leader. Summon a White Psalm, New Revelation.
@@ -2252,6 +4496,13 @@ Last Words: Deal 1 damage to the enemy leader. Summon a White Psalm, New Revelat
 
 Card Name: Quake Goliath
 Card ID: 10001130
+Cost: 4
+Attack: 4
+Defense: 5
+Class: Neutral
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Ward
 
@@ -2259,6 +4510,13 @@ Ward
 
 Card Name: Apostle of Voracity
 Card ID: 10301110
+Cost: 4
+Attack: 2
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select another follower on the field and give it +4/-4.
 
@@ -2266,13 +4524,19 @@ Fanfare: Select another follower on the field and give it +4/-4.
 
 Card Name: Mjerrabaine, Great Manifest
 Card ID: 10304110
+Cost: 4
+Attack: 3
+Defense: 3
+Class: Neutral
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Add a Great Testimony to your hand.
 ----------
 <ev>Evolve: Gain Crest: Mjerrabaine, Great Manifest.</ev>
 
 Crest
-
 <add>When you gain this crest, replace your deck with the Mjerrabaine Deck and transform the Reaper Card at the bottom of your deck into a Victory Card.
 ----------
 At the end of your turn, discard all cards not named Great Testimony and draw 6 cards.</add>
@@ -2281,6 +4545,13 @@ At the end of your turn, discard all cards not named Great Testimony and draw 6 
 
 Card Name: Gran & Djeeta, Valiant Skyfarers
 Card ID: 10403110
+Cost: 4
+Attack: 3
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate. Skybound Art - Evolve this follower.
 1. Deal 5 damage to a random enemy follower.
@@ -2288,8 +4559,27 @@ Fanfare: Select a Mode to activate. Skybound Art - Evolve this follower.
 
 ==================================================
 
+Card Name: Behemoth General
+Card ID: 10502120
+Cost: 4
+Attack: 4
+Defense: 5
+Class: Neutral
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+<ev>Evolve: If the sum of the 3 highest base costs in your hand is higher than that of your opponent's, destroy all enemy followers.</ev>
+
+==================================================
+
 Card Name: Divine Thunder
 Card ID: 10103310
+Cost: 4
+Class: Neutral
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Destroy a random enemy follower with the highest attack. Deal 1 damage to all enemy followers.
 
@@ -2297,6 +4587,11 @@ Destroy a random enemy follower with the highest attack. Deal 1 damage to all en
 
 Card Name: Greatness Ascended
 Card ID: 10301310
+Cost: 4
+Class: Neutral
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Draw 3 cards. If there are no duplicates in your deck, recover 3 play points.
 
@@ -2304,6 +4599,13 @@ Draw 3 cards. If there are no duplicates in your deck, recover 3 play points.
 
 Card Name: Gentle Treant
 Card ID: 10011130
+Cost: 4
+Attack: 4
+Defense: 4
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Combo (3) - Evolve this follower.
 ----------
@@ -2313,6 +4615,13 @@ Strike: Restore 2 defense to your leader.
 
 Card Name: Elder Sagebrush
 Card ID: 10111150
+Cost: 4
+Attack: 3
+Defense: 3
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Deal 3 damage to a random enemy follower. Combo (3) - Deal damage to 3 random enemy followers instead.
 
@@ -2320,6 +4629,13 @@ Fanfare: Deal 3 damage to a random enemy follower. Combo (3) - Deal damage to 3 
 
 Card Name: Cynthia, Chivalrous Elf
 Card ID: 10213110
+Cost: 4
+Attack: 4
+Defense: 3
+Class: Forestcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Summon 2 copies of Fairy.
 ----------
@@ -2329,19 +4645,32 @@ Fanfare: Summon 2 copies of Fairy.
 
 Card Name: Titania, Queen of Fairies
 Card ID: 10214110
+Cost: 4
+Attack: 2
+Defense: 2
+Class: Forestcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Summon a Fairy. Gain Crest: Titania, Queen of Fairies.
 ----------
 <ev>Evolve: Select an enemy follower on the field and transform it into a Fairy.</ev>
 
 Crest
-
 <add>At the start of your turn, add a Fairy to your hand.</add>
 
 ==================================================
 
 Card Name: Greatwood Warrior
 Card ID: 10312120
+Cost: 4
+Attack: 4
+Defense: 4
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Last Words: Add a Deepwood Bounty and Fairy to your hand.
 
@@ -2349,6 +4678,13 @@ Last Words: Add a Deepwood Bounty and Fairy to your hand.
 
 Card Name: Krulle, Heir to Unkilling
 Card ID: 10314110
+Cost: 4
+Attack: 1
+Defense: 3
+Class: Forestcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Give all enemy followers on the field -0/-2.
 ----------
@@ -2358,7 +4694,6 @@ Once on each of your turns, when an enemy follower is given - defense on the fie
 <sev>Super-Evolve: Give your opponent Crest: Krulle, Heir to Unkilling.</sev>
 
 Crest
-
 <add>Countdown (2)
 Whenever an allied follower enters the field, give it -1/-1.</add>
 
@@ -2366,6 +4701,13 @@ Whenever an allied follower enters the field, give it -1/-1.</add>
 
 Card Name: Manamel, Super Cutest
 Card ID: 10411120
+Cost: 4
+Attack: 2
+Defense: 1
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 At the end of your turn, evolve this follower.
 ----------
@@ -2375,6 +4717,13 @@ At the end of your turn, evolve this follower.
 
 Card Name: Cupitan, Iridescent Archer
 Card ID: 10413110
+Cost: 4
+Attack: 3
+Defense: 2
+Class: Forestcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Skybound Art - Evolve this follower. Super Skybound Art - Deal 3 damage to the enemy leader.
 ----------
@@ -2384,6 +4733,13 @@ Fanfare: Skybound Art - Evolve this follower. Super Skybound Art - Deal 3 damage
 
 Card Name: Arms Peddler
 Card ID: 10021120
+Cost: 4
+Attack: 3
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Rush
 Last Words: Draw a card.
@@ -2392,6 +4748,13 @@ Last Words: Draw a card.
 
 Card Name: Zirconia, Ironcrown Ward
 Card ID: 10123130
+Cost: 4
+Attack: 4
+Defense: 4
+Class: Swordcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 <ev>Evolve: Summon 2 copies of Knight. Give all other allied followers on the field +1/+1.</ev>
 
@@ -2399,6 +4762,13 @@ Card ID: 10123130
 
 Card Name: Rackhir, Ordinary Knight
 Card ID: 10222120
+Cost: 4
+Attack: 3
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Draw a spell.
 ----------
@@ -2408,6 +4778,13 @@ Fanfare: Draw a spell.
 
 Card Name: Congregant of Usurpation
 Card ID: 10323110
+Cost: 4
+Attack: 3
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Add a Gilded Goblet and Gilded Boots to your hand.
 ----------
@@ -2419,6 +4796,13 @@ Whenever you play or Fuse a Loot card, deal 3 damage to a random enemy follower.
 
 Card Name: Fiorito, Muscles in Bloom
 Card ID: 10422130
+Cost: 4
+Attack: 2
+Defense: 6
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Ambush
 Bane
@@ -2427,6 +4811,13 @@ Bane
 
 Card Name: Zeta & Bea, Crimson and Blue
 Card ID: 10424110
+Cost: 4
+Attack: 3
+Defense: 2
+Class: Swordcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Summon a Zeta & Bea, Crimson and Blue.
 Enhance (6): Give it Bane and this follower Storm.
@@ -2437,13 +4828,42 @@ Rush
 
 Card Name: Seofon, Leader of the Eternals
 Card ID: 10424120
+Cost: 4
+Attack: 4
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Skybound Art - Evolve all unevolved allied followers on the field. Super Skybound Art - Super-evolve them instead.
 
 ==================================================
 
+Card Name: Unmoving Tactician
+Card ID: 10523110
+Cost: 4
+Attack: 5
+Defense: 6
+Class: Swordcraft
+Type: Follower
+Rarity: Gold
+Trait: -
+--------------------------------
+Can't attack followers or leaders.
+At the end of your turn, summon a Steelclad Knight.
+----------
+<sev>Super-Evolve: Give all other allied followers on the field +3/+3.</sev>
+
+==================================================
+
 Card Name: Knightly Rending
 Card ID: 10121310
+Cost: 4
+Class: Swordcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select an enemy follower on the field and destroy it. Summon a Steelclad Knight.
 
@@ -2451,6 +4871,11 @@ Select an enemy follower on the field and destroy it. Summon a Steelclad Knight.
 
 Card Name: Ancestral Crown
 Card ID: 10022210
+Cost: 4
+Class: Swordcraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Countdown (4)
 Whenever an allied follower enters the field, give it +1/+1.
@@ -2459,6 +4884,13 @@ Whenever an allied follower enters the field, give it +1/+1.
 
 Card Name: Remi & Rami, Two-Faced Witch
 Card ID: 10032110
+Cost: 4
+Attack: 4
+Defense: 4
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Earth Rite (1) - Summon a Guardian Golem.
 ----------
@@ -2468,6 +4900,13 @@ Fanfare: Earth Rite (1) - Summon a Guardian Golem.
 
 Card Name: Starry-Eyed Penguin Wizard
 Card ID: 10131140
+Cost: 4
+Attack: 2
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Draw 2 cards.
 ----------
@@ -2477,6 +4916,13 @@ Fanfare: Draw 2 cards.
 
 Card Name: Edelweiss, Sagelight Ward
 Card ID: 10133130
+Cost: 4
+Attack: 2
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Earth Rite (2) - Evolve this follower.
 ----------
@@ -2486,6 +4932,13 @@ Fanfare: Earth Rite (2) - Evolve this follower.
 
 Card Name: Enchanting Perfumer
 Card ID: 10232120
+Cost: 4
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and deal it 3 damage. Gain an earth sigil.
 ----------
@@ -2495,6 +4948,13 @@ Fanfare: Select an enemy follower on the field and deal it 3 damage. Gain an ear
 
 Card Name: Ascetic of Wuxing
 Card ID: 10331120
+Cost: 4
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Summon a Paper Shikigami.
 ----------
@@ -2504,17 +4964,50 @@ Fanfare: Summon a Paper Shikigami.
 
 Card Name: Cagliostro, Genius Alchemist
 Card ID: 10434120
+Cost: 4
+Attack: 5
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Gain 2 earth sigils. Add an Ars Magna to your hand. Skybound Art - Evolve this follower. Super Skybound Art - Gain Crest: Cagliostro, Genius Alchemist.
 
 Crest
-
 <add>At the start of your turn, Earth Rite (1) - Add an Ars Magna to your hand.</add>
+
+==================================================
+
+Card Name: Insomniac Witch
+Card ID: 10532110
+Cost: 4
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+Fanfare: Gain Crest: Insomniac Witch.
+----------
+<ev>Evolve: Destroy your Crest: Insomniac Witch.</ev>
+
+Crest
+<add>Countdown (2)
+Last Words: Deal 3 damage to all followers.</add>
 
 ==================================================
 
 Card Name: Celestial Shikigami
 Card ID: 90034110
+Cost: 4
+Attack: 4
+Defense: 5
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: Shikigami
 --------------------------------
 Ward
 Last Words: Spellboost your hand 3 times.
@@ -2523,6 +5016,11 @@ Last Words: Spellboost your hand 3 times.
 
 Card Name: Arcane Eruption
 Card ID: 10032310
+Cost: 4
+Class: Runecraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Deal 2 damage to all followers. Earth Rite (1) - Draw a card.
 
@@ -2530,6 +5028,11 @@ Deal 2 damage to all followers. Earth Rite (1) - Draw a card.
 
 Card Name: Glacial Crash
 Card ID: 10231310
+Cost: 4
+Class: Runecraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select an enemy follower on the field and destroy it. Earth Rite (1) - Deal 2 damage to the enemy leader.
 
@@ -2537,11 +5040,15 @@ Select an enemy follower on the field and destroy it. Earth Rite (1) - Deal 2 da
 
 Card Name: Crystal Gazing
 Card ID: 10331310
+Cost: 4
+Class: Runecraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Gain Crest: Crystal Gazing.
 
 Crest
-
 <add>Countdown (2)
 Last Words: Draw 2 cards. Deal 4 damage to all enemy followers.</add>
 
@@ -2549,6 +5056,11 @@ Last Words: Draw 2 cards. Deal 4 damage to all enemy followers.</add>
 
 Card Name: Risky Amalgamation
 Card ID: 10332310
+Cost: 4
+Class: Runecraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Summon a Guardian Golem and Clay Golem.
 
@@ -2556,6 +5068,11 @@ Summon a Guardian Golem and Clay Golem.
 
 Card Name: Unleashed
 Card ID: 10432310
+Cost: 4
+Class: Runecraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Select a Mode to activate.
 1. Draw a card. Deal 4 damage to a random enemy follower.
@@ -2565,6 +5082,11 @@ Select a Mode to activate.
 
 Card Name: Ersatz Elimination
 Card ID: 90034310
+Cost: 4
+Class: Runecraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Increase the cost of all followers in your hand by 1. Destroy all enemy followers.
 
@@ -2572,6 +5094,13 @@ Increase the cost of all followers in your hand by 1. Destroy all enemy follower
 
 Card Name: Draconic Berserker
 Card ID: 10042110
+Cost: 4
+Attack: 4
+Defense: 5
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 <ev>Evolve: Select an enemy follower on the field and deal it 4 damage.</ev>
 <sev>Super-Evolve: Deal damage to all enemy followers instead.</sev>
@@ -2580,6 +5109,13 @@ Card ID: 10042110
 
 Card Name: Fledgling Dragonslayer
 Card ID: 10141130
+Cost: 4
+Attack: 2
+Defense: 2
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and destroy it.
 
@@ -2587,6 +5123,13 @@ Fanfare: Select an enemy follower on the field and destroy it.
 
 Card Name: Whitescale Herald
 Card ID: 10141150
+Cost: 4
+Attack: 4
+Defense: 4
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: If you're in Overflow, restore 4 defense to your leader.
 
@@ -2594,6 +5137,13 @@ Fanfare: If you're in Overflow, restore 4 defense to your leader.
 
 Card Name: Marion, Ravishing Dragonewt
 Card ID: 10142140
+Cost: 4
+Attack: 3
+Defense: 3
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select another allied follower on the field and give it +2/+2. If you're in Overflow, give +3/+3 instead.
 
@@ -2601,6 +5151,13 @@ Fanfare: Select another allied follower on the field and give it +2/+2. If you'r
 
 Card Name: Supreme Golden Dragon
 Card ID: 90044110
+Cost: 4
+Attack: 4
+Defense: 5
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Ward
 
@@ -2608,13 +5165,39 @@ Ward
 
 Card Name: Supreme Silver Dragon
 Card ID: 90044120
+Cost: 4
+Attack: 5
+Defense: 4
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Rush
 
 ==================================================
 
+Card Name: Roar of Prominence
+Card ID: 10542310
+Cost: 4
+Class: Dragoncraft
+Type: Spell
+Rarity: Silver
+Trait: -
+--------------------------------
+Deal X damage to all followers. X is the number of followers on the field.
+
+==================================================
+
 Card Name: Amorous Necromancer
 Card ID: 10052120
+Cost: 4
+Attack: 5
+Defense: 4
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 <ev>Evolve: Summon 2 copies of Ghost.</ev>
 <sev>Super-Evolve: Give them Drain.</sev>
@@ -2623,6 +5206,13 @@ Card ID: 10052120
 
 Card Name: Yuna, Occult Hunter
 Card ID: 10152130
+Cost: 4
+Attack: 3
+Defense: 5
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Ward
 Last Words: Add a Ghost and Bat to your hand.
@@ -2631,6 +5221,13 @@ Last Words: Add a Ghost and Bat to your hand.
 
 Card Name: Ceres, Blue Rose Maiden
 Card ID: 10153110
+Cost: 4
+Attack: 1
+Defense: 4
+Class: Abysscraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Bane
 At the end of your turn, restore 2 defense to your leader. If this follower is super-evolved, restore 4 instead and give this follower Barrier.
@@ -2639,6 +5236,13 @@ At the end of your turn, restore 2 defense to your leader. If this follower is s
 
 Card Name: Mukan, Shadowcrypt Ward
 Card ID: 10153130
+Cost: 4
+Attack: 3
+Defense: 3
+Class: Abysscraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Necromancy (8) - Evolve this follower.
 ----------
@@ -2650,6 +5254,13 @@ Whenever an allied Departed follower enters the field, give it Bane.
 
 Card Name: Exella, Nocturnal General
 Card ID: 10253120
+Cost: 4
+Attack: 1
+Defense: 3
+Class: Abysscraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Give this follower +X/+0. X is the number of other allied followers on the field. Deal 2 damage to your leader.
 ----------
@@ -2659,6 +5270,13 @@ Storm
 
 Card Name: Supplicant of Entwining
 Card ID: 10352110
+Cost: 4
+Attack: 4
+Defense: 4
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate.
 1. Deal 3 damage to a random enemy follower.
@@ -2668,8 +5286,29 @@ Fanfare: Select a Mode to activate.
 
 ==================================================
 
+Card Name: Crimson Soulmancer
+Card ID: 10551120
+Cost: 4
+Attack: 3
+Defense: 2
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Fanfare: Reanimate (2).
+----------
+<ev>Evolve: Replicate the effects of this card's Fanfare ability.</ev>
+
+==================================================
+
 Card Name: March of the Brutes
 Card ID: 10351310
+Cost: 4
+Class: Abysscraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Deal 2 damage to 2 random enemy followers and the enemy leader.
 
@@ -2677,6 +5316,13 @@ Deal 2 damage to 2 random enemy followers and the enemy leader.
 
 Card Name: Winged Warrior
 Card ID: 10061130
+Cost: 4
+Attack: 4
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select another allied follower on the field and give it +1/+1.
 ----------
@@ -2686,6 +5332,13 @@ Fanfare: Select another allied follower on the field and give it +1/+1.
 
 Card Name: Ironfist Priest
 Card ID: 10062110
+Cost: 4
+Attack: 5
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 <ev>Evolve: Select an enemy follower on the field with 3 defense or less and banish it.</ev>
 <sev>Super-Evolve: Banish all enemy followers with 3 defense or less instead.</sev>
@@ -2694,6 +5347,13 @@ Card ID: 10062110
 
 Card Name: Reno, Luxwing Featherfolk
 Card ID: 10162120
+Cost: 4
+Attack: 3
+Defense: 5
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Clash: Deal 1 damage to the enemy leader.
 ----------
@@ -2703,6 +5363,13 @@ Clash: Deal 1 damage to the enemy leader.
 
 Card Name: Ronavero, Darkhaven Ward
 Card ID: 10163120
+Cost: 4
+Attack: 1
+Defense: 3
+Class: Havencraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Ambush
 ----------
@@ -2712,19 +5379,32 @@ Ambush
 
 Card Name: Marwynn, Despair Manifest
 Card ID: 10364120
+Cost: 4
+Attack: 4
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Add a Torrent of Despair to your hand.
 ----------
 <ev>Evolve: Gain Crest: Marwynn, Despair Manifest.</ev>
 
 Crest
-
 <add>At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.</add>
 
 ==================================================
 
 Card Name: Sara, Graphos's Chosen
 Card ID: 10462110
+Cost: 4
+Attack: 4
+Defense: 5
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Enhance (6): Give this follower +0/+10.
 ----------
@@ -2736,6 +5416,13 @@ Ward
 
 Card Name: Sophia, Zeyen Priestess
 Card ID: 10462120
+Cost: 4
+Attack: 3
+Defense: 5
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Summon a random Havencraft follower that costs 2 or less from your deck.
 ----------
@@ -2743,8 +5430,34 @@ Fanfare: Summon a random Havencraft follower that costs 2 or less from your deck
 
 ==================================================
 
+Card Name: Sofina, Inspiring Strength
+Card ID: 10564110
+Cost: 4
+Attack: 2
+Defense: 2
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Fanfare: Select a Mode to activate.
+1. Evolve this follower.
+2. Evolve another random unevolved allied follower with Ward and give it +1/+1.
+----------
+Ward
+At the end of your turn, if this follower is evolved, give all other followers on the field -1/-1.
+
+==================================================
+
 Card Name: Holyflame Tiger
 Card ID: 90061120
+Cost: 4
+Attack: 4
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Rush
 
@@ -2752,11 +5465,15 @@ Rush
 
 Card Name: Maddening Benison
 Card ID: 10263310
+Cost: 4
+Class: Havencraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Restore 10 defense to your leader. Gain Crest: Maddening Benison.
 
 Crest
-
 <add>Countdown (2)
 Last Words: Deal 10 damage to your leader.</add>
 
@@ -2764,6 +5481,11 @@ Last Words: Deal 10 damage to your leader.</add>
 
 Card Name: Blinding Faith
 Card ID: 10361310
+Cost: 4
+Class: Havencraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Deal 3 damage to all enemy followers.
 Enhance (8): Draw 3 cards. Restore 3 defense to your leader.
@@ -2772,6 +5494,11 @@ Enhance (8): Draw 3 cards. Restore 3 defense to your leader.
 
 Card Name: Avian Statue
 Card ID: 10061210
+Cost: 4
+Class: Havencraft
+Type: Amulet
+Rarity: Bronze
+Trait: -
 --------------------------------
 Countdown (2)
 Last Words: Summon a Regal Falcon.
@@ -2782,6 +5509,11 @@ Engage (2): Advance this amulet's count by 2.
 
 Card Name: Shining Disenchantment
 Card ID: 10363210
+Cost: 4
+Class: Havencraft
+Type: Amulet
+Rarity: Gold
+Trait: -
 --------------------------------
 Countdown (4)
 Last Words: Deal 4 damage split between all enemies. Restore 4 defense to your leader.
@@ -2792,6 +5524,11 @@ Engage: Advance this amulet's count by X. X is the number of crests you have.
 
 Card Name: Skyfaring Vessel
 Card ID: 10462210
+Cost: 4
+Class: Havencraft
+Type: Amulet
+Rarity: Silver
+Trait: -
 --------------------------------
 Activates in hand. Whenever you Engage an amulet, reduce the cost of this card by 1.
 ----------
@@ -2801,6 +5538,13 @@ Engage: Destroy this card. Select an unevolved allied follower on the field and 
 
 Card Name: Rukina, Resistance Leader
 Card ID: 10172110
+Cost: 4
+Attack: 3
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.
 ----------
@@ -2810,6 +5554,13 @@ Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.
 
 Card Name: Devotee of Destruction
 Card ID: 10371110
+Cost: 4
+Attack: 4
+Defense: 4
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Give this follower +X/+X. X is the number of other allied cards on the field. Destroy all other allied cards on the field.
 ----------
@@ -2819,6 +5570,13 @@ Ward
 
 Card Name: Lishenna, Melody Manifest
 Card ID: 10374120
+Cost: 4
+Attack: 2
+Defense: 4
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Add a Melodious Monody to your hand.
 ----------
@@ -2828,8 +5586,44 @@ Can't be destroyed by abilities.
 
 ==================================================
 
+Card Name: Marionette Master
+Card ID: 10571110
+Cost: 4
+Attack: 3
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Fanfare: Summon an Enhanced Puppet and Puppet.
+Enhance (7): Give them Storm.
+
+==================================================
+
+Card Name: New-Age Cartographer
+Card ID: 10572110
+Cost: 4
+Attack: 2
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+Fanfare: Add an Ominous Artifact β to your hand.
+----------
+<sev>Super-Evolve: Select an Artifact follower in your hand that costs 5 or less and summon an exact copy of it.</sev>
+
+==================================================
+
 Card Name: Bullet from Beyond
 Card ID: 10071310
+Cost: 4
+Class: Portalcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select an enemy follower on the field and destroy it. Add a Gear of Ambition and Gear of Remembrance to your hand.
 
@@ -2837,6 +5631,11 @@ Select an enemy follower on the field and destroy it. Add a Gear of Ambition and
 
 Card Name: Wired Assault
 Card ID: 10371310
+Cost: 4
+Class: Portalcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Select an enemy follower on the field and destroy it. Add 2 copies of Puppet to your hand.
 
@@ -2844,6 +5643,13 @@ Select an enemy follower on the field and destroy it. Add 2 copies of Puppet to 
 
 Card Name: Katalina, Sky's Protector
 Card ID: 10401110
+Cost: 5
+Attack: 5
+Defense: 5
+Class: Neutral
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Skybound Art - Deal 5 damage to 2 random enemy followers.
 ----------
@@ -2852,8 +5658,29 @@ Can't take more than 3 damage at a time.
 
 ==================================================
 
+Card Name: Goddess of Starlight
+Card ID: 10502110
+Cost: 5
+Attack: 5
+Defense: 5
+Class: Neutral
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+<ev>Evolve: Select 3 cards in your hand and discard them. Add an exact copy each of the 3 leftmost cards in your hand to your hand without revealing them.</ev>
+
+==================================================
+
 Card Name: Demon of Purgatory
 Card ID: 90004130
+Cost: 5
+Attack: 9
+Defense: 6
+Class: Neutral
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select 2 enemy followers on the field and deal 6 damage to them and the enemy leader.
 
@@ -2861,13 +5688,36 @@ Fanfare: Select 2 enemy followers on the field and deal 6 damage to them and the
 
 Card Name: Goblin Foray
 Card ID: 10101310
+Cost: 5
+Class: Neutral
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Summon 5 copies of Goblin.
 
 ==================================================
 
+Card Name: Fate of the World
+Card ID: 10503310
+Cost: 5
+Class: Neutral
+Type: Spell
+Rarity: Gold
+Trait: -
+--------------------------------
+Draw 2 cards. Destroy a random enemy follower with the highest attack.
+Enhance (10): Deal 4 damage to all enemies.
+
+==================================================
+
 Card Name: Sweetness of Voracity
 Card ID: 90004330
+Cost: 5
+Class: Neutral
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Deal 5 damage to a random enemy follower and the enemy leader.
 
@@ -2875,6 +5725,13 @@ Deal 5 damage to a random enemy follower and the enemy leader.
 
 Card Name: Glade, Fragrantwood Ward
 Card ID: 10113120
+Cost: 5
+Attack: 3
+Defense: 3
+Class: Forestcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Draw 2 cards.
 ----------
@@ -2884,6 +5741,13 @@ Fanfare: Draw 2 cards.
 
 Card Name: Dwarven Malletman
 Card ID: 10211120
+Cost: 5
+Attack: 5
+Defense: 5
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and deal it 4 damage. Combo (3) - Deal damage to all enemy followers instead.
 
@@ -2891,6 +5755,13 @@ Fanfare: Select an enemy follower on the field and deal it 4 damage. Combo (3) -
 
 Card Name: Anthuria, Toe-Tapping Torch
 Card ID: 10412120
+Cost: 5
+Attack: 5
+Defense: 4
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Give all allied followers on the field Barrier.
 
@@ -2898,20 +5769,84 @@ Fanfare: Give all allied followers on the field Barrier.
 
 Card Name: Yuel & Societte, Dancing Duo
 Card ID: 10414120
+Cost: 5
+Attack: 4
+Defense: 3
+Class: Forestcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Do this 2 times: "Deal 4 damage to a random enemy follower."
 ----------
 <sev>Super-Evolve: Gain Crest: Yuel & Societte, Dancing Duo.</sev>
 
 Crest
-
 <add>Countdown (4)
 Once on each of your turns, when you play a follower, evolve it.</add>
 
 ==================================================
 
+Card Name: Battledore Woodsmaiden
+Card ID: 10511120
+Cost: 5
+Attack: 4
+Defense: 4
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Fanfare: Summon a Fairy.
+----------
+Whenever an allied Pixie follower enters the field, deal 1 damage to the enemy leader.
+----------
+<ev>Evolve: Replicate the effects of this card's Fanfare ability.</ev>
+
+==================================================
+
+Card Name: Fairy Beastwhisperer
+Card ID: 10512120
+Cost: 5
+Attack: 2
+Defense: 6
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+Rush
+Bane
+Drain
+
+==================================================
+
+Card Name: Spirited Skipper
+Card ID: 10513110
+Cost: 5
+Attack: 4
+Defense: 3
+Class: Forestcraft
+Type: Follower
+Rarity: Gold
+Trait: -
+--------------------------------
+Fanfare: Summon 3 copies of Fairy.
+----------
+<ev>Evolve: Replicate the effects of this card's Fanfare ability.</ev>
+<sev>Super-Evolve: Give all allied Pixie followers on the field Bane.</sev>
+
+==================================================
+
 Card Name: Luminous Magus
 Card ID: 10122120
+Cost: 5
+Attack: 1
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: Luminous
 --------------------------------
 Fanfare: Summon 3 copies of Steelclad Knight.
 ----------
@@ -2921,6 +5856,13 @@ Whenever an allied Officer follower enters the field, give it Ward.
 
 Card Name: Albert, Levin Stormsaber
 Card ID: 10124110
+Cost: 5
+Attack: 3
+Defense: 5
+Class: Swordcraft
+Type: Follower
+Rarity: Legendary
+Trait: Levin
 --------------------------------
 Enhance (9): Deal 3 damage to all enemy followers. Give this follower "Can attack 2 times per turn."
 ----------
@@ -2930,6 +5872,13 @@ Storm
 
 Card Name: Nightshadow Ninja Master
 Card ID: 10221120
+Cost: 5
+Attack: 4
+Defense: 5
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Ambush
 
@@ -2937,6 +5886,13 @@ Ambush
 
 Card Name: Peppy Scout
 Card ID: 10322120
+Cost: 5
+Attack: 3
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Summon a random Swordcraft follower that costs 3 or less from your deck.
 ----------
@@ -2944,8 +5900,33 @@ Fanfare: Summon a random Swordcraft follower that costs 3 or less from your deck
 
 ==================================================
 
+Card Name: Unkei, Goldbloom
+Card ID: 10524120
+Cost: 5
+Attack: 2
+Defense: 4
+Class: Swordcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Fanfare: Select an enemy follower on the field and banish it. Add a Glittering Gold to your hand.
+----------
+<sev>Super-Evolve: Gain Crest: Unkei, Goldbloom.</sev>
+
+Crest
+<add>Countdown (4)
+At the end of your turn, add a Glittering Gold to your hand.</add>
+
+==================================================
+
 Card Name: Knightly Ardor
 Card ID: 10423310
+Cost: 5
+Class: Swordcraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Select a Mode to activate.
 1. Give the leftmost allied Swordcraft follower on the field "Can attack 2 times per turn."
@@ -2957,6 +5938,13 @@ Select a Mode to activate.
 
 Card Name: Runeblade Conductor
 Card ID: 10131110
+Cost: 5
+Attack: 1
+Defense: 1
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 On Spellboost: Give this follower +1/+1.
 ----------
@@ -2966,6 +5954,13 @@ Fanfare: Select an enemy follower on the field and deal it X damage. X is this f
 
 Card Name: Emmylou, Witch of Wonder
 Card ID: 10132120
+Cost: 5
+Attack: 2
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 On Spellboost: Reduce the cost of this card by 1.
 ----------
@@ -2975,13 +5970,19 @@ On Spellboost: Reduce the cost of this card by 1.
 
 Card Name: Juno, Visionary Alchemist
 Card ID: 10133110
+Cost: 5
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and deal it X damage. X is the number of earth sigils you have.
 ----------
 <ev>Evolve: Gain Crest: Juno, Visionary Alchemist.</ev>
 
 Crest
-
 <add>Countdown (3)
 At the end of your turn, Earth Rite (1) - Summon a Guardian Golem.</add>
 
@@ -2989,6 +5990,13 @@ At the end of your turn, Earth Rite (1) - Summon a Guardian Golem.</add>
 
 Card Name: Anne & Grea, Mysterian Duo
 Card ID: 10134120
+Cost: 5
+Attack: 4
+Defense: 4
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: Mysteria
 --------------------------------
 Fanfare: Summon an Anne's Summoning. Spellboost your hand 3 times.
 ----------
@@ -2998,19 +6006,32 @@ Fanfare: Summon an Anne's Summoning. Spellboost your hand 3 times.
 
 Card Name: Bergent, Rejected Artes
 Card ID: 10232110
+Cost: 5
+Attack: 4
+Defense: 4
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Summon 2 copies of Onion Patch.
 ----------
 <ev>Evolve: Gain Crest: Bergent, Rejected Artes.</ev>
 
 Crest
-
 <add>At the start of your turn, summon an Onion Patch.</add>
 
 ==================================================
 
 Card Name: Supplicant of Truth
 Card ID: 10332110
+Cost: 5
+Attack: 3
+Defense: 2
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Deal 3 damage to all other followers. If this card's cost isn't 5, draw 2 cards.
 
@@ -3018,13 +6039,39 @@ Fanfare: Deal 3 damage to all other followers. If this card's cost isn't 5, draw
 
 Card Name: Mireille & Risette, Penitent Duo
 Card ID: 10432120
+Cost: 5
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Summon a Mireille & Risette, Penitent Duo. Earth Rite (2) - Evolve it and this follower.
 
 ==================================================
 
+Card Name: Grandeur of the Dawnblossom
+Card ID: 10533310
+Cost: 5
+Class: Runecraft
+Type: Spell
+Rarity: Gold
+Trait: -
+--------------------------------
+Transform all allied followers on the field into exact copies of random followers in your deck.
+
+==================================================
+
 Card Name: Battleforged Dragon Keeper
 Card ID: 10042120
+Cost: 5
+Attack: 5
+Defense: 5
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Enhance (7): Summon a Vastwing Dragon.
 
@@ -3032,6 +6079,13 @@ Enhance (7): Summon a Vastwing Dragon.
 
 Card Name: Swordsnout Trencher
 Card ID: 10141120
+Cost: 5
+Attack: 4
+Defense: 6
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: If you're in Overflow, give this follower Storm.
 
@@ -3039,6 +6093,13 @@ Fanfare: If you're in Overflow, give this follower Storm.
 
 Card Name: Seasoned Merman
 Card ID: 10242120
+Cost: 5
+Attack: 3
+Defense: 3
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Summon 2 copies of Majestic Megalorca.
 ----------
@@ -3048,6 +6109,13 @@ Fanfare: Summon 2 copies of Majestic Megalorca.
 
 Card Name: Supplicant of Disdain
 Card ID: 10342110
+Cost: 5
+Attack: 3
+Defense: 5
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Rush
 Ward
@@ -3057,6 +6125,13 @@ At the end of your turn, fully restore the defense of this follower and restore 
 
 Card Name: Galmieux, Ardor Manifest
 Card ID: 10344120
+Cost: 5
+Attack: 5
+Defense: 5
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Gain Crest: Galmieux, Ardor Manifest.
 Enhance (7): Give this follower Storm.
@@ -3064,13 +6139,19 @@ Enhance (7): Give this follower Storm.
 Once on each of your turns, when this follower takes damage but isn't destroyed, deal 3 damage to a random enemy follower.
 
 Crest
-
 <add>Once on each of your turns, when an allied follower takes damage but isn't destroyed, add a Fangs of Ardent Destruction to your hand.</add>
 
 ==================================================
 
 Card Name: Izmir, Frigid Fate
 Card ID: 10442110
+Cost: 5
+Attack: 5
+Defense: 4
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: If you have 10 max play points, evolve this follower.
 ----------
@@ -3080,6 +6161,13 @@ Fanfare: If you have 10 max play points, evolve this follower.
 
 Card Name: Zooey, Ally of the World
 Card ID: 10444120
+Cost: 5
+Attack: 5
+Defense: 5
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Gain 1 max play point.
 Enhance (10): Give this follower Storm. Set your leader's max defense to 1. Give your leader "Can't take more than 0 damage at a time" until the end of your opponent's turn.
@@ -3088,6 +6176,13 @@ Enhance (10): Give this follower Storm. Set your leader's max defense to 1. Give
 
 Card Name: Vastwing Dragon
 Card ID: 90041120
+Cost: 5
+Attack: 5
+Defense: 5
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Intimidate
 
@@ -3095,6 +6190,11 @@ Intimidate
 
 Card Name: Primal Beast Absorption
 Card ID: 10443310
+Cost: 5
+Class: Dragoncraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Select an enemy card on the field, banish it, and add a copy of it to your hand.
 
@@ -3102,6 +6202,13 @@ Select an enemy card on the field, banish it, and add a copy of it to your hand.
 
 Card Name: Darkseal Demon
 Card ID: 10151150
+Cost: 5
+Attack: 4
+Defense: 4
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Draw 2 cards. Deal 2 damage to your leader.
 ----------
@@ -3111,6 +6218,13 @@ Fanfare: Draw 2 cards. Deal 2 damage to your leader.
 
 Card Name: Aragavy, Eternal Hunter
 Card ID: 10154130
+Cost: 5
+Attack: 4
+Defense: 3
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Deal 7 damage split between all enemy followers.
 ----------
@@ -3120,6 +6234,13 @@ Fanfare: Deal 7 damage split between all enemy followers.
 
 Card Name: Rayvn, the Silver Bullet
 Card ID: 10251110
+Cost: 5
+Attack: 3
+Defense: 4
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Bane
 ----------
@@ -3129,6 +6250,13 @@ Bane
 
 Card Name: Charon, Stygian Oarswoman
 Card ID: 10254120
+Cost: 5
+Attack: 4
+Defense: 4
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Reanimate (2) and Reanimate (1).
 ----------
@@ -3137,7 +6265,6 @@ Whenever an allied Departed follower enters the field, give it Ward.
 <sev>Super-Evolve: Gain Crest: Charon, Stygian Oarswoman.</sev>
 
 Crest
-
 <add>Countdown (2)
 At the start of your turn, Reanimate (3).</add>
 
@@ -3145,6 +6272,13 @@ At the start of your turn, Reanimate (3).</add>
 
 Card Name: Congregant of Entwining
 Card ID: 10353110
+Cost: 5
+Attack: 4
+Defense: 4
+Class: Abysscraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate.
 1. Summon a Congregant of Entwining and give it and this follower Rush.
@@ -3155,13 +6289,33 @@ Fanfare: Select a Mode to activate.
 
 ==================================================
 
+Card Name: Friendly Blue Ogre
+Card ID: 10552120
+Cost: 5
+Attack: 3
+Defense: 5
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+Fanfare: Select an enemy follower on the field and give it "Can't attack followers or leaders" until the end of your opponent's turn. Draw a card.
+----------
+<ev>Evolve: Replicate the effects of this card's Fanfare ability.</ev>
+
+==================================================
+
 Card Name: Corruption
 Card ID: 10453310
+Cost: 5
+Class: Abysscraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Give all followers on the field -2/-2. Give yourself and your opponent Crest: Corruption. Super Skybound Art - Destroy your Crest: Corruption.
 
 Crest
-
 <add>Countdown (4)
 At the end of your turn, deal 2 damage to your leader.</add>
 
@@ -3169,6 +6323,13 @@ At the end of your turn, deal 2 damage to your leader.</add>
 
 Card Name: Radiant Guiding Angel
 Card ID: 10161130
+Cost: 5
+Attack: 2
+Defense: 3
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Draw 2 cards. Restore 2 defense to your leader.
 
@@ -3176,6 +6337,13 @@ Fanfare: Draw 2 cards. Restore 2 defense to your leader.
 
 Card Name: Salefa, Guardian of Water
 Card ID: 10164130
+Cost: 5
+Attack: 3
+Defense: 3
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Restore 3 defense to your leader.
 ----------
@@ -3187,6 +6355,13 @@ Ward
 
 Card Name: Immaculate Adjudicator
 Card ID: 10262120
+Cost: 5
+Attack: 4
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and banish it.
 
@@ -3194,6 +6369,13 @@ Fanfare: Select an enemy follower on the field and banish it.
 
 Card Name: Agnes, the Swiftblade
 Card ID: 10263110
+Cost: 5
+Attack: 3
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Storm
 Strike: If there are at least 2 allied amulets on the field, destroy a random enemy follower other than the opposing one.
@@ -3202,20 +6384,71 @@ Strike: If there are at least 2 allied amulets on the field, destroy a random en
 
 Card Name: Congregant of Repose
 Card ID: 10363110
+Cost: 5
+Attack: 2
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and destroy it.
 ----------
 <ev>Evolve: Gain Crest: Congregant of Repose.</ev>
 
 Crest
-
 <add>Countdown (4)
 At the end of your turn, if allied followers didn't attack this turn, draw a follower with 4 defense.</add>
 
 ==================================================
 
+Card Name: Desperate Shrinemouse
+Card ID: 10562120
+Cost: 5
+Attack: 1
+Defense: 3
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+Fanfare: Draw a card.
+----------
+During your turn, whenever you draw a card, deal 1 damage to all enemy followers.
+----------
+<ev>Evolve: Replicate the effects of this card's Fanfare ability.</ev>
+
+==================================================
+
+Card Name: Saint of Rehabilitation
+Card ID: 10563110
+Cost: 5
+Attack: 2
+Defense: 3
+Class: Havencraft
+Type: Follower
+Rarity: Gold
+Trait: -
+--------------------------------
+Fanfare: Restore 1 defense to your leader.
+----------
+Ward
+During your turn, whenever your leader's defense is restored, summon a Fox of Purity.
+----------
+<ev>Evolve: Replicate the effects of this card's Fanfare ability.</ev>
+<sev>Super-Evolve: Replicate the effects of this card's Fanfare ability.</sev>
+
+==================================================
+
 Card Name: Mecha Cavalier
 Card ID: 10072120
+Cost: 5
+Attack: 4
+Defense: 4
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Ward
 ----------
@@ -3226,6 +6459,13 @@ Ward
 
 Card Name: Dirk, Metal Mercenary
 Card ID: 10171120
+Cost: 5
+Attack: 5
+Defense: 5
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Summon a Fortifier Artifact.
 
@@ -3233,6 +6473,13 @@ Fanfare: Summon a Fortifier Artifact.
 
 Card Name: Alouette, Doomwright Ward
 Card ID: 10173140
+Cost: 5
+Attack: 2
+Defense: 4
+Class: Portalcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.
 ----------
@@ -3242,6 +6489,13 @@ Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.
 
 Card Name: Achim, Lord of Despair
 Card ID: 10272120
+Cost: 5
+Attack: 3
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 <ev>Evolve: Select an enemy follower on the field with 4 attack or less, banish it, and summon an exact copy of it.</ev>
 
@@ -3249,6 +6503,13 @@ Card ID: 10272120
 
 Card Name: Zwei, Symphonic Heart
 Card ID: 10274110
+Cost: 5
+Attack: 3
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Summon a Victoria.
 ----------
@@ -3260,6 +6521,13 @@ Whenever an allied Puppetry follower enters the field, give it Ward.
 
 Card Name: Field Scientist
 Card ID: 10372120
+Cost: 5
+Attack: 3
+Defense: 4
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select a card in your hand and discard it. Draw 3 cards.
 
@@ -3267,6 +6535,13 @@ Fanfare: Select a card in your hand and discard it. Draw 3 cards.
 
 Card Name: Eustace, Howl of Thunder
 Card ID: 10472110
+Cost: 5
+Attack: 5
+Defense: 4
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Skybound Art - Select another unevolved allied follower on the field and evolve it and this follower.
 ----------
@@ -3276,6 +6551,13 @@ Clash: Deal 3 damage to the opposing follower.
 
 Card Name: Cassius, Sky-Yearning Arrival
 Card ID: 10473110
+Cost: 5
+Attack: 3
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Select an Artifact follower in your hand and deal X damage to all enemy followers. X is the selected follower's attack.
 ----------
@@ -3285,18 +6567,64 @@ Last Words: Add a Fortifier Artifact to your hand.
 
 Card Name: Lu Woh, Light Personified
 Card ID: 10474110
+Cost: 5
+Attack: 6
+Defense: 6
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Do this 6 times: "Deal 1 damage to a random enemy follower." Give all followers in your opponent's hand +1/+0. Skybound Art - Gain Crest: Lu Woh, Light Personified.
 
 Crest
-
 <add>Countdown (2)
 Whenever an enemy follower with Storm attacks a leader, give it -3/-0 until the end of the turn.</add>
 
 ==================================================
 
+Card Name: Flowering Artisan
+Card ID: 10571120
+Cost: 5
+Attack: 3
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Fanfare: Draw a spell.
+----------
+Whenever you play a spell, deal 3 damage to all enemy followers.
+
+==================================================
+
+Card Name: Neuron Disrupter
+Card ID: 10573110
+Cost: 5
+Attack: 4
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Gold
+Trait: -
+--------------------------------
+Fanfare: Recover X play points. X is the number of other allied followers on the field.
+----------
+Rush
+Last Words: Draw 2 cards.
+
+==================================================
+
 Card Name: Ominous Artifact α
 Card ID: 90073110
+Cost: 5
+Attack: 3
+Defense: 5
+Class: Portalcraft
+Type: Follower
+Rarity: Gold
+Trait: Artifact
 --------------------------------
 Fuse: Ominous Artifact β and Ominous Artifact γ
 When you've Fused both to this card, transform it into a Masterwork Artifact Ω.
@@ -3307,6 +6635,13 @@ At the end of your turn, restore 3 defense to your leader.
 
 Card Name: Ominous Artifact β
 Card ID: 90073120
+Cost: 5
+Attack: 4
+Defense: 4
+Class: Portalcraft
+Type: Follower
+Rarity: Gold
+Trait: Artifact
 --------------------------------
 At the end of your turn, deal 3 damage to the enemy leader.
 
@@ -3314,6 +6649,13 @@ At the end of your turn, deal 3 damage to the enemy leader.
 
 Card Name: Ominous Artifact γ
 Card ID: 90073130
+Cost: 5
+Attack: 5
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Gold
+Trait: Artifact
 --------------------------------
 At the end of your turn, deal 3 damage to all enemy followers.
 
@@ -3321,6 +6663,11 @@ At the end of your turn, deal 3 damage to all enemy followers.
 
 Card Name: Doomwright Resurgence
 Card ID: 10172320
+Cost: 5
+Class: Portalcraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 Select 2 Artifact followers in your hand that cost 5 or less, summon an exact copy of each, and give the exact copies "At the end of your opponent's turn, destroy this card."
 
@@ -3328,6 +6675,11 @@ Select 2 Artifact followers in your hand that cost 5 or less, summon an exact co
 
 Card Name: Ancient Cannon
 Card ID: 10173210
+Cost: 5
+Class: Portalcraft
+Type: Amulet
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Add a Gear of Ambition to your hand.
 ----------
@@ -3337,6 +6689,13 @@ Whenever you Fuse, deal 2 damage to a random enemy follower.
 
 Card Name: Sandalphon, Primarch Successor
 Card ID: 10404110
+Cost: 6
+Attack: 7
+Defense: 6
+Class: Neutral
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Activates in deck. At the start of your turn, if allied followers have evolved at least 6 times this match, Invoke this card.
 ----------
@@ -3344,7 +6703,6 @@ When this card is Invoked, gain Crest: Sandalphon, Primarch Successor and return
 Fanfare: Super Skybound Art - Do this 5 times: "Deal 2 damage to a random enemy."
 
 Crest
-
 <add>Countdown (2)
 At the end of your turn, restore 1 defense to all allies.</add>
 
@@ -3352,6 +6710,13 @@ At the end of your turn, restore 1 defense to all allies.</add>
 
 Card Name: Silent Rider
 Card ID: 90004110
+Cost: 6
+Attack: 10
+Defense: 10
+Class: Neutral
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Storm
 
@@ -3359,19 +6724,32 @@ Storm
 
 Card Name: Aria, Lady of the Woods
 Card ID: 10114110
+Cost: 6
+Attack: 4
+Defense: 4
+Class: Forestcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Gain Crest: Aria, Lady of the Woods.
 ----------
 <sev>Super-Evolve: Summon 3 copies of Fairy.</sev>
 
 Crest
-
 <add>Whenever an allied Pixie follower enters the field, give it Storm.</add>
 
 ==================================================
 
 Card Name: Lionel, Ardent Elf
 Card ID: 10212110
+Cost: 6
+Attack: 6
+Defense: 6
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Summon 2 copies of Baby Carbuncle.
 ----------
@@ -3381,6 +6759,13 @@ Ward
 
 Card Name: Supplicant of Unkilling
 Card ID: 10312110
+Cost: 6
+Attack: 5
+Defense: 6
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Give all enemy followers on the field -0/-3.
 ----------
@@ -3390,6 +6775,11 @@ Fanfare: Give all enemy followers on the field -0/-3.
 
 Card Name: Annihilating Onslaught
 Card ID: 90014320
+Cost: 6
+Class: Forestcraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Activates in hand. At the end of your turn, reduce the cost of this card by 1.
 ----------
@@ -3399,6 +6789,13 @@ Deal 6 damage to the enemy leader. If there's an allied Izudia, Annihilation Man
 
 Card Name: Ernesta, Peace Hawker
 Card ID: 10121120
+Cost: 6
+Attack: 4
+Defense: 6
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Give all other allied followers on the field +1/+1.
 ----------
@@ -3408,6 +6805,13 @@ Fanfare: Give all other allied followers on the field +1/+1.
 
 Card Name: Amelia, Silver Captain
 Card ID: 10124120
+Cost: 6
+Attack: 4
+Defense: 4
+Class: Swordcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Draw 2 Swordcraft followers. Recover 3 play points.
 ----------
@@ -3417,6 +6821,13 @@ Fanfare: Draw 2 Swordcraft followers. Recover 3 play points.
 
 Card Name: Gildaria, Anathema of Peace
 Card ID: 10224110
+Cost: 6
+Attack: 4
+Defense: 4
+Class: Swordcraft
+Type: Follower
+Rarity: Legendary
+Trait: Anathema
 --------------------------------
 Fanfare: Rally (20) - Super-evolve this follower.
 ----------
@@ -3428,6 +6839,13 @@ Whenever another allied follower enters the field, deal 1 damage to all enemy fo
 
 Card Name: Comrade of the Swordmaster
 Card ID: 10321120
+Cost: 6
+Attack: 5
+Defense: 5
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Last Words: Summon a Comrade of the Swordmaster and remove Last Words from it.
 
@@ -3435,6 +6853,13 @@ Last Words: Summon a Comrade of the Swordmaster and remove Last Words from it.
 
 Card Name: Sinciro, Heir to Usurpation
 Card ID: 10324110
+Cost: 6
+Attack: 5
+Defense: 6
+Class: Swordcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fuse: Loot cards
 ----------
@@ -3446,6 +6871,13 @@ Fanfare: Deal X damage to all enemies. X is the number of differently named card
 
 Card Name: Aglovale, Lord of Frost
 Card ID: 10422110
+Cost: 6
+Attack: 5
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Deal 3 damage to all enemy followers.
 ----------
@@ -3453,8 +6885,47 @@ Intimidate
 
 ==================================================
 
+Card Name: Altruistic Aristocrat
+Card ID: 10521110
+Cost: 6
+Attack: 4
+Defense: 6
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Fanfare: Select a card in your hand and discard it. Restore 3 defense to your leader. If you selected a spell, restore 6 defense instead.
+
+==================================================
+
+Card Name: Swift Staffmaster
+Card ID: 10522110
+Cost: 6
+Attack: 3
+Defense: 3
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+When you draw this card, set its cost to 3 until the end of the turn.
+----------
+Fanfare: Draw a card. Restore 3 defense to your leader.
+----------
+Rush
+
+==================================================
+
 Card Name: William, Mysterian Student
 Card ID: 10132130
+Cost: 6
+Attack: 5
+Defense: 5
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: Mysteria
 --------------------------------
 X starts at 0.
 On Spellboost: Increase X by 1.
@@ -3467,6 +6938,13 @@ Fanfare: Deal X damage to all enemy followers.
 
 Card Name: Norman, Adamant Alchemist
 Card ID: 10234120
+Cost: 6
+Attack: 5
+Defense: 5
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: Mysteria
 --------------------------------
 Fanfare: Earth Rite (1) - Select a Mode to activate.
 1. Summon a Guardian Golem and give it Barrier.
@@ -3479,13 +6957,59 @@ Fanfare: Earth Rite (1) - Select a Mode to activate.
 
 Card Name: Ezecrain, Portent of Vengeance
 Card ID: 10432110
+Cost: 6
+Attack: 6
+Defense: 5
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select 2 enemy followers on the field and deal them 4 damage. Gain 2 earth sigils.
 
 ==================================================
 
+Card Name: Waterbending Charmwielder
+Card ID: 10531120
+Cost: 6
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Fanfare: Deal 3 damage to 3 random enemy followers. Spellboost your hand 3 times.
+
+==================================================
+
+Card Name: Woodsong Haikumaster
+Card ID: 10532120
+Cost: 6
+Attack: 2
+Defense: 1
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+On Spellboost: Reduce the cost of this card by 1.
+----------
+Fanfare: Draw a card.
+----------
+Last Words: Spellboost your hand.
+
+==================================================
+
 Card Name: Axe-Wielding Dragonslayer
 Card ID: 10041120
+Cost: 6
+Attack: 5
+Defense: 10
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Ward
 
@@ -3493,6 +7017,13 @@ Ward
 
 Card Name: Kit, Luxfang Champion
 Card ID: 10142110
+Cost: 6
+Attack: 8
+Defense: 7
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 When this card is discarded, give a random allied follower on the field +1/+0.
 ----------
@@ -3502,6 +7033,13 @@ Rush
 
 Card Name: Zahar, Stormwave Dragoon
 Card ID: 10143130
+Cost: 6
+Attack: 3
+Defense: 3
+Class: Dragoncraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Summon a Vastwing Dragon.
 ----------
@@ -3511,6 +7049,13 @@ Ward
 
 Card Name: Forte, Blackwing Dragoon
 Card ID: 10144120
+Cost: 6
+Attack: 5
+Defense: 2
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Storm
 Intimidate
@@ -3519,6 +7064,13 @@ Intimidate
 
 Card Name: Snowstorm Dragonewt
 Card ID: 10341120
+Cost: 6
+Attack: 6
+Defense: 6
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Destroy all damaged enemy followers.
 
@@ -3526,6 +7078,13 @@ Fanfare: Destroy all damaged enemy followers.
 
 Card Name: Congregant of Disdain
 Card ID: 10343110
+Cost: 6
+Attack: 5
+Defense: 7
+Class: Dragoncraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Deal 3 damage to all followers.
 ----------
@@ -3533,8 +7092,29 @@ At the end of your turn, if this follower's defense is 3 or less, give all Drago
 
 ==================================================
 
+Card Name: Stormy Shamisen Shredder
+Card ID: 10541120
+Cost: 6
+Attack: 5
+Defense: 5
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
+--------------------------------
+Fanfare: Summon a Majestic Megalorca.
+----------
+Whenever an allied Marine follower enters the field, restore 2 defense to your leader.
+
+==================================================
+
 Card Name: Calamity Breath
 Card ID: 10141310
+Cost: 6
+Class: Dragoncraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Deal 5 damage to all followers.
 
@@ -3542,6 +7122,11 @@ Deal 5 damage to all followers.
 
 Card Name: Draconic Strike
 Card ID: 10243310
+Cost: 6
+Class: Dragoncraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Select a card in your hand and reduce its cost by 2. Deal 3 damage to all enemy followers.
 
@@ -3549,6 +7134,13 @@ Select a card in your hand and reduce its cost by 2. Deal 3 damage to all enemy 
 
 Card Name: Mistress of the Fanged
 Card ID: 10051110
+Cost: 6
+Attack: 3
+Defense: 6
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Storm
 Bane
@@ -3557,6 +7149,13 @@ Bane
 
 Card Name: Ghost Juggler
 Card ID: 10151140
+Cost: 6
+Attack: 5
+Defense: 5
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Reanimate (4).
 
@@ -3564,6 +7163,13 @@ Fanfare: Reanimate (4).
 
 Card Name: Undead Soldier
 Card ID: 10252120
+Cost: 6
+Attack: 3
+Defense: 3
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Summon 2 copies of Rotting Zombie.
 
@@ -3571,6 +7177,13 @@ Fanfare: Summon 2 copies of Rotting Zombie.
 
 Card Name: Vaseraga, Unyielding Scythe
 Card ID: 10451120
+Cost: 6
+Attack: 2
+Defense: 7
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Intimidate
 Last Words: Summon a Vaseraga, Unyielding Scythe. Deal 2 damage to your leader.
@@ -3579,6 +7192,13 @@ Last Words: Summon a Vaseraga, Unyielding Scythe. Deal 2 damage to your leader.
 
 Card Name: Nezha, Soaring War God
 Card ID: 10452110
+Cost: 6
+Attack: 8
+Defense: 6
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Rush
 At the end of your turn, deal 4 damage to a random enemy follower, then deal 2 damage to a random enemy follower.
@@ -3587,6 +7207,13 @@ At the end of your turn, deal 4 damage to a random enemy follower, then deal 2 d
 
 Card Name: Nehan, Dispenser of Samsara
 Card ID: 10453110
+Cost: 6
+Attack: 2
+Defense: 4
+Class: Abysscraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Evolve all unevolved allied followers on the field. Deal 2 damage to your leader.
 ----------
@@ -3594,8 +7221,36 @@ Drain
 
 ==================================================
 
+Card Name: Milteo & Luzen
+Card ID: 10554110
+Cost: 6
+Attack: 3
+Defense: 3
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Fanfare: Reanimate (4) and Reanimate (2).
+----------
+<ev>When this follower evolves, destroy 6 other random followers.</ev>
+<sev>When this follower super-evolves, gain Crest: Milteo & Luzen.</sev>
+
+Crest
+<add>Allied Fanfare and Enhance abilities don't activate.
+Whenever you play a follower, evolve it.</add>
+
+==================================================
+
 Card Name: Soulcure Sister
 Card ID: 10061110
+Cost: 6
+Attack: 3
+Defense: 5
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Restore 5 defense to your leader.
 ----------
@@ -3605,6 +7260,13 @@ Ward
 
 Card Name: Skullfane of Demise
 Card ID: 10163110
+Cost: 6
+Attack: 4
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Destroy all allied amulets. Deal X damage to all enemies. X is the number of amulets destroyed by this ability.
 
@@ -3612,6 +7274,13 @@ Fanfare: Destroy all allied amulets. Deal X damage to all enemies. X is the numb
 
 Card Name: Wilbert, Desolate Paladin
 Card ID: 10264120
+Cost: 6
+Attack: 4
+Defense: 6
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Ward
 Last Words: Summon 2 copies of Holy Cavalier.
@@ -3619,20 +7288,25 @@ Last Words: Summon 2 copies of Holy Cavalier.
 <ev>Evolve: Gain Crest: Wilbert, Desolate Paladin.</ev>
 
 Crest
-
 <add>Whenever an allied follower with Ward enters the field, give it +1/+2.</add>
 
 ==================================================
 
 Card Name: Himeka, Heir to Repose
 Card ID: 10364110
+Cost: 6
+Attack: 0
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Gain Crest: Himeka, Heir to Repose.
 ----------
 <sev>Super-Evolve: Set the attack of all enemy followers on the field to 4.</sev>
 
 Crest
-
 <add>Countdown (4)
 At the end of your turn, if there's an allied Himeka, Heir to Repose on the field, give X random enemy followers on the field with 4 attack or less "Can't attack followers or leaders" and "At the end of your turn, banish this card." X is the number of crests you have.</add>
 
@@ -3640,6 +7314,13 @@ At the end of your turn, if there's an allied Himeka, Heir to Repose on the fiel
 
 Card Name: Regal Falcon
 Card ID: 90061130
+Cost: 6
+Attack: 4
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Storm
 
@@ -3647,6 +7328,11 @@ Storm
 
 Card Name: Featherfall
 Card ID: 10161310
+Cost: 6
+Class: Havencraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Deal 3 damage to all enemy followers. Summon a Holy Falcon.
 
@@ -3654,6 +7340,11 @@ Deal 3 damage to all enemy followers. Summon a Holy Falcon.
 
 Card Name: Unholy Vessel
 Card ID: 10163220
+Cost: 6
+Class: Havencraft
+Type: Amulet
+Rarity: Gold
+Trait: -
 --------------------------------
 Engage: Destroy this card and all followers.
 
@@ -3661,6 +7352,13 @@ Engage: Destroy this card and all followers.
 
 Card Name: Mechanized Beast
 Card ID: 10071130
+Cost: 6
+Attack: 4
+Defense: 9
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Bane
 Ward
@@ -3669,6 +7367,13 @@ Ward
 
 Card Name: Noah, Thread of Death
 Card ID: 10172130
+Cost: 6
+Attack: 5
+Defense: 6
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Add 3 copies of Puppet to your hand. Give all Puppetry followers in your hand +1/+0.
 
@@ -3676,6 +7381,13 @@ Fanfare: Add 3 copies of Puppet to your hand. Give all Puppetry followers in you
 
 Card Name: Sylvia, Garden Executioner
 Card ID: 10173120
+Cost: 6
+Attack: 5
+Defense: 5
+Class: Portalcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate.
 1. Draw 2 cards.
@@ -3688,6 +7400,13 @@ Fanfare: Select a Mode to activate.
 
 Card Name: Engineblade Maven
 Card ID: 10271110
+Cost: 6
+Attack: 4
+Defense: 5
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Summon a Striker Artifact. Add a Gear of Remembrance to your hand.
 ----------
@@ -3697,6 +7416,13 @@ Fanfare: Summon a Striker Artifact. Add a Gear of Remembrance to your hand.
 
 Card Name: Karula, Eternal Arts
 Card ID: 10274120
+Cost: 6
+Attack: 5
+Defense: 4
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select an Artifact follower in your hand that costs 5 or less and summon an exact copy of it.
 ----------
@@ -3706,6 +7432,13 @@ Fanfare: Select an Artifact follower in your hand that costs 5 or less and summo
 
 Card Name: Congregant of Destruction
 Card ID: 10373110
+Cost: 6
+Attack: 3
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Destroy X random enemy followers. X is the number of other allied cards on the field. Destroy all other allied cards on the field.
 
@@ -3713,6 +7446,11 @@ Fanfare: Destroy X random enemy followers. X is the number of other allied cards
 
 Card Name: Synchronous Hearts
 Card ID: 10273310
+Cost: 6
+Class: Portalcraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Summon a Lloyd and Victoria.
 
@@ -3720,6 +7458,11 @@ Summon a Lloyd and Victoria.
 
 Card Name: Chaos Legion
 Card ID: 10473310
+Cost: 6
+Class: Portalcraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 Deal 3 damage to all enemies. Super Skybound Art - Deal 6 damage instead.
 
@@ -3727,6 +7470,13 @@ Deal 3 damage to all enemies. Super Skybound Art - Deal 6 damage instead.
 
 Card Name: Caravan Mammoth
 Card ID: 10002120
+Cost: 7
+Attack: 10
+Defense: 10
+Class: Neutral
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 -
 
@@ -3734,6 +7484,13 @@ Card ID: 10002120
 
 Card Name: Olivia, Heroic Dark Angel
 Card ID: 10104110
+Cost: 7
+Attack: 4
+Defense: 4
+Class: Neutral
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Draw 2 cards. Restore 2 defense to your leader. Recover 2 play points.
 ----------
@@ -3743,6 +7500,13 @@ Fanfare: Draw 2 cards. Restore 2 defense to your leader. Recover 2 play points.
 
 Card Name: Reina, Angelic Partner
 Card ID: 10203110
+Cost: 7
+Attack: 5
+Defense: 5
+Class: Neutral
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 <ev>Evolve: Evolve all unevolved allied followers on the field.</ev>
 
@@ -3750,6 +7514,13 @@ Card ID: 10203110
 
 Card Name: Odin, Twilit Fate
 Card ID: 10204110
+Cost: 7
+Attack: 4
+Defense: 2
+Class: Neutral
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select an enemy card on the field and banish it.
 ----------
@@ -3759,6 +7530,13 @@ Storm
 
 Card Name: Selwyn, Sonic Archer
 Card ID: 10012120
+Cost: 7
+Attack: 4
+Defense: 6
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Storm
 ----------
@@ -3768,6 +7546,13 @@ Storm
 
 Card Name: Aerin, Crystalian Frostward
 Card ID: 10112110
+Cost: 7
+Attack: 6
+Defense: 8
+Class: Forestcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and destroy it. Restore 2 defense to your leader.
 ----------
@@ -3777,6 +7562,13 @@ Ward
 
 Card Name: Lymaga, Untamed Wild
 Card ID: 10214120
+Cost: 7
+Attack: 7
+Defense: 7
+Class: Forestcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select 2 enemy followers on the field and give them "Can't attack followers or leaders" until the end of your opponent's turn.
 ----------
@@ -3786,6 +7578,13 @@ Fanfare: Select 2 enemy followers on the field and give them "Can't attack follo
 
 Card Name: Kou & You, Love and Hatred
 Card ID: 10411110
+Cost: 7
+Attack: 8
+Defense: 6
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Can attack 2 times per turn.
 Strike: Restore 3 defense to all allies.
@@ -3794,6 +7593,11 @@ Strike: Restore 3 defense to all allies.
 
 Card Name: Woodwalkers
 Card ID: 10211310
+Cost: 7
+Class: Forestcraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Summon 3 copies of Gentle Treant.
 
@@ -3801,6 +7605,13 @@ Summon 3 copies of Gentle Treant.
 
 Card Name: Jeno, Levin Axeraider
 Card ID: 10123110
+Cost: 7
+Attack: 7
+Defense: 6
+Class: Swordcraft
+Type: Follower
+Rarity: Gold
+Trait: Levin
 --------------------------------
 Rush
 Can attack 2 times per turn.
@@ -3810,6 +7621,13 @@ Strike: Give this follower Barrier. Summon a Knight.
 
 Card Name: Golden Knight, True King's Blade
 Card ID: 10423110
+Cost: 7
+Attack: 6
+Defense: 6
+Class: Swordcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate.
 1. Super-evolve this follower.
@@ -3819,8 +7637,43 @@ Enhance (9): Activate all of them instead.
 
 ==================================================
 
+Card Name: Amphibian Goldmuncher
+Card ID: 10522120
+Cost: 7
+Attack: 5
+Defense: 5
+Class: Swordcraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+At the end of your turn, if you have at least 2 spells in your hand, deal 5 damage to all enemy followers.
+----------
+<ev>Evolve: Add 2 copies of Glittering Gold to your hand.</ev>
+
+==================================================
+
+Card Name: Oluon, Raging Chariot
+Card ID: 10524110
+Cost: 7
+Attack: 7
+Defense: 7
+Class: Swordcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+At the end of your turn, if this follower is unevolved, deal 7 damage to all enemy followers. If it's evolved, do this 3 times: "Deal 7 damage to another random ally or enemy."
+
+==================================================
+
 Card Name: Ravening Tentacles
 Card ID: 10123310
+Cost: 7
+Class: Swordcraft
+Type: Spell
+Rarity: Gold
+Trait: Levin
 --------------------------------
 Select an enemy follower on the field or the enemy leader and deal it 5 damage. Restore 5 defense to your leader.
 
@@ -3828,6 +7681,13 @@ Select an enemy follower on the field or the enemy leader and deal it 5 damage. 
 
 Card Name: Kuon, Fivefold Master
 Card ID: 10134110
+Cost: 7
+Attack: 3
+Defense: 3
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Summon a Celestial Shikigami, Demonic Shikigami, and Paper Shikigami.
 Enhance (10): Destroy all allied Shikigami followers. Summon a Noble Shikigami.
@@ -3836,8 +7696,29 @@ Enhance (10): Destroy all allied Shikigami followers. Summon a Noble Shikigami.
 
 ==================================================
 
+Card Name: Emperor of Elements
+Card ID: 10533110
+Cost: 7
+Attack: 4
+Defense: 4
+Class: Runecraft
+Type: Follower
+Rarity: Gold
+Trait: -
+--------------------------------
+Fanfare: Summon 2 copies of Guardian Golem.
+----------
+Whenever an allied Golem follower enters the field, Earth Rite (1) - Evolve it.
+
+==================================================
+
 Card Name: Demonic Call
 Card ID: 10133320
+Cost: 7
+Class: Runecraft
+Type: Spell
+Rarity: Gold
+Trait: -
 --------------------------------
 On Spellboost: Reduce the cost of this card by 1.
 ----------
@@ -3847,6 +7728,11 @@ Summon a Demonic Shikigami.
 
 Card Name: Rune Portal
 Card ID: 10431310
+Cost: 7
+Class: Runecraft
+Type: Spell
+Rarity: Bronze
+Trait: -
 --------------------------------
 Deal 6 damage to all enemy followers. Restore 3 defense to your leader.
 
@@ -3854,13 +7740,19 @@ Deal 6 damage to all enemy followers. Restore 3 defense to your leader.
 
 Card Name: Burnite, Anathema of Flame
 Card ID: 10144110
+Cost: 7
+Attack: 7
+Defense: 7
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: Anathema
 --------------------------------
 Fanfare: Select a card in your hand and discard it. Deal X damage to all enemy followers. X is the cost of the selected card.
 ----------
 <sev>Super-Evolve: Give your opponent Crest: Burnite, Anathema of Flame.</sev>
 
 Crest
-
 <add>At the start of your turn, deal 1 damage to your leader.
 Once on each of your turns, when your leader's defense is restored, deal 1 damage to it.</add>
 
@@ -3868,6 +7760,13 @@ Once on each of your turns, when your leader's defense is restored, deal 1 damag
 
 Card Name: Neptune, Arbiter of Tides
 Card ID: 10243110
+Cost: 7
+Attack: 5
+Defense: 5
+Class: Dragoncraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Gain Crest: Neptune, Arbiter of Tides. Summon 2 copies of Majestic Megalorca.
 ----------
@@ -3876,13 +7775,19 @@ Ward
 <sev>Super-Evolve: Summon 2 copies of Majestic Megalorca.</sev>
 
 Crest
-
 <add>Whenever an allied Marine follower enters the field, restore 1 defense to your leader.</add>
 
 ==================================================
 
 Card Name: Wilnas, Flame Personified
 Card ID: 10444110
+Cost: 7
+Attack: 8
+Defense: 6
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and deal it 8 damage.
 ----------
@@ -3892,8 +7797,29 @@ Intimidate
 
 ==================================================
 
+Card Name: Ruinbringer
+Card ID: 10543110
+Cost: 7
+Attack: 5
+Defense: 5
+Class: Dragoncraft
+Type: Follower
+Rarity: Gold
+Trait: -
+--------------------------------
+<sev>Super-Evolve: Banish all 1-, 3-, 5-, 7-, and 9-cost cards from your deck. Deal X damage split between all enemy followers. X is the number of cards you banished.</sev>
+
+==================================================
+
 Card Name: Medusa, Venomfang Royalty
 Card ID: 10154120
+Cost: 7
+Attack: 3
+Defense: 7
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Rush
 Can attack 3 times per turn.
@@ -3903,6 +7829,13 @@ Follower Strike: Destroy the opposing follower.
 
 Card Name: Rulenye & Valnareik
 Card ID: 10354120
+Cost: 7
+Attack: 5
+Defense: 5
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate.
 1. Add a Scream Diffusion to your hand.
@@ -3912,6 +7845,13 @@ Fanfare: Select a Mode to activate.
 
 Card Name: Fediel, Darkness Personified
 Card ID: 10454110
+Cost: 7
+Attack: 5
+Defense: 5
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Necromancy (6) - Reanimate (2), Reanimate (1), and evolve them.
 ----------
@@ -3921,13 +7861,19 @@ At the end of your turn, give all enemy followers on the field -2/-2.
 
 Card Name: Belial, Archangel of Cunning
 Card ID: 10454120
+Cost: 7
+Attack: 7
+Defense: 6
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Deal 10 damage to all other followers. Super Skybound Art - Gain Crest: Belial, Archangel of Cunning.
 ----------
 <sev>Super-Evolve: Advance the count of your Crest: Belial, Archangel of Cunning by 1.</sev>
 
 Crest
-
 <add>Countdown (4)
 Last Words: Deal 20 damage to the enemy leader.</add>
 
@@ -3935,6 +7881,13 @@ Last Words: Deal 20 damage to the enemy leader.</add>
 
 Card Name: Maeve, Guardian of Earth
 Card ID: 10162130
+Cost: 7
+Attack: 5
+Defense: 7
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Ward
 Last Words: Summon a copy of a random allied amulet destroyed this match with the highest base cost.
@@ -3943,6 +7896,13 @@ Last Words: Summon a copy of a random allied amulet destroyed this match with th
 
 Card Name: Rodeo, Anathema of Judgment
 Card ID: 10164110
+Cost: 7
+Attack: 5
+Defense: 5
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: Anathema
 --------------------------------
 Fanfare: Select a card in your hand and discard it. Summon 3 random differently named amulets that cost 3 or less from your deck.
 ----------
@@ -3952,6 +7912,13 @@ Fanfare: Select a card in your hand and discard it. Summon 3 random differently 
 
 Card Name: Aether, Empyrean Guardian
 Card ID: 10264110
+Cost: 7
+Attack: 2
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Summon 3 random differently named followers that cost 3 or less from your deck.
 ----------
@@ -3961,8 +7928,35 @@ Ward
 
 ==================================================
 
+Card Name: Kukishiro, Mistbloom
+Card ID: 10564120
+Cost: 7
+Attack: 5
+Defense: 5
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Fanfare: Gain Crest: Kukishiro, Mistbloom. Return 2 random cards from your hand to deck. Draw 2 cards.
+----------
+Rush
+
+Crest
+<add>During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a Fox of Purity or Holy Falcon at random.
+During your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy Fox of Purity or Holy Falcon at random.</add>
+
+==================================================
+
 Card Name: Supersonic Fighter
 Card ID: 10371120
+Cost: 7
+Attack: 3
+Defense: 3
+Class: Portalcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Summon an Ominous Artifact γ.
 ----------
@@ -3972,6 +7966,13 @@ Fanfare: Summon an Ominous Artifact γ.
 
 Card Name: Ilsa, Brutal Drill Sergeant
 Card ID: 10472120
+Cost: 7
+Attack: 7
+Defense: 6
+Class: Portalcraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate.
 1. Do this 3 times: "Deal 4 damage to a random enemy follower."
@@ -3979,8 +7980,31 @@ Fanfare: Select a Mode to activate.
 
 ==================================================
 
+Card Name: Getenou, Eightfold Glory
+Card ID: 10504110
+Cost: 8
+Attack: 8
+Defense: 8
+Class: Neutral
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Fanfare: Discard your hand. Select a Mode to activate.
+1. Draw 8 cards.
+2. Draw 2 cards and reduce their costs by 8.
+
+==================================================
+
 Card Name: Deepwood Fairy Beast
 Card ID: 10111130
+Cost: 8
+Attack: 4
+Defense: 4
+Class: Forestcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Draw a card. Restore X defense to your leader. X is the number of cards in your hand.
 
@@ -3988,6 +8012,13 @@ Fanfare: Draw a card. Restore X defense to your leader. X is the number of cards
 
 Card Name: Bayle, Luxglaive Warrior
 Card ID: 10113130
+Cost: 8
+Attack: 4
+Defense: 4
+Class: Forestcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Activates in hand. Whenever an allied follower leaves the field, reduce the cost of this card by 1.
 ----------
@@ -3997,6 +8028,13 @@ Fanfare: Select an enemy follower on the field and deal it 4 damage.
 
 Card Name: Izudia, Annihilation Manifest
 Card ID: 10314120
+Cost: 8
+Attack: 6
+Defense: 6
+Class: Forestcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and give it -0/-6.
 ----------
@@ -4006,6 +8044,13 @@ Fanfare: Select an enemy follower on the field and give it -0/-6.
 
 Card Name: Centaur Centurion
 Card ID: 10021130
+Cost: 8
+Attack: 7
+Defense: 5
+Class: Swordcraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Storm
 
@@ -4013,6 +8058,13 @@ Storm
 
 Card Name: Amalia, Luxsteel Paladin
 Card ID: 10123140
+Cost: 8
+Attack: 6
+Defense: 6
+Class: Swordcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Summon 4 copies of Steelclad Knight.
 ----------
@@ -4022,6 +8074,13 @@ Whenever another allied follower enters the field, give it +1/+0, Rush, and Ward
 
 Card Name: Yurius, Levin Authority
 Card ID: 10224120
+Cost: 8
+Attack: 5
+Defense: 7
+Class: Swordcraft
+Type: Follower
+Rarity: Legendary
+Trait: Levin
 --------------------------------
 Fanfare: Summon 2 enemy copies of Knight.
 ----------
@@ -4031,6 +8090,13 @@ Whenever an enemy follower enters the field, give it "Can't attack followers or 
 
 Card Name: Lilanthim, Anathema of Edacity
 Card ID: 10234110
+Cost: 8
+Attack: 5
+Defense: 5
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: Anathema
 --------------------------------
 Aura
 Last Words: Earth Rite (2) - Summon a Lilanthim, Anathema of Edacity.
@@ -4041,6 +8107,11 @@ Last Words: Earth Rite (2) - Summon a Lilanthim, Anathema of Edacity.
 
 Card Name: Snowman Army
 Card ID: 10132320
+Cost: 8
+Class: Runecraft
+Type: Spell
+Rarity: Silver
+Trait: -
 --------------------------------
 On Spellboost: Reduce the cost of this card by 1.
 ----------
@@ -4050,6 +8121,13 @@ Select an enemy follower on the field, set its defense to 1, and, until the end 
 
 Card Name: Warrior of the Deep
 Card ID: 10041130
+Cost: 8
+Attack: 6
+Defense: 6
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Deal 6 damage to the enemy leader.
 
@@ -4057,6 +8135,13 @@ Fanfare: Deal 6 damage to the enemy leader.
 
 Card Name: Silvercloud Dragonrider
 Card ID: 10141110
+Cost: 8
+Attack: 6
+Defense: 6
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Ward
 Last Words: Summon a Vastwing Dragon.
@@ -4065,6 +8150,13 @@ Last Words: Summon a Vastwing Dragon.
 
 Card Name: Garyu, Fabled Dragonkin
 Card ID: 10144130
+Cost: 8
+Attack: 5
+Defense: 5
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Summon a Supreme Golden Dragon and Supreme Silver Dragon.
 ----------
@@ -4074,6 +8166,13 @@ Fanfare: Summon a Supreme Golden Dragon and Supreme Silver Dragon.
 
 Card Name: Fennie, Prismatic Phoenix
 Card ID: 10244120
+Cost: 8
+Attack: 4
+Defense: 4
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Halve the cost of all cards in your deck.
 
@@ -4081,6 +8180,13 @@ Fanfare: Halve the cost of all cards in your deck.
 
 Card Name: Mugen, Steel-Bodied Honesty
 Card ID: 10442120
+Cost: 8
+Attack: 10
+Defense: 8
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Super Skybound Art - Give this follower Storm.
 ----------
@@ -4088,8 +8194,29 @@ Fanfare: Super Skybound Art - Give this follower Storm.
 
 ==================================================
 
+Card Name: Ironmace Dragoon
+Card ID: 10542110
+Cost: 8
+Attack: 7
+Defense: 7
+Class: Dragoncraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+Fanfare: Select an enemy follower on the field and deal it 7 damage. Summon a Vastwing Dragon.
+
+==================================================
+
 Card Name: Vlad, Impaler
 Card ID: 10152140
+Cost: 8
+Attack: 5
+Defense: 8
+Class: Abysscraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Fanfare: Select an enemy follower on the field and deal it 5 damage. Restore 5 defense to your leader.
 
@@ -4097,6 +8224,13 @@ Fanfare: Select an enemy follower on the field and deal it 5 damage. Restore 5 d
 
 Card Name: Cerberus, Hellfire Unleashed
 Card ID: 10154110
+Cost: 8
+Attack: 6
+Defense: 6
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Summon a Mimi, Right Paw Hellhound and Coco, Left Paw Hellhound. Necromancy (6) - Give all other allied followers on the field +2/+0.
 ----------
@@ -4106,6 +8240,13 @@ Fanfare: Summon a Mimi, Right Paw Hellhound and Coco, Left Paw Hellhound. Necrom
 
 Card Name: Ephemeral Demon Princess
 Card ID: 10351120
+Cost: 8
+Attack: 4
+Defense: 6
+Class: Abysscraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Fanfare: Select 2 enemy followers on the field and destroy them. Deal 4 damage to your leader.
 ----------
@@ -4115,6 +8256,13 @@ Storm
 
 Card Name: Sacred Griffon
 Card ID: 10062120
+Cost: 8
+Attack: 6
+Defense: 8
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 Ward
 Whenever you Engage an amulet, give this follower Storm.
@@ -4123,11 +8271,17 @@ Whenever you Engage an amulet, give this follower Storm.
 
 Card Name: Lapis, Shining Seraph
 Card ID: 10163130
+Cost: 8
+Attack: 7
+Defense: 6
+Class: Havencraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Last Words: Gain Crest: Lapis, Shining Seraph.
 
 Crest
-
 <add>Countdown (2)
 Last Words: Summon a Lapis, Shining Seraph and give it Storm.</add>
 
@@ -4135,6 +8289,13 @@ Last Words: Summon a Lapis, Shining Seraph and give it Storm.</add>
 
 Card Name: Jeanne, Saintly Knight
 Card ID: 10164120
+Cost: 8
+Attack: 6
+Defense: 6
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Deal 6 damage to all enemy followers. Give all other allied followers on the field +2/+4.
 ----------
@@ -4144,6 +8305,13 @@ Ward
 
 Card Name: Vira, Luminous Primal Knight
 Card ID: 10464120
+Cost: 8
+Attack: 6
+Defense: 8
+Class: Havencraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select 2 enemy followers on the field and banish them. Super Skybound Art - Super-evolve this follower.
 ----------
@@ -4152,8 +8320,31 @@ Can't take more than 3 damage at a time.
 
 ==================================================
 
+Card Name: Immovable Paladin
+Card ID: 10562110
+Cost: 8
+Attack: 4
+Defense: 4
+Class: Havencraft
+Type: Follower
+Rarity: Silver
+Trait: -
+--------------------------------
+Fanfare: Summon 3 copies of Immovable Paladin.
+----------
+Ward
+
+==================================================
+
 Card Name: Orchis, Newfound Heart
 Card ID: 10174120
+Cost: 8
+Attack: 5
+Defense: 5
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Summon a Lloyd.
 ----------
@@ -4165,6 +8356,13 @@ Whenever an allied Puppetry follower enters the field, give it Storm and Bane.
 
 Card Name: Ralmia, Sonic Boom
 Card ID: 10174130
+Cost: 8
+Attack: 2
+Defense: 2
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select 3 Artifact followers in your hand that cost 5 or less and summon an exact copy of each.
 ----------
@@ -4174,6 +8372,13 @@ Fanfare: Select 3 Artifact followers in your hand that cost 5 or less and summon
 
 Card Name: Opulent Rose Queen
 Card ID: 10114120
+Cost: 9
+Attack: 6
+Defense: 6
+Class: Forestcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Transform all Forestcraft cards in your hand that cost 2 or less into copies of Bramble Burst.
 ----------
@@ -4184,6 +8389,13 @@ Can attack 2 times per turn.
 
 Card Name: Congregant of Unkilling
 Card ID: 10313110
+Cost: 9
+Attack: 4
+Defense: 6
+Class: Forestcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 When this card enters the field, summon an exact copy of it and give the exact copy -0/-1.
 ----------
@@ -4194,6 +8406,13 @@ Ward
 
 Card Name: Raio, Elimination Manifest
 Card ID: 10334120
+Cost: 9
+Attack: 9
+Defense: 9
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Reduce the cost of all followers in your deck by 3. Transform a random spell in your hand into an Ersatz Elimination. It costs 0 until the end of the turn.
 
@@ -4201,6 +8420,13 @@ Fanfare: Reduce the cost of all followers in your deck by 3. Transform a random 
 
 Card Name: Twilight Dragon
 Card ID: 10143140
+Cost: 9
+Attack: 9
+Defense: 9
+Class: Dragoncraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Give all enemy followers on the field -0/-9.
 ----------
@@ -4210,6 +8436,13 @@ Fanfare: Give all enemy followers on the field -0/-9.
 
 Card Name: Azurifrit, Heir to Disdain
 Card ID: 10344110
+Cost: 9
+Attack: 5
+Defense: 7
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Do this 3 times: "Deal 2 damage to all followers."
 ----------
@@ -4222,6 +8455,13 @@ During your turn, whenever this follower takes damage but isn't destroyed, deal 
 
 Card Name: Ginsetsu & Yuzuki, Twin Calamities
 Card ID: 10254110
+Cost: 9
+Attack: 5
+Defense: 9
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select a Mode to activate.
 1. Summon 4 copies of One-Tailed Fox.
@@ -4229,8 +8469,33 @@ Fanfare: Select a Mode to activate.
 
 ==================================================
 
+Card Name: Lifestealer
+Card ID: 10553110
+Cost: 9
+Attack: 7
+Defense: 7
+Class: Abysscraft
+Type: Follower
+Rarity: Gold
+Trait: -
+--------------------------------
+Fanfare: Transform all other followers on the field into copies of Skeleton.
+----------
+Whenever a Skeleton is destroyed, restore 1 defense to your leader.
+----------
+<ev>Evolve: Deal 1 damage to all other followers.</ev>
+
+==================================================
+
 Card Name: Liam, Crazed Creator
 Card ID: 10173130
+Cost: 9
+Attack: 7
+Defense: 7
+Class: Portalcraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Fanfare: Summon 3 copies of Enhanced Puppet.
 ----------
@@ -4240,6 +8505,13 @@ Fanfare: Summon 3 copies of Enhanced Puppet.
 
 Card Name: Beelzebub, Supreme King
 Card ID: 10474120
+Cost: 9
+Attack: 9
+Defense: 9
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Select 2 enemy followers on the field, remove all abilities from them, and deal them 9 damage. Give the enemy leader "Takes 1 more damage."
 
@@ -4247,6 +8519,13 @@ Fanfare: Select 2 enemy followers on the field, remove all abilities from them, 
 
 Card Name: Ruler of Cocytus
 Card ID: 10104120
+Cost: 10
+Attack: 10
+Defense: 10
+Class: Neutral
+Type: Follower
+Rarity: Legendary
+Trait: -
 --------------------------------
 Fanfare: Replace your deck with the Apocalypse Deck.
 
@@ -4254,6 +8533,11 @@ Fanfare: Replace your deck with the Apocalypse Deck.
 
 Card Name: Astaroth's Reckoning
 Card ID: 90004310
+Cost: 10
+Class: Neutral
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 Set the enemy leader's max defense to 1.
 
@@ -4261,13 +8545,45 @@ Set the enemy leader's max defense to 1.
 
 Card Name: Blaze Destroyer
 Card ID: 10032120
+Cost: 10
+Attack: 8
+Defense: 6
+Class: Runecraft
+Type: Follower
+Rarity: Silver
+Trait: -
 --------------------------------
 On Spellboost: Reduce the cost of this card by 1.
 
 ==================================================
 
+Card Name: Ara, Dawnblossom
+Card ID: 10534120
+Cost: 10
+Attack: 4
+Defense: 4
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+On Spellboost: Reduce the cost of this card by 1.
+----------
+Fanfare: Select an enemy follower on the field and deal it 10 damage.
+----------
+<ev>Evolve: Select another follower on the field and transform it into a Regal Falcon.</ev>
+
+==================================================
+
 Card Name: Noble Shikigami
 Card ID: 90034120
+Cost: 10
+Attack: 1
+Defense: 1
+Class: Runecraft
+Type: Follower
+Rarity: Legendary
+Trait: Shikigami
 --------------------------------
 When this follower enters the field, give it +X/+Y. X/Y is the total base attack/defense of allied Shikigami followers destroyed this turn.
 ----------
@@ -4278,6 +8594,13 @@ Aura
 
 Card Name: Genesis Dragon Reborn
 Card ID: 10143110
+Cost: 10
+Attack: 9
+Defense: 10
+Class: Dragoncraft
+Type: Follower
+Rarity: Gold
+Trait: -
 --------------------------------
 Storm
 
@@ -4285,6 +8608,13 @@ Storm
 
 Card Name: Wise Guardian Dragon
 Card ID: 10241110
+Cost: 10
+Attack: 4
+Defense: 4
+Class: Dragoncraft
+Type: Follower
+Rarity: Bronze
+Trait: -
 --------------------------------
 Activates in hand. Whenever an allied follower super-evolves, reduce the cost of this card by 3.
 ----------
@@ -4292,8 +8622,48 @@ Fanfare: Summon a Vastwing Dragon.
 
 ==================================================
 
+Card Name: Erntz, Governing Justice
+Card ID: 10544110
+Cost: 10
+Attack: 8
+Defense: 8
+Class: Dragoncraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Ward
+At the end of your turn, if this follower is unevolved, deal 8 damage to 2 random enemy followers and restore 8 defense to your leader. If this follower is evolved, deal 8 damage to the enemy leader.
+----------
+<ev>Evolve: Remove Ward from this follower. Give it Intimidate.</ev>
+
+==================================================
+
+Card Name: Shakdoh, Nightblossom
+Card ID: 10554120
+Cost: 10
+Attack: 4
+Defense: 4
+Class: Abysscraft
+Type: Follower
+Rarity: Legendary
+Trait: -
+--------------------------------
+Fanfare: Do this 2 times: "Return your hand to deck. Draw X cards. X is the number of cards you returned. Then, if you have at least 4 cards with the same cost in your hand, deal 4 damage to all enemies."
+----------
+<sev>Super-Evolve: Replicate the effects of this card's Fanfare ability.</sev>
+
+==================================================
+
 Card Name: Masterwork Artifact Ω
 Card ID: 90074110
+Cost: 10
+Attack: 10
+Defense: 10
+Class: Portalcraft
+Type: Follower
+Rarity: Legendary
+Trait: Artifact
 --------------------------------
 Fanfare: Deal 5 damage to all enemy followers. Restore 5 defense to your leader.
 ----------
@@ -4305,6 +8675,11 @@ Aura
 
 Card Name: Dimension Climb
 Card ID: 10134310
+Cost: 18
+Class: Runecraft
+Type: Spell
+Rarity: Legendary
+Trait: -
 --------------------------------
 On Spellboost: Reduce the cost of this card by 1.
 ----------
