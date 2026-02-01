@@ -1774,23 +1774,52 @@ function renderResults(matches, container, inputField) {
     return;
   }
 
-  // Populate list
   matches.forEach(card => {
     const li = document.createElement('li');
-    // Highlight match in name if possible
     li.innerHTML = `${card.name} <span class="card-id-preview">ID: ${card.id}</span>`;
     
     li.onclick = () => {
       inputField.value = card.name;
       container.style.display = 'none';
-      // In the future, this is where you'd trigger loading the card details
-      console.log("Selected card:", card); 
+      
+      // NEW: Logic for Balance Page
+      if (inputField.id === 'balanceSearchInput') {
+        populateBalanceForm(card);
+      } 
+      // Existing Logic for Workshop/Other
+      else {
+        console.log("Selected card:", card);
+      }
     };
     
     container.appendChild(li);
   });
 
   container.style.display = 'block';
+}
+
+function populateBalanceForm(card) {
+  // Hide placeholder, show form
+  const placeholder = document.querySelector('#page-balance .placeholder-content');
+  if (placeholder) placeholder.style.display = 'none';
+  
+  const form = document.getElementById('balanceAdjustmentForm');
+  if (form) form.style.display = 'block';
+
+  // Stats
+  document.getElementById('adjCost').value = card.cost || 0;
+  document.getElementById('adjAttack').value = card.attack || 0;
+  document.getElementById('adjDefense').value = card.defense || 0;
+
+  // Trait
+  document.getElementById('adjTrait').value = (card.trait === '-' ? '' : card.trait) || '';
+
+  // Text Fields
+  document.getElementById('adjCardText').value = card.text.card || '';
+  document.getElementById('adjEvolveText').value = card.text.evolve || '';
+  document.getElementById('adjSuperEvolveText').value = card.text.superEvolve || '';
+  document.getElementById('adjCrestText').value = card.text.crest || '';
+  document.getElementById('adjFaithText').value = card.text.faith || '';
 }
 
 // Initialize Search on Load
