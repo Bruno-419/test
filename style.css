@@ -1432,3 +1432,39 @@ body {
 
 
 
+/* --- Balance Adjustment Form --- */
+.adjustment-form {
+  max-width: 800px;
+  margin: 20px auto;
+  background: var(--panel);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  text-align: left; /* Ensure labels align left */
+}
+
+.adjustment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.adjustment-form .field {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.adjustment-form label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.adjustment-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
