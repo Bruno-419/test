@@ -750,20 +750,19 @@ async function drawCard() {
              const costVal = costField ? costField.value : "1";
              const labelText = isAccelerate ? "Accelerate" : "Crystallize";
              
-              ctx.save();
-              ctx.fillStyle = "#f3d87d";
-              ctx.shadowColor = "black";
-              ctx.shadowBlur = 4;
+             ctx.save();
+             ctx.fillStyle = "#f3d87d";
+             ctx.shadowColor = "black";
+             ctx.shadowBlur = 4;
 
-              // Draw the custom cost number
-              ctx.font = "28px 'Sv_numbers'";
-              ctx.textAlign = "center";
-              ctx.fillText(costVal, 843, iconY + ICON_H / 2 + 10);
+             // Draw the custom cost number
+             ctx.font = "28px 'Sv_numbers'";
+             ctx.textAlign = "center";
+             ctx.fillText(costVal, 843, iconY + ICON_H / 2 + 10);
 
-              // Draw the Accelerate/Crystallize label
-              drawTextWithHyphenSwap(labelText, 891, iconY + ICON_H / 2 + 10, 33, "left");
-              ctx.restore();
-             }
+             // Draw the Accelerate/Crystallize label
+             drawTextWithHyphenSwap(labelText, 891, iconY + ICON_H / 2 + 10, 33, "left");
+             ctx.restore();
           }
         }
         currentY += blockHeight - 10;
@@ -1873,4 +1872,5 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
