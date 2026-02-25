@@ -49,7 +49,9 @@ const assets = {
     evolve: "assets/boxes/box_evolve.png",
     superEvolve: "assets/boxes/box_super_evolve.png",
     crest: "assets/boxes/box_crest.png",
-    faith: "assets/boxes/box_faith.png"
+    faith: "assets/boxes/box_faith.png",
+    accelerate: "assets/boxes/box_accelerate.png",
+    crystallize: "assets/boxes/box_crystallize.png"
   }
 };
 
@@ -79,7 +81,9 @@ const textInputs = {
   evolve: document.getElementById("evolveText"),
   superEvolve: document.getElementById("superEvolveText"),
   crest: document.getElementById("crestText"),
-  faith: document.getElementById("faithText")
+  faith: document.getElementById("faithText"),
+  accelerate: document.getElementById("accelerateText"),
+  crystallize: document.getElementById("crystallizeText")
 };
 
 // --- Crest and Faith uploads ---
@@ -263,7 +267,7 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   let middleStartY = topHeight;
   let middleHeight = img.height - topHeight - bottomHeight;
 
-  if (key === "crest" || key === "faith") {
+  if (key === "crest" || key === "faith" || key === "accelerate" || key === "crystallize") {
     topHeight = 107;
     middleStartY = 107;
     middleHeight = 38;
@@ -377,8 +381,8 @@ async function calculateTextBlockHeight(key, startY) {
   const stretchCount = Math.max(0, (totalHeight / lineHeight) - 1);
   let boxHeight = 0;
   if (boxImg) {
-      const topHeight = (key === "crest" || key === "faith") ? 107 : 40;
-      const bottomHeight = (key === "crest" || key === "faith") ? 28 : 40;
+      const topHeight = (key === "crest" || key === "faith" || key === "accelerate" || key === "crystallize") ? 107 : 40;
+      const bottomHeight = (key === "crest" || key === "faith" || key === "accelerate" || key === "crystallize") ? 28 : 40;
       const middleHeight = boxImg.height - topHeight - bottomHeight;
       const stretchAmount = stretchCount * 50;
       boxHeight = topHeight + middleHeight + bottomHeight + stretchAmount;
@@ -491,7 +495,7 @@ async function drawTextBlock(key, box, x, startY) {
   ctx.shadowBlur = 4;
 
   let xPos = textStartX;
-  let textY = startY + 50 + (key === "crest" || key === "faith" ? 90 : 0);
+  let textY = startY + 50 + (key === "crest" || key === "faith" || key === "accelerate" || key === "crystallize" ? 90 : 0);
   let wetStyle = { bold: false, italic: false, color: null, isKeyword: false };
   let lastTokenWasDivider = false;
 
@@ -574,7 +578,9 @@ async function drawCard() {
     { key: "evolve", box: "evolve" },
     { key: "superEvolve", box: "superEvolve" },
     { key: "crest", box: "crest" },
-    { key: "faith", box: "faith" }
+    { key: "faith", box: "faith" },
+    { key: "accelerate", box: "accelerate" },
+    { key: "crystallize", box: "crystallize" }
   ];
   const boxX = 768;
   const startY = 246;
@@ -691,7 +697,9 @@ async function drawCard() {
         
         const isCrest = key === "crest";
         const isFaith = key === "faith";
-        if (isCrest || isFaith) {
+        const isAccelerate = key === "accelerate";
+        const isCrystallize = key === "crystallize";
+        if (isCrest || isFaith || isAccelerate || isCrystallize) {
           const iconX = boxX + 120;
           const iconY = currentY + 32;
           const iconImg = isCrest ? crestArt : faithArt;
@@ -733,6 +741,20 @@ async function drawCard() {
             ctx.shadowBlur = 4;
             drawTextWithHyphenSwap(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10, 33, "left");
             ctx.restore();
+          }
+          else {
+             const costField = document.getElementById(isAccelerate ? "accelerateCost" : "crystallizeCost");
+             const costVal = costField ? costField.value : "1";
+             const displayName = (isAccelerate ? "Accelerate " : "Crystallize ") + costVal;
+             
+             if (displayName) {
+              ctx.save();
+              ctx.fillStyle = "#f3d87d";
+              ctx.shadowColor = "black";
+              ctx.shadowBlur = 4;
+              drawTextWithHyphenSwap(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10, 33, "left");
+              ctx.restore();
+             }
           }
         }
         currentY += blockHeight - 10;
@@ -1504,8 +1526,10 @@ function openWorkshopModal(index) {
   const hasSuperEvolve = isFollower && card.text.superEvolve;
   const hasCrest = !!card.text.crest;
   const hasFaith = !!card.text.faith;
+  const hasAccelerate = !!card.text.accelerate;
+  const hasCrystallize = !!card.text.crystallize;
 
-  const hasAnyExtra = hasEvolve || hasSuperEvolve || hasCrest || hasFaith;
+  const hasAnyExtra = hasEvolve || hasSuperEvolve || hasCrest || hasFaith || hasAccelerate || hasCrystallize;
 
   // 3. Insert Structural Divider between Card Text and Extras
   if (card.text.card && hasAnyExtra) {
@@ -1559,6 +1583,13 @@ function openWorkshopModal(index) {
 
     return wrapper;
   };
+
+  if (hasAccelerate) {
+    container.appendChild(createSubBox("Accelerate", "Accelerate " + (card.costs?.accelerate || "1"), card.text.accelerate));
+  }
+  if (hasCrystallize) {
+    container.appendChild(createSubBox("Crystallize", "Crystallize " + (card.costs?.crystallize || "1"), card.text.crystallize));
+  }
 
   if (hasCrest) {
     container.appendChild(createSubBox("Crest", card.names.crest, card.text.crest));
@@ -1650,12 +1681,18 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
         crest: document.getElementById("crestName").value.trim(),
         faith: document.getElementById("faithName").value.trim()
       },
+      costs: {
+        accelerate: document.getElementById("accelerateCost").value,
+        crystallize: document.getElementById("crystallizeCost").value
+      },
       text: {
         card: textInputs.card.value.trim(),
         evolve: textInputs.evolve.value.trim(),
         superEvolve: textInputs.superEvolve.value.trim(),
         crest: textInputs.crest.value.trim(),
-        faith: textInputs.faith.value.trim()
+        faith: textInputs.faith.value.trim(),
+        accelerate: textInputs.accelerate.value.trim(),
+        crystallize: textInputs.crystallize.value.trim()
       }
     };
 
@@ -1829,6 +1866,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
