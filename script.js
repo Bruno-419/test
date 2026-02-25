@@ -575,12 +575,12 @@ async function drawTextBlock(key, box, x, startY) {
 async function drawCard() {
   const textOrder = [
     { key: "card", box: null },
+    { key: "accelerate", box: "accelerate" },
+    { key: "crystallize", box: "crystallize" },
     { key: "evolve", box: "evolve" },
     { key: "superEvolve", box: "superEvolve" },
     { key: "crest", box: "crest" },
-    { key: "faith", box: "faith" },
-    { key: "accelerate", box: "accelerate" },
-    { key: "crystallize", box: "crystallize" }
+    { key: "faith", box: "faith" }
   ];
   const boxX = 768;
   const startY = 246;
@@ -699,50 +699,53 @@ async function drawCard() {
         const isFaith = key === "faith";
         const isAccelerate = key === "accelerate";
         const isCrystallize = key === "crystallize";
+
         if (isCrest || isFaith || isAccelerate || isCrystallize) {
           const iconX = boxX + 120;
           const iconY = currentY + 32;
-          const iconImg = isCrest ? crestArt : faithArt;
-          const nameField = document.getElementById(isCrest ? "crestName" : "faithName");
-          const nameValue = nameField ? nameField.value.trim() : "";
 
-          if (iconImg) {
-            const s = previewState[isCrest ? "crest" : "faith"];
-            const dWidth = iconImg.width * s.scale;
-            const dHeight = iconImg.height * s.scale;
-            const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
-              resizeWidth: Math.round(dWidth),
-              resizeHeight: Math.round(dHeight),
-              resizeQuality: "high"
-            });
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = Math.round(dWidth);
-            tempCanvas.height = Math.round(dHeight);
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCtx.drawImage(bmp, 0, 0);
-            applySharpen(tempCtx, tempCanvas.width, tempCanvas.height, 0.25);
+          if (isCrest || isFaith) {
+            const iconImg = isCrest ? crestArt : faithArt;
+            const nameField = document.getElementById(isCrest ? "crestName" : "faithName");
+            const nameValue = nameField ? nameField.value.trim() : "";
 
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
-            ctx.closePath();
-            ctx.clip();
-            ctx.drawImage(tempCanvas, iconX + s.tx, iconY + s.ty);
-            ctx.restore();
-            bmp.close();
-          }
-          
-          const defaultName = isCrest ? "Crest" : "Faith";
-          const displayName = nameValue || defaultName;
-          if (displayName) {
-            ctx.save();
-            ctx.fillStyle = "#f3d87d";
-            ctx.shadowColor = "black";
-            ctx.shadowBlur = 4;
-            drawTextWithHyphenSwap(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10, 33, "left");
-            ctx.restore();
-          }
-          else {
+            if (iconImg) {
+              const s = previewState[isCrest ? "crest" : "faith"];
+              const dWidth = iconImg.width * s.scale;
+              const dHeight = iconImg.height * s.scale;
+              const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
+                resizeWidth: Math.round(dWidth),
+                resizeHeight: Math.round(dHeight),
+                resizeQuality: "high"
+              });
+              const tempCanvas = document.createElement('canvas');
+              tempCanvas.width = Math.round(dWidth);
+              tempCanvas.height = Math.round(dHeight);
+              const tempCtx = tempCanvas.getContext('2d');
+              tempCtx.drawImage(bmp, 0, 0);
+              applySharpen(tempCtx, tempCanvas.width, tempCanvas.height, 0.25);
+
+              ctx.save();
+              ctx.beginPath();
+              ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
+              ctx.closePath();
+              ctx.clip();
+              ctx.drawImage(tempCanvas, iconX + s.tx, iconY + s.ty);
+              ctx.restore();
+              bmp.close();
+            }
+
+            const defaultName = isCrest ? "Crest" : "Faith";
+            const displayName = nameValue || defaultName;
+            if (displayName) {
+              ctx.save();
+              ctx.fillStyle = "#f3d87d";
+              ctx.shadowColor = "black";
+              ctx.shadowBlur = 4;
+              drawTextWithHyphenSwap(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10, 33, "left");
+              ctx.restore();
+            }
+          } else {
              const costField = document.getElementById(isAccelerate ? "accelerateCost" : "crystallizeCost");
              const costVal = costField ? costField.value : "1";
              const displayName = (isAccelerate ? "Accelerate " : "Crystallize ") + costVal;
@@ -1553,8 +1556,7 @@ function openWorkshopModal(index) {
     container.appendChild(p);
   }
 
-  // 5. Render Crest / Faith (New Sub-box Structure)
-  // Helper to create the sub-box
+  // 5. Render Extras (New Sub-box Structure)
   const createSubBox = (type, name, text) => {
     const wrapper = document.createElement("div");
     wrapper.className = "sv-sub-box";
@@ -1562,16 +1564,17 @@ function openWorkshopModal(index) {
     const header = document.createElement("div");
     header.className = "sv-sub-header";
 
-    // Icon
-    const img = document.createElement("img");
-    img.src = `assets/misc/${type.toLowerCase()}.png`; // Expects 'crest.png' or 'faith.png'
-    img.alt = type;
+    if (type !== "Accelerate" && type !== "Crystallize") {
+        const img = document.createElement("img");
+        img.src = `assets/misc/${type.toLowerCase()}.png`; // Expects 'crest.png' or 'faith.png'
+        img.alt = type;
+        header.appendChild(img);
+    }
     
     // Title
     const titleSpan = document.createElement("span");
     titleSpan.textContent = name || type; // Use custom name or default to Type (Crest/Faith)
 
-    header.appendChild(img);
     header.appendChild(titleSpan);
 
     const content = document.createElement("div");
@@ -1590,11 +1593,9 @@ function openWorkshopModal(index) {
   if (hasCrystallize) {
     container.appendChild(createSubBox("Crystallize", "Crystallize " + (card.costs?.crystallize || "1"), card.text.crystallize));
   }
-
   if (hasCrest) {
     container.appendChild(createSubBox("Crest", card.names.crest, card.text.crest));
   }
-
   if (hasFaith) {
     container.appendChild(createSubBox("Faith", card.names.faith, card.text.faith));
   }
@@ -1866,11 +1867,3 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
-
-
-
-
-
-
-
-
