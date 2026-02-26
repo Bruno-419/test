@@ -751,18 +751,18 @@ async function drawCard() {
              const labelText = isAccelerate ? "Accelerate" : "Crystallize";
              
              ctx.save();
-             ctx.fillStyle = "#f3d87d";
              ctx.shadowColor = "black";
              ctx.shadowBlur = 4;
 
              // Draw the custom cost number
-             ctx.font = "28px 'Sv_numbers'";
              ctx.fillStyle = "#efeee9";
+             ctx.font = "28px 'Sv_numbers'";
              ctx.textAlign = "center";
-             ctx.fillText(costVal, 846, iconY + ICON_H / 2 + 10);
+             ctx.fillText(costVal, 850, iconY + ICON_H / 2 + 10);
 
              // Draw the Accelerate/Crystallize label
-             drawTextWithHyphenSwap(labelText, 891, iconY + ICON_H / 2 + 10, 33, "left");
+             ctx.fillStyle = "#f3d87d";
+             drawTextWithHyphenSwap(labelText, 895, iconY + ICON_H / 2 + 10, 33, "left");
              ctx.restore();
           }
         }
@@ -1873,6 +1873,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
