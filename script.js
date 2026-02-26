@@ -757,8 +757,9 @@ async function drawCard() {
 
              // Draw the custom cost number
              ctx.font = "28px 'Sv_numbers'";
+             ctx.fillStyle = "#efeee9";
              ctx.textAlign = "center";
-             ctx.fillText(costVal, 843, iconY + ICON_H / 2 + 10);
+             ctx.fillText(costVal, 846, iconY + ICON_H / 2 + 10);
 
              // Draw the Accelerate/Crystallize label
              drawTextWithHyphenSwap(labelText, 891, iconY + ICON_H / 2 + 10, 33, "left");
@@ -1872,5 +1873,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
