@@ -1027,6 +1027,8 @@ if (artInput) {
     }
     try {
       const img = await loadImageFromFile(file);
+      
+      // Update Main Art
       previewState.main.img = img;
       fitImageToMask(img, previewState.main);
       if (mainZoomSlider) {
@@ -1037,6 +1039,31 @@ if (artInput) {
         mainZoomSlider.step = (max - min) / 100;
         mainZoomSlider.value = previewState.main.scale;
       }
+
+      // Automatically update Crest Art
+      previewState.crest.img = img;
+      fitImageToMask(img, previewState.crest);
+      if (crestZoomSlider) {
+        const min = previewState.crest.minScale;
+        const max = min * 8; 
+        crestZoomSlider.min = min;
+        crestZoomSlider.max = max;
+        crestZoomSlider.step = (max - min) / 100;
+        crestZoomSlider.value = previewState.crest.scale;
+      }
+
+      // Automatically update Faith Art
+      previewState.faith.img = img;
+      fitImageToMask(img, previewState.faith);
+      if (faithZoomSlider) {
+        const min = previewState.faith.minScale;
+        const max = min * 8; 
+        faithZoomSlider.min = min;
+        faithZoomSlider.max = max;
+        faithZoomSlider.step = (max - min) / 100;
+        faithZoomSlider.value = previewState.faith.scale;
+      }
+
       updateAll();
     } catch (err) {
       console.error("Failed to load main art:", err);
@@ -1872,6 +1899,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
