@@ -573,7 +573,6 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
 
 .adorned-accelerate input[type="number"], 
 .adorned-crystallize input[type="number"] {
-  border-left: 3px solid #3CB371;
   box-shadow: none;
 }
 
@@ -1501,4 +1500,5 @@ body {
   min-height: 80px;
   resize: vertical;
 }
+
 
