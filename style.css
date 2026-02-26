@@ -459,6 +459,38 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
 
 /*——————COLOR THINGS———————— */
 
+/* Custom focus states for the colored inputs */
+
+#cardName:focus, #cardTrait:focus, #illustratorName:focus {
+  border-color: #20B2AA;
+  box-shadow: inset 0 0 0 1px rgba(0, 255, 183, 0.15), 0 0 5px rgba(0, 255, 183, 0.4);
+}
+
+#costValue:focus {
+  border-color: #3CB371;
+  box-shadow: inset 0 0 0 1px rgba(0, 255, 38, 0.15), 0 0 5px rgba(0, 255, 38, 0.4);
+}
+
+#attackValue:focus {
+  border-color: #1E90FF;
+  box-shadow: inset 0 0 0 1px rgba(0, 145, 255, 0.15), 0 0 5px rgba(0, 145, 255, 0.4);
+}
+
+#defenseValue:focus {
+  border-color: #DC143C;
+  box-shadow: inset 0 0 0 1px rgba(255, 0, 0, 0.15), 0 0 5px rgba(255, 0, 0, 0.4);
+}
+
+#evolveText:focus {
+  border-color: #d6a629;
+  box-shadow: inset 0 0 0 1px rgba(255, 215, 0, 0.15), 0 0 5px rgba(255, 215, 0, 0.4);
+}
+
+#superEvolveText:focus {
+  border-color: #8229d6;
+  box-shadow: inset 0 0 0 1px rgba(255, 0, 255, 0.15), 0 0 5px rgba(255, 0, 255, 0.4);
+}
+
 #cardName, #cardTrait, #illustratorName {
   position: relative;
   border-left: 6px solid #20B2AA; 
@@ -1513,6 +1545,7 @@ body {
   min-height: 80px;
   resize: vertical;
 }
+
 
 
 
