@@ -388,7 +388,8 @@ async function calculateTextBlockHeight(key, startY) {
       boxHeight = topHeight + middleHeight + bottomHeight + stretchAmount;
   }
 
-  return Math.max(boxHeight, totalHeight + 40);
+  const specialOffset = (key === "crest" || key === "faith" || key === "accelerate" || key === "crystallize") ? 90 : 0;
+  return Math.max(boxHeight, totalHeight + specialOffset + 40);
 }
 
 // --- drawTextBlock ---
@@ -1899,6 +1900,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
