@@ -758,7 +758,7 @@ async function drawCard() {
              ctx.fillStyle = "#efeee9";
              ctx.font = "28px 'Sv_numbers'";
              ctx.textAlign = "center";
-             ctx.fillText(costVal, 850, iconY + ICON_H / 2 + 10);
+             ctx.fillText(costVal, 850, iconY + ICON_H / 2 + 12);
 
              // Draw the Accelerate/Crystallize label
              ctx.fillStyle = "#f3d87d";
@@ -1873,6 +1873,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
