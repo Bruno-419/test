@@ -575,12 +575,12 @@ async function drawTextBlock(key, box, x, startY) {
 async function drawCard() {
   const textOrder = [
     { key: "card", box: null },
-    { key: "accelerate", box: "accelerate" },
-    { key: "crystallize", box: "crystallize" },
     { key: "evolve", box: "evolve" },
     { key: "superEvolve", box: "superEvolve" },
     { key: "crest", box: "crest" },
-    { key: "faith", box: "faith" }
+    { key: "faith", box: "faith" },
+    { key: "accelerate", box: "accelerate" },
+    { key: "crystallize", box: "crystallize" }
   ];
   const boxX = 768;
   const startY = 246;
@@ -1872,6 +1872,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
