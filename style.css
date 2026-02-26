@@ -309,7 +309,20 @@ input[type="text"], input[type="number"], select, textarea {
   padding: 8px 10px;
   border-radius: 6px;
   font-size: 15px;
+  /* Added properties for smooth animation and removing default browser outlines */
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
+
+/* New focus state block mimicking the search bar */
+input[type="text"]:focus, 
+input[type="number"]:focus, 
+select:focus, 
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 5px rgba(42, 164, 138, 0.4);
+}
+
 textarea { min-height: 70px; resize: none; overflow-y: hidden; }
 
 .stat-row {
@@ -1500,6 +1513,7 @@ body {
   min-height: 80px;
   resize: vertical;
 }
+
 
 
 
