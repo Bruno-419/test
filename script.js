@@ -675,14 +675,24 @@ async function drawCard() {
       const dynamicBoxWidth = mainBoxImg.width;
       const dynamicBoxHeight = mainBoxImg.height + stretchPixels; 
 
+      // Inset the blur to prevent it from hanging off the transparent edges of the box image
+      const insetX = 8;
+      const insetY = 8;
+      const blurX = textBoxX + insetX;
+      const blurY = textBoxY + insetY;
+      const blurWidth = dynamicBoxWidth - (insetX * 2);
+      const blurHeight = dynamicBoxHeight - (insetY * 2);
+
       const offCanvas = document.createElement("canvas");
-      offCanvas.width = dynamicBoxWidth;
-      offCanvas.height = dynamicBoxHeight;
+      offCanvas.width = blurWidth;
+      offCanvas.height = blurHeight;
       const offCtx = offCanvas.getContext("2d");
-      offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
+          
+      // Draw and blur the inset area
+      offCtx.drawImage(canvas, blurX, blurY, blurWidth, blurHeight, 0, 0, blurWidth, blurHeight);
       offCtx.filter = "blur(5px)";
       offCtx.drawImage(offCanvas, 0, 0);
-      ctx.drawImage(offCanvas, textBoxX, textBoxY);
+      ctx.drawImage(offCanvas, blurX, blurY);
 
       drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
       
@@ -1899,6 +1909,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
