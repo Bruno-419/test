@@ -677,8 +677,8 @@ async function drawCard() {
       const dynamicBoxHeight = mainBoxImg.height + stretchPixels; 
 
       const offCanvas = document.createElement("canvas");
-      offCanvas.width = dynamicBoxWidth;
-      offCanvas.height = dynamicBoxHeight;
+      offCanvas.width = dynamicBoxWidth - 18;
+      offCanvas.height = dynamicBoxHeight - 22;
       const offCtx = offCanvas.getContext("2d");
       offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
       offCtx.filter = "blur(5px)";
@@ -1900,6 +1900,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
