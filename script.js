@@ -680,29 +680,11 @@ async function drawCard() {
       offCanvas.width = dynamicBoxWidth;
       offCanvas.height = dynamicBoxHeight;
       const offCtx = offCanvas.getContext("2d");
-      
-      // 1. Grab the background
       offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
-      
-      // 2. Blur it
       offCtx.filter = "blur(5px)";
       offCtx.drawImage(offCanvas, 0, 0);
-      
-      // 3. Mask the blur to the exact shape of the text box
-      offCtx.filter = "none";
-      offCtx.globalCompositeOperation = "destination-in";
-      
-      const topH = 60;
-      const bottomH = 120;
-      const midH = mainBoxImg.height - topH - bottomH;
-      const sAmt = stretchCount * 50;
-      
-      offCtx.drawImage(mainBoxImg, 0, 0, mainBoxImg.width, topH, 0, 0, mainBoxImg.width, topH);
-      offCtx.drawImage(mainBoxImg, 0, topH, mainBoxImg.width, midH, 0, topH, mainBoxImg.width, midH + sAmt);
-      offCtx.drawImage(mainBoxImg, 0, mainBoxImg.height - bottomH, mainBoxImg.width, bottomH, 0, topH + midH + sAmt, mainBoxImg.width, bottomH);
-      
-      // 4. Draw the perfectly masked frosted glass, then draw the box on top
       ctx.drawImage(offCanvas, textBoxX, textBoxY);
+
       drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
       
       let currentY = startY;
@@ -1918,6 +1900,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
