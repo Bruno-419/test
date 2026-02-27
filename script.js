@@ -683,7 +683,7 @@ async function drawCard() {
       offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
       offCtx.filter = "blur(5px)";
       offCtx.drawImage(offCanvas, 0, 0);
-      ctx.drawImage(offCanvas, textBoxX, textBoxY);
+      ctx.drawImage(offCanvas, textBoxX + 9, textBoxY + 11);
 
       drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
       
@@ -1900,6 +1900,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
