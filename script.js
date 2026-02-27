@@ -633,7 +633,7 @@ async function drawCard() {
 
   if (!saveCardOnly) {
       const bg = await getImage(assets.backgrounds[classSelect.value]);
-      const slicePointY = 1000;
+      const slicePointY = 200;
       const topHeight = Math.min(slicePointY, bg.height);
       const bottomPartHeight = bg.height - topHeight;
       ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
@@ -1900,6 +1900,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
