@@ -450,15 +450,25 @@
     const statExtraFields = document.getElementById('statExtraFields');
     const evolveTextField = document.getElementById('evolveTextField');
     const superEvolveTextField = document.getElementById('superEvolveTextField');
+    const accelerateSection = document.querySelector('.accelerate-section');
+    const crystallizeSection = document.querySelector('.crystallize-section');
 
     function toggleFieldVisibility() {
       const typeValue = cardTypeSelect.value.toLowerCase();
       const isFollower = (typeValue === 'follower');
       const isAmulet = (typeValue === 'amulet');
+      const isSpell = (typeValue === 'spell');
       statExtraFields.style.visibility = isFollower ? 'visible' : 'hidden';
       evolveTextField.style.display = isFollower ? 'block' : 'none';
       superEvolveTextField.style.display = isFollower ? 'block' : 'none';
 
+      if (accelerateSection) {
+        accelerateSection.style.display = isSpell ? 'none' : '';
+      }
+      if (crystallizeSection) {
+        crystallizeSection.style.display = isAmulet ? 'none' : '';
+      }
+      
       let signatureOption = null;
       for (const option of cardRaritySelect.options) {
         if (option.value === "Signature") {
@@ -484,6 +494,7 @@
   </script>
 </body>
 </html>
+
 
 
 
