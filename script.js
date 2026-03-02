@@ -607,7 +607,7 @@ async function drawCard() {
       const defaultStretchThreshold = 900;
       const bottomBarStretchThreshold = 825;
       const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
-      stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
+      stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold + 150);
   }
 
   const stretchCount = stretchPixels / 50;
@@ -1900,6 +1900,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
