@@ -590,8 +590,15 @@ async function drawCard() {
   const isFollower = (currentCardType === 'follower');
   const saveCardOnly = saveCardOnlyCheckbox.checked; 
 
-  let stretchPixels = 0;
-  
+  let textStretchPixels = 0;
+  let bgStretchPixels = 0;
+
+  // We fetch the mainBoxImg earlier so we can use its height in the stretch calculations
+  const illustrator = document.getElementById("illustratorName").value.trim();
+  const showBottomBar = wordCountCheckbox.checked || illustrator;
+  const boxAsset = showBottomBar ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
+  const mainBoxImg = await getImage(boxAsset);
+
   if (!saveCardOnly) {
       let calculatedTotalY = startY;
       for (const { key } of textOrder) {
@@ -602,22 +609,32 @@ async function drawCard() {
           const blockHeight = await calculateTextBlockHeight(key); 
           calculatedTotalY += blockHeight - 10;
       }
-      const illustrator = document.getElementById("illustratorName").value.trim();
-      const showBottomBar = wordCountCheckbox.checked || illustrator;
+
       const defaultStretchThreshold = 900;
       const bottomBarStretchThreshold = 825;
       const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
-      stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
+      
+      // Calculate how much the text box needs to stretch to fit the text
+      textStretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
+
+      // Calculate the absolute bottom Y coordinate of the stretched text box
+      let currentBottomY = 206 + mainBoxImg.height + textStretchPixels;
+      
+      // Account for the "token card" text
+      if (tokenCheckbox.checked) {
+          currentBottomY += 35; 
+      }
+      
+      // Only stretch the background canvas if it exceeds the 1050 threshold
+      bgStretchPixels = Math.max(0, currentBottomY - 1050);
   }
 
-  const stretchCount = stretchPixels / 50;
-  const boxAsset = (wordCountCheckbox.checked || document.getElementById("illustratorName").value.trim()) ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
-  const mainBoxImg = await getImage(boxAsset);
+  const stretchCount = textStretchPixels / 50;
   
   const baseHeight = 1080; 
   const baseWidth = 1920;
   const newWidth = saveCardOnly ? 729 : baseWidth;
-  const newHeight = saveCardOnly ? 882 : (baseHeight + stretchPixels);
+  const newHeight = saveCardOnly ? 882 : (baseHeight + bgStretchPixels);
 
   if (canvas.height !== newHeight) canvas.height = newHeight;
   if (canvas.width !== newWidth) canvas.width = newWidth;
@@ -630,7 +647,7 @@ async function drawCard() {
   if (saveCardOnly) {
     ctx.translate(-48, -153);
   }
-
+  
   if (!saveCardOnly) {
       const bg = await getImage(assets.backgrounds[classSelect.value]);
       const slicePointY = 200;
@@ -638,7 +655,7 @@ async function drawCard() {
       const bottomPartHeight = bg.height - topHeight;
       ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
       if (bottomPartHeight > 0) {
-        const newBottomHeight = bottomPartHeight + stretchPixels;
+        const newBottomHeight = bottomPartHeight + bgStretchPixels;
         ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
       }
   }
@@ -674,7 +691,7 @@ async function drawCard() {
       const textBoxX = 722;
       const textBoxY = 206;
       const dynamicBoxWidth = mainBoxImg.width;
-      const dynamicBoxHeight = mainBoxImg.height + stretchPixels; 
+      const dynamicBoxHeight = mainBoxImg.height + textStretchPixels; 
 
       const offCanvas = document.createElement("canvas");
       offCanvas.width = dynamicBoxWidth - 18;
@@ -820,7 +837,7 @@ async function drawCard() {
       }
 
       const bottomBarBaseY = 911;
-      const dynamicBottomBarY = bottomBarBaseY + stretchPixels;
+      const dynamicBottomBarY = bottomBarBaseY + textStretchPixels;
 
       const illustrator = document.getElementById("illustratorName").value.trim();
       if (illustrator) {
@@ -1900,6 +1917,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
