@@ -638,7 +638,7 @@ async function drawCard() {
       const bottomPartHeight = bg.height - topHeight;
       ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
       if (bottomPartHeight > 0) {
-        const newBottomHeight = bottomPartHeight + stretchPixels + 150;
+        const newBottomHeight = bottomPartHeight + stretchPixels - 150;
         ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
       }
   }
@@ -1900,6 +1900,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
