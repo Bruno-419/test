@@ -833,7 +833,7 @@ async function drawCard() {
       if (tokenCheckbox.checked) {
         ctx.font = "28px 'NotoSans'";
         ctx.textAlign = "right";
-        const tokenY = 1025 + textStretchPixels;
+        const tokenY = 1025 ? textStretchPixels > 0 : 1025 + textStretchPixels;
         ctx.fillText("*This is a token card.", 1788, tokenY);
       }
 
@@ -1918,6 +1918,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
