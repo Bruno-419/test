@@ -616,39 +616,8 @@ async function drawCard() {
   
   const baseHeight = 1080; 
   const baseWidth = 1920;
-
-  // --- Scale-down logic ---
-  // When not saving card-only, compute a scaleFactor so the final canvas never
-  // grows taller than 1080 px.  Instead of stretching, the entire drawing is
-  // scaled down uniformly to fit within the 1080 px boundary.
-  //
-  // Normal mode  : resize kicks in when (baseHeight + stretchPixels) > 1080
-  // Token mode   : resize kicks in when the token text Y-position
-  //                (naturalHeight − 55) exceeds 1080 px, giving the token
-  //                line a little extra room before scaling starts.
-  let scaleFactor = 1;
-  if (!saveCardOnly) {
-    const naturalHeight = baseHeight + stretchPixels;
-    if (tokenCheckbox.checked) {
-      // Token text is drawn at canvas.height − 55; scale when that exceeds 1080
-      const tokenTextY = naturalHeight - 55;
-      if (tokenTextY > 1080) {
-        scaleFactor = 1080 / tokenTextY;
-      }
-    } else {
-      // Standard mode: scale when total content height exceeds 1080 px
-      if (naturalHeight > 1080) {
-        scaleFactor = 1080 / naturalHeight;
-      }
-    }
-  }
-
   const newWidth = saveCardOnly ? 729 : baseWidth;
-  // When scaling is active the canvas stays at exactly the scaled dimensions
-  // (which equals 1080 px tall when scaleFactor = 1080/naturalHeight).
-  const newHeight = saveCardOnly
-    ? 882
-    : Math.round((baseHeight + stretchPixels) * scaleFactor);
+  const newHeight = saveCardOnly ? 882 : (baseHeight + stretchPixels);
 
   if (canvas.height !== newHeight) canvas.height = newHeight;
   if (canvas.width !== newWidth) canvas.width = newWidth;
@@ -660,11 +629,6 @@ async function drawCard() {
   ctx.save();
   if (saveCardOnly) {
     ctx.translate(-48, -153);
-  }
-  // Apply uniform scale-down so all subsequent drawing fits the smaller canvas.
-  // When scaleFactor === 1 this is a no-op.
-  if (scaleFactor !== 1) {
-    ctx.scale(scaleFactor, scaleFactor);
   }
 
   if (!saveCardOnly) {
@@ -1936,3 +1900,19 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
