@@ -606,7 +606,7 @@ async function drawCard() {
       const showBottomBar = wordCountCheckbox.checked || illustrator;
       const defaultStretchThreshold = 900;
       const bottomBarStretchThreshold = 825;
-      const stretchThreshold = tokenCheckbox.checked ? (1080 - 55) : 1080;
+      const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
       stretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
   }
 
@@ -1900,6 +1900,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
