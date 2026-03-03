@@ -318,7 +318,7 @@ async function calculateTextBlockHeight(key, startY) {
     processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
   }
   
-  const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+|-)/g;
+  const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|[^\S\r\n]+|-)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
 
   let totalHeight = lineHeight;
@@ -420,7 +420,7 @@ async function drawTextBlock(key, box, x, startY) {
     processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
   }
 
-  const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|\s+|-)/g;
+  const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|[^\S\r\n]+|-)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
 
   // --- Dry Run (Height Calc) ---
@@ -1919,6 +1919,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
