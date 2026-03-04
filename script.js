@@ -1796,26 +1796,78 @@ async function fetchOfficialCards() {
 }
 
 function parseOfficialCards(fullText) {
-  // Pattern to find "Card Name: ...", "Card ID: ..."
-  // We'll split the file by the "====================..." separators first
   const sections = fullText.split(/={10,}/);
-  
   officialCards = [];
 
   sections.forEach(section => {
-    // Basic extraction
     const nameMatch = section.match(/Card Name:\s*(.+)/);
     const idMatch = section.match(/Card ID:\s*(\d+)/);
     
     if (nameMatch && idMatch) {
-      const name = nameMatch[1].trim();
-      const id = idMatch[1].trim();
-      
-      officialCards.push({ name, id, fullText: section });
+      const card = {
+        name: nameMatch[1].trim(),
+        id: idMatch[1].trim(),
+        fullText: section,
+        text: {}
+      };
+
+      // Extract Stats
+      const costMatch = section.match(/Cost:\s*(-?\d+)/);
+      if (costMatch) card.cost = parseInt(costMatch[1]);
+
+      const attackMatch = section.match(/Attack:\s*(-?\d+)/);
+      if (attackMatch) card.attack = parseInt(attackMatch[1]);
+
+      const defenseMatch = section.match(/Defense:\s*(-?\d+)/);
+      if (defenseMatch) card.defense = parseInt(defenseMatch[1]);
+
+      const traitMatch = section.match(/Trait:\s*(.+)/);
+      if (traitMatch) card.trait = traitMatch[1].trim();
+
+      // Extract Text Section
+      const textSplit = section.split(/-{30,}/);
+      if (textSplit.length > 1) {
+        let rawText = textSplit[1].trim();
+        
+        // Remove stray prompt tags from the data
+        rawText = rawText.replace(/\\s*/g, '');
+
+        // Parse <ev> blocks
+        const evMatch = rawText.match(/<ev>([\s\S]*?)<\/ev>/);
+        if (evMatch) {
+          card.text.evolve = evMatch[1].replace(/^Evolve:\s*/, '').trim();
+          rawText = rawText.replace(/<ev>[\s\S]*?<\/ev>/, '');
+        }
+
+        // Parse <sev> blocks
+        const sevMatch = rawText.match(/<sev>([\s\S]*?)<\/sev>/);
+        if (sevMatch) {
+          card.text.superEvolve = sevMatch[1].replace(/^Super-Evolve:\s*/, '').trim();
+          rawText = rawText.replace(/<sev>[\s\S]*?<\/sev>/, '');
+        }
+
+        // Parse Crest blocks
+        const crestMatch = rawText.match(/Crest\s*<add>([\s\S]*?)<\/add>/);
+        if (crestMatch) {
+          card.text.crest = crestMatch[1].trim();
+          rawText = rawText.replace(/Crest\s*<add>[\s\S]*?<\/add>/, '');
+        }
+
+        // Parse Faith blocks
+        const faithMatch = rawText.match(/Faith\s*<add>([\s\S]*?)<\/add>/);
+        if (faithMatch) {
+          card.text.faith = faithMatch[1].trim();
+          rawText = rawText.replace(/Faith\s*<add>[\s\S]*?<\/add>/, '');
+        }
+
+        // Whatever remains goes into the base card text
+        card.text.card = rawText.replace(/----------/g, '').trim();
+      }
+
+      officialCards.push(card);
     }
   });
 
-  // Sort alphabetically by name
   officialCards.sort((a, b) => a.name.localeCompare(b.name));
   console.log(`Loaded ${officialCards.length} official cards.`);
 }
@@ -1897,9 +1949,9 @@ function populateBalanceForm(card) {
   if (form) form.style.display = 'block';
 
   // Stats
-  document.getElementById('adjCost').value = card.cost || 0;
-  document.getElementById('adjAttack').value = card.attack || 0;
-  document.getElementById('adjDefense').value = card.defense || 0;
+  document.getElementById('adjCost').value = card.cost !== undefined ? card.cost : '';
+  document.getElementById('adjAttack').value = card.attack !== undefined ? card.attack : '';
+  document.getElementById('adjDefense').value = card.defense !== undefined ? card.defense : '';
 
   // Trait
   document.getElementById('adjTrait').value = (card.trait === '-' ? '' : card.trait) || '';
@@ -1919,6 +1971,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
+
 
 
 
