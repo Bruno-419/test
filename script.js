@@ -1808,7 +1808,8 @@ function parseOfficialCards(fullText) {
         name: nameMatch[1].trim(),
         id: idMatch[1].trim(),
         fullText: section,
-        text: {}
+        text: {},
+        costs: {} // Initialize for Accelerate/Crystallize
       };
 
       // Extract Stats
@@ -1829,20 +1830,20 @@ function parseOfficialCards(fullText) {
       if (textSplit.length > 1) {
         let rawText = textSplit[1].trim();
         
-        // Remove stray prompt tags from the data
+        // Clean stray tags from txt file
         rawText = rawText.replace(/\\s*/g, '');
 
-        // Parse <ev> blocks
+        // Parse <ev> blocks (Keep the 'Evolve:' string!)
         const evMatch = rawText.match(/<ev>([\s\S]*?)<\/ev>/);
         if (evMatch) {
-          card.text.evolve = evMatch[1].replace(/^Evolve:\s*/, '').trim();
+          card.text.evolve = evMatch[1].trim(); 
           rawText = rawText.replace(/<ev>[\s\S]*?<\/ev>/, '');
         }
 
-        // Parse <sev> blocks
+        // Parse <sev> blocks (Keep the 'Super-Evolve:' string!)
         const sevMatch = rawText.match(/<sev>([\s\S]*?)<\/sev>/);
         if (sevMatch) {
-          card.text.superEvolve = sevMatch[1].replace(/^Super-Evolve:\s*/, '').trim();
+          card.text.superEvolve = sevMatch[1].trim(); 
           rawText = rawText.replace(/<sev>[\s\S]*?<\/sev>/, '');
         }
 
@@ -1860,8 +1861,29 @@ function parseOfficialCards(fullText) {
           rawText = rawText.replace(/Faith\s*<add>[\s\S]*?<\/add>/, '');
         }
 
-        // Whatever remains goes into the base card text
-        card.text.card = rawText.replace(/----------/g, '').trim();
+        // Parse Accelerate blocks
+        const accMatch = rawText.match(/\((\d+)\)\s*Accelerate\s*<add>([\s\S]*?)<\/add>/);
+        if (accMatch) {
+          card.costs.accelerate = accMatch[1];
+          card.text.accelerate = accMatch[2].trim();
+          rawText = rawText.replace(/\(\d+\)\s*Accelerate\s*<add>[\s\S]*?<\/add>/, '');
+        }
+
+        // Parse Crystallize blocks
+        const cryMatch = rawText.match(/\((\d+)\)\s*Crystallize\s*<add>([\s\S]*?)<\/add>/);
+        if (cryMatch) {
+          card.costs.crystallize = cryMatch[1];
+          card.text.crystallize = cryMatch[2].trim();
+          rawText = rawText.replace(/\(\d+\)\s*Crystallize\s*<add>[\s\S]*?<\/add>/, '');
+        }
+
+        // Clean up trailing ---------- left over after extracting Evolve/Super-Evolve
+        rawText = rawText.trim();
+        if (rawText.endsWith('----------')) {
+            rawText = rawText.slice(0, -10).trim();
+        }
+
+        card.text.card = rawText;
       }
 
       officialCards.push(card);
@@ -1962,6 +1984,13 @@ function populateBalanceForm(card) {
   document.getElementById('adjSuperEvolveText').value = card.text.superEvolve || '';
   document.getElementById('adjCrestText').value = card.text.crest || '';
   document.getElementById('adjFaithText').value = card.text.faith || '';
+
+  // Accelerate / Crystallize Fields
+  document.getElementById('adjAccelerateCost').value = card.costs && card.costs.accelerate ? card.costs.accelerate : '';
+  document.getElementById('adjAccelerateText').value = card.text.accelerate || '';
+  
+  document.getElementById('adjCrystallizeCost').value = card.costs && card.costs.crystallize ? card.costs.crystallize : '';
+  document.getElementById('adjCrystallizeText').value = card.text.crystallize || '';
 }
 
 // Initialize Search on Load
