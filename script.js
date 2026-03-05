@@ -2088,6 +2088,44 @@ async function drawBalanceCard() {
 
   ctx.restore(); // End of 81% scaling block
 
+  // --- NEW: Draw Card Name, Class, and Emblem ---
+  ctx.save();
+  ctx.font = "40px 'Memento'";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#efeee9"; // Shadowverse default text color
+  ctx.shadowColor = "black";
+  ctx.shadowBlur = 4;
+
+  // Retrieve the selected official card data
+  const searchName = document.getElementById("balanceSearchInput").value.trim();
+  const selectedCard = officialCards.find(c => c.name === searchName);
+  const cardNameText = selectedCard ? selectedCard.name : (searchName || "Unnamed Card");
+  const displayClass = selectedCard ? selectedCard.class : "Neutral";
+
+  // Draw the Card Name
+  ctx.fillText(cardNameText, 233, 947);
+
+  // Draw the Class
+  ctx.fillText(displayClass, 398, 892);
+
+  // Draw the Emblem Image
+  // Automatically loads the emblem based on the class (e.g., assets/emblems/emblem_Forestcraft.png)
+  const emblemImg = await getImage(`assets/emblems/emblem_${displayClass}.png`).catch(() => null);
+  
+  if (emblemImg) {
+    // Calculate placement to dynamically sit to the left of the centered Class text
+    const textWidth = ctx.measureText(displayClass).width;
+    const emblemSize = 44; // You can adjust this based on your actual emblem dimensions
+    const padding = 10;
+    
+    const emblemX = 398 - (textWidth / 2) - emblemSize - padding;
+    const emblemY = 863;
+    
+    ctx.drawImage(emblemImg, emblemX, emblemY, emblemSize, emblemSize);
+  }
+  
+  ctx.restore();
+
   // 3. Draw the two Text Boxes
   if (textChangeImg) {
     const boxX = 721; // Standard X coordinate for right-side text boxes
@@ -2166,6 +2204,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
