@@ -2006,80 +2006,106 @@ document.addEventListener("DOMContentLoaded", () => {
 // BALANCE ADJUSTMENTS GENERATION
 // ------------------------------------
 
-async function generateBalanceCard() {
-    // 1. Snapshot the current global state of the main form & assets
-    const state = {
-        bg: assets.backgrounds[classSelect.value],
-        box: assets.boxes.text_box,
-        boxNoBottom: assets.boxes.text_box_no_bottom,
-        cost: costInput.value,
-        attack: attackInput.value,
-        defense: defenseInput.value,
-        trait: traitInput.value,
-        name: nameInput.value,
-        card: textInputs.card.value,
-        evolve: textInputs.evolve.value,
-        superEvolve: textInputs.superEvolve.value,
-        crest: textInputs.crest.value,
-        faith: textInputs.faith.value,
-        accelerate: textInputs.accelerate.value,
-        crystallize: textInputs.crystallize.value,
-        accCost: document.getElementById("accelerateCost")?.value,
-        crysCost: document.getElementById("crystallizeCost")?.value,
-        saveOnly: saveCardOnlyCheckbox.checked
-    };
+async function drawBalanceCard() {
+  // Set fixed dimensions for the balance card canvas
+  const newWidth = 1920;
+  const newHeight = 1080; // You can dynamically adjust this later if the 2nd box pushes past the bottom
+  
+  if (canvas.width !== newWidth) canvas.width = newWidth;
+  if (canvas.height !== newHeight) canvas.height = newHeight;
 
-    // 2. Temporarily inject Balance adjustments and Assets
-    assets.backgrounds[classSelect.value] = "assets/backgrounds/balance_changes.png";
-    assets.boxes.text_box = "assets/boxes/text_change.png";
-    assets.boxes.text_box_no_bottom = "assets/boxes/text_change.png";
-    
-    costInput.value = document.getElementById("adjCost").value;
-    attackInput.value = document.getElementById("adjAttack").value;
-    defenseInput.value = document.getElementById("adjDefense").value;
-    traitInput.value = document.getElementById("adjTrait").value;
-    nameInput.value = document.getElementById("balanceSearchInput").value || "Balance Adjustment";
-    
-    textInputs.card.value = document.getElementById("adjCardText").value;
-    textInputs.evolve.value = document.getElementById("adjEvolveText").value;
-    textInputs.superEvolve.value = document.getElementById("adjSuperEvolveText").value;
-    textInputs.crest.value = document.getElementById("adjCrestText").value;
-    textInputs.faith.value = document.getElementById("adjFaithText").value;
-    textInputs.accelerate.value = document.getElementById("adjAccelerateText").value;
-    textInputs.crystallize.value = document.getElementById("adjCrystallizeText").value;
-    
-    const adjAccCost = document.getElementById("adjAccelerateCost");
-    if (adjAccCost && document.getElementById("accelerateCost")) document.getElementById("accelerateCost").value = adjAccCost.value;
-    const adjCrysCost = document.getElementById("adjCrystallizeCost");
-    if (adjCrysCost && document.getElementById("crystallizeCost")) document.getElementById("crystallizeCost").value = adjCrysCost.value;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
 
-    // Force background render regardless of user's main checkbox toggle state
-    saveCardOnlyCheckbox.checked = false; 
+  // Load specific balance assets
+  // Note: Using a fallback color/error handling just in case the images haven't been added yet
+  const bgImg = await getImage("assets/backgrounds/balance_changes.png").catch(() => null);
+  const textChangeImg = await getImage("assets/boxes/text_change.png").catch(() => null);
 
-    // 3. Draw using the primary canvas logic
-    await drawCard();
+  // 1. Draw Background
+  if (bgImg) {
+    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+  } else {
+    ctx.fillStyle = "#1a1a1a";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
 
-    // 4. Restore everything back to its original state seamlessly
-    assets.backgrounds[classSelect.value] = state.bg;
-    assets.boxes.text_box = state.box;
-    assets.boxes.text_box_no_bottom = state.boxNoBottom;
+  // 2. Draw Card Image Scaled to 81%
+  ctx.save();
+  ctx.scale(0.81, 0.81);
+
+  // Fetch standard card assets based on form state
+  const currentClass = document.getElementById("cardClass").value || "Neutral";
+  const currentType = document.getElementById("cardType").value.toLowerCase() || "follower";
+  const currentRarity = document.getElementById("cardRarity").value.toLowerCase() || "legendary";
+  
+  const framePath = assets[currentType][["bronze", "silver", "gold", "legendary", "signature"].indexOf(currentRarity)] || assets.follower[3];
+  
+  const [frame, gem] = await Promise.all([
+    getImage(framePath),
+    getImage(assets.gems[currentClass] || assets.gems.Neutral)
+  ]);
+
+  // Draw uploaded art if it exists
+  if (uploadedArt) {
+    const s = previewState.main;
+    const dWidth = uploadedArt.width * s.scale;
+    const dHeight = uploadedArt.height * s.scale;
+    const bmp = await createImageBitmap(uploadedArt, 0, 0, uploadedArt.width, uploadedArt.height, {
+      resizeWidth: Math.round(dWidth),
+      resizeHeight: Math.round(dHeight),
+      resizeQuality: "high" 
+    });
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(MAIN_ART_X, MAIN_ART_Y, MAIN_MASK_W, MAIN_MASK_H);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(bmp, MAIN_ART_X + s.tx, MAIN_ART_Y + s.ty);
+    ctx.restore();
+    bmp.close();
+  }
+
+  // Draw standard frame and gem
+  if (frame) ctx.drawImage(frame, 48, 153);
+  if (gem) ctx.drawImage(gem, 398, 863);
+
+  // Draw Stats using the adjustment inputs
+  ctx.fillStyle = "#efeee9";
+  ctx.shadowColor = "black";
+  ctx.shadowBlur = 4;
+  
+  const costVal = document.getElementById('adjCost').value || document.getElementById('costValue').value;
+  drawScaledNumber(costVal, 197, 335, 80, 95, 'Sv_numbers', -5, -0.2);
+
+  if (currentType === "follower") {
+    const atkVal = document.getElementById('adjAttack').value || document.getElementById('attackValue').value;
+    const defVal = document.getElementById('adjDefense').value || document.getElementById('defenseValue').value;
+    drawScaledNumber(atkVal, 201, 922, 82, 90, 'Sv_numbers', -5, -0.2);
+    drawScaledNumber(defVal, 642, 917, 82, 90, 'Sv_numbers', -5, -0.2);
+  }
+
+  ctx.restore(); // End of 81% scaling block
+
+  // 3. Draw the two Text Boxes
+  if (textChangeImg) {
+    const boxX = 722; // Standard X coordinate for right-side text boxes
+    const box1Y = 206; // Starting Y coordinate
     
-    costInput.value = state.cost;
-    attackInput.value = state.attack;
-    defenseInput.value = state.defense;
-    traitInput.value = state.trait;
-    nameInput.value = state.name;
-    textInputs.card.value = state.card;
-    textInputs.evolve.value = state.evolve;
-    textInputs.superEvolve.value = state.superEvolve;
-    textInputs.crest.value = state.crest;
-    textInputs.faith.value = state.faith;
-    textInputs.accelerate.value = state.accelerate;
-    textInputs.crystallize.value = state.crystallize;
+    // Draw Box 1 (e.g., for 'Before' text)
+    ctx.drawImage(textChangeImg, boxX, box1Y);
     
-    if (document.getElementById("accelerateCost")) document.getElementById("accelerateCost").value = state.accCost;
-    if (document.getElementById("crystallizeCost")) document.getElementById("crystallizeCost").value = state.crysCost;
-    saveCardOnlyCheckbox.checked = state.saveOnly;
+    // Draw Box 2 exactly 33 pixels below Box 1 (e.g., for 'After' text)
+    const box2Y = box1Y + textChangeImg.height + 33;
+    ctx.drawImage(textChangeImg, boxX, box2Y);
+
+    /* TODO: Implement your text drawing logic here for both boxes. 
+      You can map 'adjCardText.value' or official card original text to these boxes 
+      using your existing drawTextWithHyphenSwap or drawTextBlock functions, 
+      adjusting the starting Y values to match box1Y and box2Y.
+    */
+  }
 }
 
 // ------------------------------------
@@ -2087,77 +2113,59 @@ async function generateBalanceCard() {
 // ------------------------------------
 
 document.getElementById("balancePreviewBtn").addEventListener("click", async () => {
-    const btn = document.getElementById("balancePreviewBtn");
-    const originalText = btn.textContent;
-    btn.textContent = "Loading...";
-    btn.disabled = true;
+  const btn = document.getElementById("balancePreviewBtn");
+  const originalText = btn.textContent;
+  btn.textContent = "Loading...";
+  btn.disabled = true;
 
-    try {
-        await document.fonts.ready;
-        await generateBalanceCard();
-        
-        const dataUrl = canvas.toDataURL("image/png", 1.0);
-        const previewWindow = window.open("");
-        
-        if (previewWindow) {
-            const cardTitle = document.getElementById("balanceSearchInput").value.trim() || "balance-preview";
-            previewWindow.document.title = cardTitle;
-            previewWindow.document.body.style.margin = "0";
-            previewWindow.document.body.style.backgroundColor = "#222";
-            previewWindow.document.body.innerHTML = `<img src="${dataUrl}" alt="Card Preview" style="max-width: 100%; height: auto; display: block; margin: auto;">`;
-        } else {
-            alert("Pop-up blocked! Please allow pop-ups for this site to use the preview feature.");
-        }
-    } catch (err) {
-        console.error("Balance preview failed:", err);
-        alert("Error: Could not generate balance preview. Try again.");
-    } finally {
-        btn.textContent = originalText;
-        btn.disabled = false;
-    }
+  try {
+      await document.fonts.ready;
+      await drawBalanceCard(); // Call the dedicated balance drawing function
+      
+      const dataUrl = canvas.toDataURL("image/png", 1.0);
+      const previewWindow = window.open("");
+      
+      if (previewWindow) {
+          const cardTitle = document.getElementById("balanceSearchInput").value.trim() || "balance-preview";
+          previewWindow.document.title = cardTitle;
+          previewWindow.document.body.style.margin = "0";
+          previewWindow.document.body.style.backgroundColor = "#222";
+          previewWindow.document.body.innerHTML = `<img src="${dataUrl}" alt="Card Preview" style="max-width: 100%; height: auto; display: block; margin: auto;">`;
+      } else {
+          alert("Pop-up blocked! Please allow pop-ups for this site to use the preview feature.");
+      }
+  } catch (err) {
+      console.error("Balance preview failed:", err);
+      alert("Error: Could not generate balance preview. Try again.");
+  } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
+  }
 });
 
 document.getElementById("balanceDownloadBtn").addEventListener("click", async () => {
-    const btn = document.getElementById("balanceDownloadBtn");
-    const originalText = btn.textContent;
-    btn.textContent = "Processing...";
-    btn.disabled = true;
+  const btn = document.getElementById("balanceDownloadBtn");
+  const originalText = btn.textContent;
+  btn.textContent = "Processing...";
+  btn.disabled = true;
 
-    try {
-        await document.fonts.ready;
-        await generateBalanceCard();
+  try {
+      await document.fonts.ready;
+      await drawBalanceCard(); // Call the dedicated balance drawing function
 
-        const downloadLink = document.createElement("a");
-        const cardTitle = document.getElementById("balanceSearchInput").value.trim() || "Balance_Adjustment";
-        downloadLink.download = `${cardTitle}.png`;
-        downloadLink.href = canvas.toDataURL("image/png", 1.0);
-        downloadLink.click();
-    } catch (err) {
-        console.error("Balance download failed:", err);
-        alert("Error: Could not download balance card. Try again.");
-    } finally {
-        btn.textContent = originalText;
-        btn.disabled = false;
-    }
+      const downloadLink = document.createElement("a");
+      const cardTitle = document.getElementById("balanceSearchInput").value.trim() || "Balance_Adjustment";
+      downloadLink.download = `${cardTitle}.png`;
+      downloadLink.href = canvas.toDataURL("image/png", 1.0);
+      downloadLink.click();
+  } catch (err) {
+      console.error("Balance download failed:", err);
+      alert("Error: Could not download balance card. Try again.");
+  } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
+  }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
