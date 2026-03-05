@@ -2219,14 +2219,14 @@ Type: Follower
 Rarity: Legendary
 Trait: Encroacher
 --------------------------------
-Fanfare: Reduce the faith of Faith: Sham-Nacha, Heir to Entwining by 10 to give it "Increase the number of Mode s you can select by 1."
+Fanfare: Reduce your faith's value by 10 to give it "Increase the number of Modes you can select by 1."
 ----------
 <sev>Super-Evolve: Select an enemy follower on the field, destroy it, and add a copy of it to your hand.</sev>
 
 Faith
-<add>Faith starts at 0.
+<add>This faith's value starts at 0.
 ----------
-Whenever you select Mode s, increase faith by 1.</add>
+Whenever you select Modes, increase this faith's value by 1.</add>
 
 ==================================================
 
