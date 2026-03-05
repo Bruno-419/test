@@ -42,14 +42,15 @@
         <div class="page-content">
           <header>
             <h1>Balance Adjustments</h1>
-            <p class="subheader">WIP</p>
             </header>
-
-          <div class="search-section">
-            <div class="search-wrapper">
+          
+          <div class="search-section" style="display: flex; gap: 10px; align-items: flex-start;">
+            <div class="search-wrapper" style="flex: 1;">
               <input type="text" id="balanceSearchInput" class="card-search-input" placeholder="Search official cards database...">
               <ul id="balanceSearchResults" class="search-results-list"></ul>
             </div>
+            <button id="balancePreviewBtn" type="button" style="height: 45px;">Preview</button>
+            <button id="balanceDownloadBtn" type="button" style="height: 45px;">Download</button>
           </div>
           
           <div id="balanceAdjustmentForm" class="adjustment-form" style="display: none;">
@@ -560,6 +561,7 @@
   </script>
 </body>
 </html>
+
 
 
 
