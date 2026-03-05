@@ -2090,8 +2090,8 @@ async function drawBalanceCard() {
 
   // 3. Draw the two Text Boxes
   if (textChangeImg) {
-    const boxX = 722; // Standard X coordinate for right-side text boxes
-    const box1Y = 206; // Starting Y coordinate
+    const boxX = 721; // Standard X coordinate for right-side text boxes
+    const box1Y = 200; // Starting Y coordinate
     
     // Draw Box 1 (e.g., for 'Before' text)
     ctx.drawImage(textChangeImg, boxX, box1Y);
@@ -2166,6 +2166,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
