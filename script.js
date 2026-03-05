@@ -295,8 +295,9 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
 }
 
 // --- Calculate Height ---
-async function calculateTextBlockHeight(key, startY) {
-  const textValue = textInputs[key].value.trim();
+async function calculateTextBlockHeight(key, startY, textOverride = null) {
+  const rawText = textOverride !== null ? textOverride : textInputs[key].value;
+  const textValue = rawText.trim();
   if (!textValue) return 0;
 
   const isSpecialBox = (key !== "card");
@@ -393,8 +394,9 @@ async function calculateTextBlockHeight(key, startY) {
 }
 
 // --- drawTextBlock ---
-async function drawTextBlock(key, box, x, startY) {
-  const textValue = textInputs[key].value.trim();
+async function drawTextBlock(key, box, x, startY, textOverride = null) {
+  const rawText = textOverride !== null ? textOverride : textInputs[key].value;
+  const textValue = rawText.trim();
   if (!textValue) return 0;
 
   const isSpecialBox = (key !== "card");
@@ -1963,6 +1965,8 @@ function renderResults(matches, container, inputField) {
 }
 
 function populateBalanceForm(card) {
+  // Store the selected card globally for the preview logic
+  window.selectedBalanceCard = card;
   // Hide placeholder, show form
   const placeholder = document.querySelector('#page-balance .placeholder-content');
   if (placeholder) placeholder.style.display = 'none';
@@ -2007,9 +2011,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // ------------------------------------
 
 async function drawBalanceCard() {
-  // Set fixed dimensions for the balance card canvas
   const newWidth = 1920;
-  const newHeight = 1080; // You can dynamically adjust this later if the 2nd box pushes past the bottom
+  let newHeight = 1080; // Default height, will expand if the boxes push past it
   
   if (canvas.width !== newWidth) canvas.width = newWidth;
   if (canvas.height !== newHeight) canvas.height = newHeight;
@@ -2018,8 +2021,6 @@ async function drawBalanceCard() {
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
-  // Load specific balance assets
-  // Note: Using a fallback color/error handling just in case the images haven't been added yet
   const bgImg = await getImage("assets/backgrounds/balance_changes.png").catch(() => null);
   const textChangeImg = await getImage("assets/boxes/text_change.png").catch(() => null);
 
@@ -2031,15 +2032,13 @@ async function drawBalanceCard() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // 2. Draw Card Image Scaled to 81%
+  // 2. Draw Card Elements Scaled to 81%
   ctx.save();
   ctx.scale(0.81, 0.81);
 
-  // Fetch standard card assets based on form state
   const currentClass = document.getElementById("cardClass").value || "Neutral";
   const currentType = document.getElementById("cardType").value.toLowerCase() || "follower";
   const currentRarity = document.getElementById("cardRarity").value.toLowerCase() || "legendary";
-  
   const framePath = assets[currentType][["bronze", "silver", "gold", "legendary", "signature"].indexOf(currentRarity)] || assets.follower[3];
   
   const [frame, gem] = await Promise.all([
@@ -2047,7 +2046,6 @@ async function drawBalanceCard() {
     getImage(assets.gems[currentClass] || assets.gems.Neutral)
   ]);
 
-  // Draw uploaded art if it exists
   if (uploadedArt) {
     const s = previewState.main;
     const dWidth = uploadedArt.width * s.scale;
@@ -2067,11 +2065,9 @@ async function drawBalanceCard() {
     bmp.close();
   }
 
-  // Draw standard frame and gem
   if (frame) ctx.drawImage(frame, 48, 153);
   if (gem) ctx.drawImage(gem, 398, 863);
 
-  // Draw Stats using the adjustment inputs
   ctx.fillStyle = "#efeee9";
   ctx.shadowColor = "black";
   ctx.shadowBlur = 4;
@@ -2085,26 +2081,113 @@ async function drawBalanceCard() {
     drawScaledNumber(atkVal, 201, 922, 82, 90, 'Sv_numbers', -5, -0.2);
     drawScaledNumber(defVal, 642, 917, 82, 90, 'Sv_numbers', -5, -0.2);
   }
+  ctx.restore(); // End of 81% scaling
 
-  ctx.restore(); // End of 81% scaling block
+  // 3. Setup Text Box Rendering Logic
+  const fieldsOrder = [
+    { key: "card", box: null },
+    { key: "evolve", box: "evolve" },
+    { key: "superEvolve", box: "superEvolve" },
+    { key: "crest", box: "crest" },
+    { key: "faith", box: "faith" },
+    { key: "accelerate", box: "accelerate" },
+    { key: "crystallize", box: "crystallize" }
+  ];
 
-  // 3. Draw the two Text Boxes
+  const offCard = window.selectedBalanceCard || { text: {} };
+  const getOfficialText = (key) => offCard.text[key] || "";
+  
+  const getAdjustedText = (key) => {
+    const idMap = {
+      card: "adjCardText", evolve: "adjEvolveText", superEvolve: "adjSuperEvolveText",
+      crest: "adjCrestText", faith: "adjFaithText", accelerate: "adjAccelerateText", crystallize: "adjCrystallizeText"
+    };
+    return document.getElementById(idMap[key]) ? document.getElementById(idMap[key]).value : "";
+  };
+
+  // Determine which fields have changes
+  const changedFields = fieldsOrder.map(f => f.key).filter(key => getOfficialText(key).trim() !== getAdjustedText(key).trim());
+  const coreFields = ["card", "evolve", "superEvolve"];
+  
+  // If only core fields changed, strip out the others to save space
+  const onlyCoreChanged = changedFields.length > 0 && changedFields.every(f => coreFields.includes(f));
+  const fieldsToDraw = onlyCoreChanged ? fieldsOrder.filter(f => coreFields.includes(f.key)) : fieldsOrder;
+
+  const bgBoxX = 722;
+  const contentX = 768;
+  let currentBoxY = 80; // Start higher up for the balance page
+
+  // --- DRAW TOP BOX (Official Text) ---
   if (textChangeImg) {
-    const boxX = 722; // Standard X coordinate for right-side text boxes
-    const box1Y = 206; // Starting Y coordinate
+    let offTotalHeight = currentBoxY;
+    for (const { key } of fieldsToDraw) {
+      const txt = getOfficialText(key);
+      if (!txt) continue;
+      const h = await calculateTextBlockHeight(key, currentBoxY, txt);
+      offTotalHeight += h - 10;
+    }
     
-    // Draw Box 1 (e.g., for 'Before' text)
-    ctx.drawImage(textChangeImg, boxX, box1Y);
-    
-    // Draw Box 2 exactly 33 pixels below Box 1 (e.g., for 'After' text)
-    const box2Y = box1Y + textChangeImg.height + 33;
-    ctx.drawImage(textChangeImg, boxX, box2Y);
+    // Stretch logic based on content height
+    const offTextStretch = Math.max(0, offTotalHeight - (currentBoxY + 500)); 
+    const stretchCountOff = offTextStretch / 50;
+    const offBoxHeight = drawStretchBox(textChangeImg, bgBoxX, currentBoxY, stretchCountOff, "main");
 
-    /* TODO: Implement your text drawing logic here for both boxes. 
-      You can map 'adjCardText.value' or official card original text to these boxes 
-      using your existing drawTextWithHyphenSwap or drawTextBlock functions, 
-      adjusting the starting Y values to match box1Y and box2Y.
-    */
+    let topTextY = currentBoxY;
+    for (const { key, box } of fieldsToDraw) {
+      const txt = getOfficialText(key);
+      if (!txt) continue;
+      const blockHeight = await drawTextBlock(key, box, contentX, topTextY, txt);
+      topTextY += blockHeight - 10;
+    }
+
+    // Apply 20% opacity black overlay
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillRect(bgBoxX, currentBoxY, textChangeImg.width, offBoxHeight);
+
+    // --- DRAW BOTTOM BOX (Adjusted Text) ---
+    currentBoxY = currentBoxY + offBoxHeight + 33;
+
+    let adjTotalHeight = currentBoxY;
+    for (const { key } of fieldsToDraw) {
+      const txt = getAdjustedText(key);
+      if (!txt) continue;
+      const h = await calculateTextBlockHeight(key, currentBoxY, txt);
+      adjTotalHeight += h - 10;
+    }
+    
+    const adjTextStretch = Math.max(0, adjTotalHeight - (currentBoxY + 500));
+    const stretchCountAdj = adjTextStretch / 50;
+    const adjBoxHeight = drawStretchBox(textChangeImg, bgBoxX, currentBoxY, stretchCountAdj, "main");
+
+    let bottomTextY = currentBoxY;
+    for (const { key, box } of fieldsToDraw) {
+      const txt = getAdjustedText(key);
+      if (!txt) continue;
+      const blockHeight = await drawTextBlock(key, box, contentX, bottomTextY, txt);
+      bottomTextY += blockHeight - 10;
+    }
+    
+    // Expand canvas height dynamically if the second box goes off-screen
+    const requiredHeight = currentBoxY + adjBoxHeight + 80;
+    if (requiredHeight > canvas.height) {
+        // We calculate the stretch, but resizing the canvas clears it. 
+        // For a seamless expansion, we could capture the canvas, resize, and redraw.
+        // For standard usages, 1080px or slightly stretched will usually suffice.
+        // To keep it simple, if it overflows, we stretch the canvas and redraw the background
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        tempCanvas.getContext('2d').drawImage(canvas, 0, 0);
+        
+        canvas.height = requiredHeight;
+        if (bgImg) {
+            ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+        } else {
+            ctx.fillStyle = "#1a1a1a";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        ctx.drawImage(tempCanvas, 0, 0);
+    }
   }
 }
 
@@ -2120,7 +2203,7 @@ document.getElementById("balancePreviewBtn").addEventListener("click", async () 
 
   try {
       await document.fonts.ready;
-      await drawBalanceCard(); // Call the dedicated balance drawing function
+      await drawBalanceCard(); 
       
       const dataUrl = canvas.toDataURL("image/png", 1.0);
       const previewWindow = window.open("");
@@ -2151,7 +2234,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
 
   try {
       await document.fonts.ready;
-      await drawBalanceCard(); // Call the dedicated balance drawing function
+      await drawBalanceCard(); 
 
       const downloadLink = document.createElement("a");
       const cardTitle = document.getElementById("balanceSearchInput").value.trim() || "Balance_Adjustment";
@@ -2166,6 +2249,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
