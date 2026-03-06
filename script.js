@@ -2104,7 +2104,7 @@ async function drawBalanceCard() {
   }
 
   // --- NEW: Draw Card Name and Class ---
-  ctx.font = "45px 'Memento'";
+  ctx.font = "42px 'Memento'";
   ctx.textAlign = "center";
   ctx.fillStyle = "#efeee9";
   ctx.shadowColor = "black";
@@ -2192,6 +2192,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
