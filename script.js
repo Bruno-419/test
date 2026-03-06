@@ -2099,8 +2099,8 @@ async function drawBalanceCard() {
   ctx.fillStyle = "#efeee9";
   ctx.shadowColor = "black";
   ctx.shadowBlur = 4;
-  ctx.fillText(currentClass, 418, 992);
-  ctx.fillText(cardNameText, 397, 1047);
+  ctx.fillText(currentClass, 438, 1042);
+  ctx.fillText(cardNameText, 427, 1097);
 
   ctx.restore(); // End of 81% scaling block
 
@@ -2182,6 +2182,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
