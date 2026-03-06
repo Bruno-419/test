@@ -2117,7 +2117,7 @@ async function drawBalanceCard() {
   if (emblemImg) {
     // X is shifted left by 45px. Y is shifted up by 36px from the text baseline to align vertically.
     // If your emblem image is exceptionally large, you can add width/height parameters: ctx.drawImage(emblemImg, 353, 856, 40, 40);
-    ctx.drawImage(emblemImg, 353, 856, 44, 44); 
+    ctx.drawImage(emblemImg, 287, 951, 46, 46); 
   }
   ctx.fillText(currentClass, 439, 998);
   ctx.fillText(cardNameText, 412, 1059);
@@ -2202,6 +2202,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
