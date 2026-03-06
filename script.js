@@ -2077,7 +2077,7 @@ async function drawBalanceCard() {
 
   // Draw the full official card image
   if (fullCardImg) {
-    ctx.drawImage(fullCardImg, 48, 153);
+    ctx.drawImage(fullCardImg, 137, 245);
   } else {
     // Optional fallback: Draw a placeholder rectangle if the image isn't found
     ctx.fillStyle = "#222";
@@ -2109,8 +2109,8 @@ async function drawBalanceCard() {
   ctx.fillStyle = "#efeee9";
   ctx.shadowColor = "black";
   ctx.shadowBlur = 4;
-  ctx.fillText(currentClass, 478, 1093);
-  ctx.fillText(cardNameText, 467, 1158);
+  ctx.fillText(currentClass, 431, 1006);
+  ctx.fillText(cardNameText, 420, 1071);
 
   ctx.restore(); // End of 81% scaling block
 
@@ -2192,6 +2192,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
