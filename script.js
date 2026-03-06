@@ -1813,6 +1813,9 @@ function parseOfficialCards(fullText) {
       };
 
       // Extract Stats
+      const classMatch = section.match(/Class:\s*(.+)/);
+      if (classMatch) card.class = classMatch[1].trim();
+      
       const costMatch = section.match(/Cost:\s*(-?\d+)/);
       if (costMatch) card.cost = parseInt(costMatch[1]);
 
@@ -2179,6 +2182,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
