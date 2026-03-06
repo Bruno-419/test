@@ -2047,12 +2047,13 @@ async function drawBalanceCard() {
   const currentType = document.getElementById("cardType").value.toLowerCase() || "follower";
   const currentRarity = document.getElementById("cardRarity").value.toLowerCase() || "legendary";
   
-  const framePath = assets[currentType][["bronze", "silver", "gold", "legendary", "signature"].indexOf(currentRarity)] || assets.follower[3];
-  
-  const [frame, gem] = await Promise.all([
-    getImage(framePath),
-    getImage(assets.gems[currentClass] || assets.gems.Neutral)
-  ]);
+  // Load the specific card image using its ID and Name
+  let fullCardImg = null;
+  if (selectedCard && selectedCard.id && selectedCard.name) {
+    // Note: Adjust "cards/" if your images are stored in a different folder
+    const cardImagePath = `cards/${selectedCard.id}_${selectedCard.name}.png`;
+    fullCardImg = await getImage(cardImagePath).catch(() => null);
+  }
 
   // Draw uploaded art if it exists
   if (uploadedArt) {
@@ -2074,9 +2075,18 @@ async function drawBalanceCard() {
     bmp.close();
   }
 
-  // Draw standard frame and gem
-  if (frame) ctx.drawImage(frame, 48, 153);
-  if (gem) ctx.drawImage(gem, 398, 863);
+  // Draw the full official card image
+  if (fullCardImg) {
+    ctx.drawImage(fullCardImg, 48, 153);
+  } else {
+    // Optional fallback: Draw a placeholder rectangle if the image isn't found
+    ctx.fillStyle = "#222";
+    ctx.fillRect(48, 153, 580, 770); 
+    ctx.fillStyle = "#fff";
+    ctx.font = "30px 'Roboto'";
+    ctx.textAlign = "center";
+    ctx.fillText("Card Image Missing", 48 + 290, 153 + 385);
+  }
 
   // Draw Stats using the adjustment inputs
   ctx.fillStyle = "#efeee9";
@@ -2182,6 +2192,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
