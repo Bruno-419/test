@@ -2036,7 +2036,11 @@ async function drawBalanceCard() {
   ctx.scale(0.81, 0.81);
 
   // Fetch standard card assets based on form state
-  const currentClass = document.getElementById("cardClass").value || "Neutral";
+  const searchInputVal = document.getElementById("balanceSearchInput").value.trim();
+  const selectedCard = officialCards.find(c => c.name === searchInputVal);
+  const currentClass = (selectedCard && selectedCard.class) ? selectedCard.class : (document.getElementById("cardClass").value || "Neutral");
+  const cardNameText = (selectedCard && selectedCard.name) ? selectedCard.name : (searchInputVal || "Unnamed Card");
+  
   const currentType = document.getElementById("cardType").value.toLowerCase() || "follower";
   const currentRarity = document.getElementById("cardRarity").value.toLowerCase() || "legendary";
   
@@ -2085,6 +2089,15 @@ async function drawBalanceCard() {
     drawScaledNumber(atkVal, 201, 922, 82, 90, 'Sv_numbers', -5, -0.2);
     drawScaledNumber(defVal, 642, 917, 82, 90, 'Sv_numbers', -5, -0.2);
   }
+
+  // --- NEW: Draw Card Name and Class ---
+  ctx.font = "40px 'Memento'";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#efeee9";
+  ctx.shadowColor = "black";
+  ctx.shadowBlur = 4;
+  ctx.fillText(currentClass, 398, 892);
+  ctx.fillText(cardNameText, 367, 947);
 
   ctx.restore(); // End of 81% scaling block
 
@@ -2166,6 +2179,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
