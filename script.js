@@ -2088,131 +2088,23 @@ async function drawBalanceCard() {
 
   ctx.restore(); // End of 81% scaling block
 
-  // --- NEW: Draw Card Name, Class, and Emblem ---
-  ctx.save();
-  ctx.font = "40px 'Memento'";
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#efeee9"; // Shadowverse default text color
-  ctx.shadowColor = "black";
-  ctx.shadowBlur = 4;
-
-  // Retrieve the selected official card data
-  const searchName = document.getElementById("balanceSearchInput").value.trim();
-  const selectedCard = officialCards.find(c => c.name === searchName);
-  const cardNameText = selectedCard ? selectedCard.name : (searchName || "Unnamed Card");
-  const displayClass = selectedCard ? selectedCard.class : "Neutral";
-
-  // Draw the Card Name
-  ctx.fillText(cardNameText, 233, 947);
-
-  // Draw the Class
-  ctx.fillText(displayClass, 398, 892);
-
-  // Draw the Emblem Image
-  // Automatically loads the emblem based on the class (e.g., assets/emblems/emblem_Forestcraft.png)
-  const emblemImg = await getImage(`assets/emblems/emblem_${displayClass}.png`).catch(() => null);
-  
-  if (emblemImg) {
-    // Calculate placement to dynamically sit to the left of the centered Class text
-    const textWidth = ctx.measureText(displayClass).width;
-    const emblemSize = 44; // You can adjust this based on your actual emblem dimensions
-    const padding = 10;
-    
-    const emblemX = 398 - (textWidth / 2) - emblemSize - padding;
-    const emblemY = 863;
-    
-    ctx.drawImage(emblemImg, emblemX, emblemY, emblemSize, emblemSize);
-  }
-  
-  ctx.restore();
-
-// 3. Draw the two Text Boxes
+  // 3. Draw the two Text Boxes
   if (textChangeImg) {
     const boxX = 722; // Standard X coordinate for right-side text boxes
-    const box1Y = 206; // Starting Y coordinate for "Before"
+    const box1Y = 206; // Starting Y coordinate
     
-    // Draw Box 1 (Before)
+    // Draw Box 1 (e.g., for 'Before' text)
     ctx.drawImage(textChangeImg, boxX, box1Y);
     
-    // Draw Box 2 (After) exactly 33 pixels below Box 1
+    // Draw Box 2 exactly 33 pixels below Box 1 (e.g., for 'After' text)
     const box2Y = box1Y + textChangeImg.height + 33;
     ctx.drawImage(textChangeImg, boxX, box2Y);
 
-    // --- TEXT RENDERING LOGIC ---
-    const searchName = document.getElementById("balanceSearchInput").value.trim();
-    // Default to an empty text object if no official card is found
-    const selectedCard = officialCards.find(c => c.name === searchName) || { text: {} };
-
-    const fieldKeys = ["card", "evolve", "superEvolve", "crest", "faith", "accelerate", "crystallize"];
-    
-    let changedFields = new Set();
-    let extraFieldChanged = false;
-
-    // Map to track the exact text needed for Before and After
-    const textData = { before: {}, after: {} };
-
-    fieldKeys.forEach(key => {
-      // Resolve the matching ID for the adjustment input
-      const adjInputStr = key === "card" ? "adjCardText" : 
-                          key === "superEvolve" ? "adjSuperEvolveText" : 
-                          "adj" + key.charAt(0).toUpperCase() + key.slice(1) + "Text";
-                          
-      const adjEl = document.getElementById(adjInputStr);
-      const adjVal = adjEl ? adjEl.value.trim() : "";
-      const origVal = (selectedCard.text[key] || "").trim();
-
-      textData.before[key] = origVal;
-      textData.after[key] = adjVal;
-
-      // Mark the field as changed if the texts don't match
-      if (origVal !== adjVal) {
-        changedFields.add(key);
-        if (key !== "card") {
-          extraFieldChanged = true;
-        }
-      }
-    });
-
-    // Rule: If any extra field changed, ensure the 'card' text field is also drawn
-    if (extraFieldChanged) {
-      changedFields.add("card");
-    }
-
-    // Temporarily hijack the global textInputs so we can reuse your drawTextBlock function
-    const backupTextInputs = {};
-    fieldKeys.forEach(key => {
-      backupTextInputs[key] = textInputs[key].value;
-    });
-
-    // Helper to draw a specific text set (Before or After) starting at a specific Y coordinate
-    const drawBoxContent = async (startY, textSource) => {
-      let currentY = startY;
-      for (const key of fieldKeys) {
-        // Enforce the rule: only draw if it was marked as changed (or forced by an extra field)
-        if (!changedFields.has(key)) continue; 
-
-        // Point the global reference to the text we want to draw
-        textInputs[key].value = textSource[key]; 
-        if (!textInputs[key].value) continue; // Skip if it's completely empty
-
-        // Draw the text block. Passing `null` for the 'box' parameter 
-        // prevents it from drawing standard colored boxes (evolve, crest, etc.)
-        const blockHeight = await drawTextBlock(key, null, boxX, currentY);
-        
-        currentY += blockHeight - 10;
-      }
-    };
-
-    // Draw the "Before" text block
-    await drawBoxContent(box1Y, textData.before);
-
-    // Draw the "After" text block
-    await drawBoxContent(box2Y, textData.after);
-
-    // Restore the global textInputs to their original values
-    fieldKeys.forEach(key => {
-      textInputs[key].value = backupTextInputs[key];
-    });
+    /* TODO: Implement your text drawing logic here for both boxes. 
+      You can map 'adjCardText.value' or official card original text to these boxes 
+      using your existing drawTextWithHyphenSwap or drawTextBlock functions, 
+      adjusting the starting Y values to match box1Y and box2Y.
+    */
   }
 }
 
@@ -2274,9 +2166,6 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
-
-
-
 
 
 
