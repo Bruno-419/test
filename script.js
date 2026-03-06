@@ -2094,7 +2094,7 @@ async function drawBalanceCard() {
   }
 
   // --- NEW: Draw Card Name and Class ---
-  ctx.font = "40px 'Memento'";
+  ctx.font = "45px 'Memento'";
   ctx.textAlign = "center";
   ctx.fillStyle = "#efeee9";
   ctx.shadowColor = "black";
@@ -2113,7 +2113,7 @@ async function drawBalanceCard() {
     ctx.drawImage(textChangeImg, boxX, box1Y);
     
     // Draw Box 2 exactly 33 pixels below Box 1 (e.g., for 'After' text)
-    const box2Y = box1Y + textChangeImg.height + 33;
+    const box2Y = box1Y + 33;
     ctx.drawImage(textChangeImg, boxX, box2Y);
 
     /* TODO: Implement your text drawing logic here for both boxes. 
@@ -2182,6 +2182,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
