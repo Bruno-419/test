@@ -2055,6 +2055,10 @@ async function drawBalanceCard() {
     fullCardImg = await getImage(cardImagePath).catch(() => null);
   }
 
+  // --- NEW: Load the Class Emblem ---
+  // Note: Adjust the folder path if your emblems are inside an 'assets/' folder
+  const emblemImg = await getImage(`emblem_${currentClass}.png`).catch(() => null);
+
   // Draw uploaded art if it exists
   if (uploadedArt) {
     const s = previewState.main;
@@ -2109,6 +2113,12 @@ async function drawBalanceCard() {
   ctx.fillStyle = "#efeee9";
   ctx.shadowColor = "black";
   ctx.shadowBlur = 4;
+  // Draw the Emblem to the left of the Class text
+  if (emblemImg) {
+    // X is shifted left by 45px. Y is shifted up by 36px from the text baseline to align vertically.
+    // If your emblem image is exceptionally large, you can add width/height parameters: ctx.drawImage(emblemImg, 353, 856, 40, 40);
+    ctx.drawImage(emblemImg, 353, 856, 44, 44); 
+  }
   ctx.fillText(currentClass, 439, 998);
   ctx.fillText(cardNameText, 412, 1059);
 
@@ -2192,6 +2202,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
