@@ -2034,9 +2034,9 @@ async function drawBalanceCard() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // 2. Draw Card Image Scaled to 81%
+  // 2. Draw Card Image Scaled to 90%
   ctx.save();
-  ctx.scale(0.81, 0.81);
+  ctx.scale(0.9, 0.9);
 
   // Fetch standard card assets based on form state
   const searchInputVal = document.getElementById("balanceSearchInput").value.trim();
@@ -2123,7 +2123,7 @@ async function drawBalanceCard() {
     ctx.drawImage(textChangeImg, boxX, box1Y);
     
     // Draw Box 2 exactly 33 pixels below Box 1 (e.g., for 'After' text)
-    const box2Y = box1Y + 33;
+    const box2Y = box1Y + textChangeImg.height + 33;
     ctx.drawImage(textChangeImg, boxX, box2Y);
 
     /* TODO: Implement your text drawing logic here for both boxes. 
@@ -2192,6 +2192,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
