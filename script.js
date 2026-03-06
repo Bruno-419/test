@@ -2099,15 +2099,15 @@ async function drawBalanceCard() {
   ctx.fillStyle = "#efeee9";
   ctx.shadowColor = "black";
   ctx.shadowBlur = 4;
-  ctx.fillText(currentClass, 438, 1042);
-  ctx.fillText(cardNameText, 427, 1097);
+  ctx.fillText(currentClass, 478, 1093);
+  ctx.fillText(cardNameText, 467, 1158);
 
   ctx.restore(); // End of 81% scaling block
 
   // 3. Draw the two Text Boxes
   if (textChangeImg) {
-    const boxX = 722; // Standard X coordinate for right-side text boxes
-    const box1Y = 206; // Starting Y coordinate
+    const boxX = 701; // Standard X coordinate for right-side text boxes
+    const box1Y = 181; // Starting Y coordinate
     
     // Draw Box 1 (e.g., for 'Before' text)
     ctx.drawImage(textChangeImg, boxX, box1Y);
@@ -2182,6 +2182,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
