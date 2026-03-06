@@ -2057,7 +2057,7 @@ async function drawBalanceCard() {
 
   // --- NEW: Load the Class Emblem ---
   // Note: Adjust the folder path if your emblems are inside an 'assets/' folder
-  const emblemImg = await getImage(`emblems/emblem_${currentClass}.png`).catch(() => null);
+  const emblemImg = await getImage(`assets/emblems/emblem_${currentClass}.png`).catch(() => null);
 
   // Draw uploaded art if it exists
   if (uploadedArt) {
@@ -2202,6 +2202,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
