@@ -2131,7 +2131,17 @@ async function drawBalanceCard() {
   // Apply the specific shadow color based on the current class, defaulting to black just in case
   ctx.shadowColor = classShadowColors[currentClass] || "black"; 
   ctx.shadowBlur = 10;
+  
+// --- SET THE STROKE PROPERTIES ---
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = classShadowColors[currentClass] || "black";
+
+  // Draw Class Text
+  ctx.strokeText(currentClass, 439, 998);
   ctx.fillText(currentClass, 439, 998);
+
+  // Draw Card Name Text
+  ctx.strokeText(cardNameText, 412, 1059);
   ctx.fillText(cardNameText, 412, 1059);
 
   ctx.restore(); // End of 81% scaling block
@@ -2214,6 +2224,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
