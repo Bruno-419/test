@@ -2081,7 +2081,25 @@ async function drawBalanceCard() {
 
   // Draw the full official card image
   if (fullCardImg) {
+    ctx.save();
+    
+    // Set the shadow properties for the image
+    ctx.shadowColor = "#27698b"; 
+    ctx.shadowBlur = 25;
+    
+    // Draw the image with the shadow applied
     ctx.drawImage(fullCardImg, 147, 254);
+    
+    // Remove the shadow so it doesn't double-apply to the stroke
+    ctx.shadowColor = "transparent"; 
+    ctx.shadowBlur = 0;
+    
+    // Apply the 2-pixel stroke around the image's exact dimensions
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#cdeef3";
+    ctx.strokeRect(147, 254, fullCardImg.width, fullCardImg.height);
+    
+    ctx.restore();
   } else {
     // Optional fallback: Draw a placeholder rectangle if the image isn't found
     ctx.fillStyle = "#222";
@@ -2224,6 +2242,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
