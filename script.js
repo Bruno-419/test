@@ -1815,6 +1815,9 @@ function parseOfficialCards(fullText) {
       // Extract Stats
       const classMatch = section.match(/Class:\s*(.+)/);
       if (classMatch) card.class = classMatch[1].trim();
+
+      const typeMatch = section.match(/Type:\s*(.+)/);
+      if (typeMatch) card.type = typeMatch[1].trim();
       
       const costMatch = section.match(/Cost:\s*(-?\d+)/);
       if (costMatch) card.cost = parseInt(costMatch[1]);
@@ -2046,6 +2049,9 @@ async function drawBalanceCard() {
   
   const currentType = document.getElementById("cardType").value.toLowerCase() || "follower";
   const currentRarity = document.getElementById("cardRarity").value.toLowerCase() || "legendary";
+
+  const actualType = (selectedCard && selectedCard.type) ? selectedCard.type.toLowerCase() : currentType;
+  const strokeImg = await getImage(`assets/misc/stroke_${actualType}.png`).catch(() => null);
   
   // Load the specific card image using its ID and Name
   let fullCardImg = null;
@@ -2058,6 +2064,11 @@ async function drawBalanceCard() {
   // --- NEW: Load the Class Emblem ---
   // Note: Adjust the folder path if your emblems are inside an 'assets/' folder
   const emblemImg = await getImage(`assets/emblems/emblem_${currentClass}.png`).catch(() => null);
+
+  if (strokeImg) {
+    // Coordinates match the fullCardImg placement. Tweak these if the stroke asset dimensions differ.
+    ctx.drawImage(strokeImg, 147, 254);
+  }
 
   // Draw uploaded art if it exists
   if (uploadedArt) {
@@ -2089,15 +2100,6 @@ async function drawBalanceCard() {
     
     // Draw the image with the shadow applied
     ctx.drawImage(fullCardImg, 147, 254);
-    
-    // Remove the shadow so it doesn't double-apply to the stroke
-    ctx.shadowColor = "transparent"; 
-    ctx.shadowBlur = 0;
-    
-    // Apply the 2-pixel stroke around the image's exact dimensions
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "#cdeef3";
-    ctx.strokeRect(147, 254, fullCardImg.width, fullCardImg.height);
     
     ctx.restore();
   } else {
@@ -2242,6 +2244,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
