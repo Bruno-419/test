@@ -2108,11 +2108,23 @@ async function drawBalanceCard() {
   }
 
   // --- NEW: Draw Card Name and Class ---
+  const classShadowColors = {
+    "Neutral": "transparent",
+    "Forestcraft": "#04742c",
+    "Swordcraft": "#818c26",
+    "Runecraft": "#2e48a9",
+    "Dragoncraft": "#8a4f15",
+    "Abysscraft": "#a3284e",
+    "Havencraft": "#88847b",
+    "Portalcraft": "#0b8c78"
+  };
+
   ctx.font = "42px 'Memento'";
   ctx.textAlign = "center";
   ctx.fillStyle = "#efeee9";
-  ctx.shadowColor = "black";
-  ctx.shadowBlur = 4;
+  // Apply the specific shadow color based on the current class, defaulting to black just in case
+  ctx.shadowColor = classShadowColors[currentClass] || "black"; 
+  ctx.shadowBlur = 5;
   // Draw the Emblem to the left of the Class text
   if (emblemImg) {
     // X is shifted left by 45px. Y is shifted up by 36px from the text baseline to align vertically.
@@ -2202,6 +2214,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
