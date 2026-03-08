@@ -259,7 +259,7 @@ const HIGHLIGHT_KEYWORDS = [
 ];
 const HIGHLIGHT_REGEX = new RegExp(`\\b(${HIGHLIGHT_KEYWORDS.join("|")})\\b`, "g");
 
-// --- Updated Helper: drawStretchBox ---
+// --- drawStretchBox ---
 function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   const stretchPerBreak = 50;
   const stretchAmount = stretchCount * stretchPerBreak;
@@ -272,7 +272,7 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
     middleStartY = 107;
     middleHeight = 38;
     bottomHeight = 28;
-  } else if (key === "main" || key === "text_change") {
+  } else if (key === "main") {
     topHeight = 60;
     bottomHeight = 120;
     middleStartY = topHeight;
@@ -294,10 +294,9 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   return topHeight + middleHeight + bottomHeight + stretchAmount;
 }
 
-// --- Updated Helper: calculateTextBlockHeight ---
-async function calculateTextBlockHeight(key, overrideText = null) {
-  // Use overrideText if provided (for Balance page), otherwise fallback to standard inputs
-  const textValue = overrideText !== null ? overrideText.trim() : (textInputs[key] ? textInputs[key].value.trim() : "");
+// --- Calculate Height ---
+async function calculateTextBlockHeight(key, startY) {
+  const textValue = textInputs[key].value.trim();
   if (!textValue) return 0;
 
   const isSpecialBox = (key !== "card");
@@ -393,9 +392,9 @@ async function calculateTextBlockHeight(key, overrideText = null) {
   return Math.max(boxHeight, totalHeight + specialOffset + 40);
 }
 
-// --- Updated Helper: drawTextBlock ---
-async function drawTextBlock(key, box, x, startY, overrideText = null) {
-  const textValue = overrideText !== null ? overrideText.trim() : (textInputs[key] ? textInputs[key].value.trim() : "");
+// --- drawTextBlock ---
+async function drawTextBlock(key, box, x, startY) {
+  const textValue = textInputs[key].value.trim();
   if (!textValue) return 0;
 
   const isSpecialBox = (key !== "card");
@@ -572,70 +571,6 @@ async function drawTextBlock(key, box, x, startY, overrideText = null) {
   return Math.max(boxHeight, textY - startY + 40);
 }
 
-// --- NEW Helper: drawSpecialIcons ---
-async function drawSpecialIcons(key, boxX, currentY, namesObj, costsObj) {
-  const isCrest = key === "crest";
-  const isFaith = key === "faith";
-  const isAccelerate = key === "accelerate";
-  const isCrystallize = key === "crystallize";
-
-  if (isCrest || isFaith || isAccelerate || isCrystallize) {
-    const iconX = boxX + 120;
-    const iconY = currentY + 32;
-
-    if (isCrest || isFaith) {
-      const iconImg = isCrest ? crestArt : faithArt;
-      const displayName = (namesObj && namesObj[key]) ? namesObj[key] : (isCrest ? "Crest" : "Faith");
-
-      if (iconImg) {
-        const s = previewState[isCrest ? "crest" : "faith"];
-        const dWidth = iconImg.width * s.scale;
-        const dHeight = iconImg.height * s.scale;
-        const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
-          resizeWidth: Math.round(dWidth),
-          resizeHeight: Math.round(dHeight),
-          resizeQuality: "high"
-        });
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = Math.round(dWidth);
-        tempCanvas.height = Math.round(dHeight);
-        const tempCtx = tempCanvas.getContext('2d');
-        tempCtx.drawImage(bmp, 0, 0);
-        applySharpen(tempCtx, tempCanvas.width, tempCanvas.height, 0.25);
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(tempCanvas, iconX + s.tx, iconY + s.ty);
-        ctx.restore();
-        bmp.close();
-      }
-
-      if (displayName) {
-        ctx.save();
-        ctx.fillStyle = "#f3d87d";
-        ctx.shadowColor = "black";
-        ctx.shadowBlur = 4;
-        drawTextWithHyphenSwap(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10, 33, "left");
-        ctx.restore();
-      }
-    } else {
-       const costVal = (costsObj && costsObj[key]) ? costsObj[key] : "1";
-       const labelText = isAccelerate ? "Accelerate" : "Crystallize";
-       
-       ctx.save();
-       ctx.shadowColor = "black";
-       ctx.shadowBlur = 4;
-       ctx.fillStyle = "#efeee9";
-       drawScaledNumber(costVal, 850, iconY + ICON_H / 2 + 8, 28, 50, 'Sv_numbers', -2, 0);
-       ctx.fillStyle = "#f3d87d";
-       drawTextWithHyphenSwap(labelText, 895, iconY + ICON_H / 2 + 10, 33, "left");
-       ctx.restore();
-    }
-  }
-}
 
 // --- drawCard ---
 async function drawCard() {
@@ -2078,128 +2013,64 @@ document.addEventListener("DOMContentLoaded", () => {
 // ------------------------------------
 
 async function drawBalanceCard() {
-  const textOrder = [
-    { key: "card", box: null },
-    { key: "evolve", box: "evolve" },
-    { key: "superEvolve", box: "superEvolve" },
-    { key: "crest", box: "crest" },
-    { key: "faith", box: "faith" },
-    { key: "accelerate", box: "accelerate" },
-    { key: "crystallize", box: "crystallize" }
-  ];
-
-  // Map out form selections and DB matches
-  const searchInputVal = document.getElementById("balanceSearchInput").value.trim();
-  const selectedCard = officialCards.find(c => c.name === searchInputVal);
-  const currentClass = (selectedCard && selectedCard.class) ? selectedCard.class : (document.getElementById("cardClass").value || "Neutral");
-  const cardNameText = (selectedCard && selectedCard.name) ? selectedCard.name : (searchInputVal || "Unnamed Card");
+  // Set fixed dimensions for the balance card canvas
+  const newWidth = 1920;
+  const newHeight = 1080; // You can dynamically adjust this later if the 2nd box pushes past the bottom
   
-  const currentType = document.getElementById("cardType").value.toLowerCase() || "follower";
-  const actualType = (selectedCard && selectedCard.type) ? selectedCard.type.toLowerCase() : currentType;
-  const isFollower = actualType === 'follower';
-
-  // Extract 'Before' Text Objects
-  const textBefore = {};
-  if (selectedCard) {
-    textBefore.card = selectedCard.text.card || "";
-    textBefore.evolve = selectedCard.text.evolve || "";
-    textBefore.superEvolve = selectedCard.text.superEvolve || "";
-    textBefore.crest = selectedCard.text.crest || "";
-    textBefore.faith = selectedCard.text.faith || "";
-    textBefore.accelerate = selectedCard.text.accelerate || "";
-    textBefore.crystallize = selectedCard.text.crystallize || "";
-  } else {
-    textOrder.forEach(t => textBefore[t.key] = "");
-  }
-
-  // Extract 'After' Text Objects
-  const textAfter = {
-    card: document.getElementById('adjCardText').value || "",
-    evolve: document.getElementById('adjEvolveText').value || "",
-    superEvolve: document.getElementById('adjSuperEvolveText').value || "",
-    crest: document.getElementById('adjCrestText').value || "",
-    faith: document.getElementById('adjFaithText').value || "",
-    accelerate: document.getElementById('adjAccelerateText').value || "",
-    crystallize: document.getElementById('adjCrystallizeText').value || ""
-  };
-
-  // 1. Calculate Stretch & Height Logic
-  const boxX = 701; 
-  const startYBox1 = 181;
-  
-  let calcYBox1 = startYBox1;
-  for (const { key } of textOrder) {
-    const text = textBefore[key].trim();
-    if (!text) continue;
-    if ((key === 'evolve' || key === 'superEvolve') && !isFollower) continue;
-    calcYBox1 += (await calculateTextBlockHeight(key, text)) - 10;
-  }
-
-  const textChangeImg = await getImage("assets/boxes/text_change.png").catch(() => null);
-  const boxBaseHeight = textChangeImg ? textChangeImg.height : 240; 
-  
-  // Base height thresholds offset by the 120px bottom buffer mapped in drawStretchBox for "text_change"
-  const stretchBox1Pixels = Math.max(0, calcYBox1 - (startYBox1 + boxBaseHeight - 120));
-  const box1TotalHeight = boxBaseHeight + stretchBox1Pixels;
-
-  const startYBox2 = startYBox1 + box1TotalHeight + 33; // Second box starts exactly 33px below the first one
-  let calcYBox2 = startYBox2;
-  
-  for (const { key } of textOrder) {
-    const text = textAfter[key].trim();
-    if (!text) continue;
-    if ((key === 'evolve' || key === 'superEvolve') && !isFollower) continue;
-    calcYBox2 += (await calculateTextBlockHeight(key, text)) - 10;
-  }
-
-  const stretchBox2Pixels = Math.max(0, calcYBox2 - (startYBox2 + boxBaseHeight - 120));
-  const box2TotalHeight = boxBaseHeight + stretchBox2Pixels;
-
-  const finalContentY = startYBox2 + box2TotalHeight;
-  const bgStretchPixels = Math.max(0, finalContentY - 1000); 
-
-  // 2. Set dimensions and clear
-  const baseWidth = 1920;
-  const baseHeight = 1080;
-  const newHeight = baseHeight + bgStretchPixels;
-  
-  if (canvas.width !== baseWidth) canvas.width = baseWidth;
+  if (canvas.width !== newWidth) canvas.width = newWidth;
   if (canvas.height !== newHeight) canvas.height = newHeight;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
-  // 3. Draw Background
+  // Load specific balance assets
+  // Note: Using a fallback color/error handling just in case the images haven't been added yet
   const bgImg = await getImage("assets/backgrounds/balance_changes.png").catch(() => null);
+  const textChangeImg = await getImage("assets/boxes/text_change.png").catch(() => null);
+
+  // 1. Draw Background
   if (bgImg) {
-      const topHeight = Math.min(200, bgImg.height);
-      const bottomPartHeight = bgImg.height - topHeight;
-      ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight);
-      if (bottomPartHeight > 0) {
-        ctx.drawImage(bgImg, 0, topHeight, bgImg.width, bottomPartHeight, 0, topHeight, bgImg.width, bottomPartHeight + bgStretchPixels);
-      }
+    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
   } else {
-      ctx.fillStyle = "#1a1a1a";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#1a1a1a";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // 4. Draw Left Side Element (Card Image, Stroke, and Text) Scaled to 90%
+  // 2. Draw Card Image Scaled to 90%
   ctx.save();
   ctx.scale(0.9, 0.9);
 
+  // Fetch standard card assets based on form state
+  const searchInputVal = document.getElementById("balanceSearchInput").value.trim();
+  const selectedCard = officialCards.find(c => c.name === searchInputVal);
+  const currentClass = (selectedCard && selectedCard.class) ? selectedCard.class : (document.getElementById("cardClass").value || "Neutral");
+  const cardNameText = (selectedCard && selectedCard.name) ? selectedCard.name : (searchInputVal || "Unnamed Card");
+  
+  const currentType = document.getElementById("cardType").value.toLowerCase() || "follower";
+  const currentRarity = document.getElementById("cardRarity").value.toLowerCase() || "legendary";
+
+  const actualType = (selectedCard && selectedCard.type) ? selectedCard.type.toLowerCase() : currentType;
   const strokeImg = await getImage(`assets/misc/stroke_${actualType}.png`).catch(() => null);
+  
+  // Load the specific card image using its ID and Name
   let fullCardImg = null;
   if (selectedCard && selectedCard.id && selectedCard.name) {
+    // Note: Adjust "cards/" if your images are stored in a different folder
     const cardImagePath = `cards/${selectedCard.id}_${selectedCard.name}.png`;
     fullCardImg = await getImage(cardImagePath).catch(() => null);
   }
+
+  // --- NEW: Load the Class Emblem ---
+  // Note: Adjust the folder path if your emblems are inside an 'assets/' folder
   const emblemImg = await getImage(`assets/emblems/emblem_${currentClass}.png`).catch(() => null);
 
   if (strokeImg) {
+    // Coordinates match the fullCardImg placement. Tweak these if the stroke asset dimensions differ.
     ctx.drawImage(strokeImg, 112, 209);
   }
 
+  // Draw uploaded art if it exists
   if (uploadedArt) {
     const s = previewState.main;
     const dWidth = uploadedArt.width * s.scale;
@@ -2219,11 +2090,13 @@ async function drawBalanceCard() {
     bmp.close();
   }
 
+  // Draw the full official card image
   if (fullCardImg) {
     ctx.save();
     ctx.drawImage(fullCardImg, 147, 254);
     ctx.restore();
   } else {
+    // Optional fallback: Draw a placeholder rectangle if the image isn't found
     ctx.fillStyle = "#222";
     ctx.fillRect(48, 153, 580, 770); 
     ctx.fillStyle = "#fff";
@@ -2232,6 +2105,7 @@ async function drawBalanceCard() {
     ctx.fillText("Card Image Missing", 48 + 290, 153 + 385);
   }
 
+  // Draw Stats using the adjustment inputs
   ctx.fillStyle = "#efeee9";
   ctx.shadowColor = "black";
   ctx.shadowBlur = 4;
@@ -2246,6 +2120,7 @@ async function drawBalanceCard() {
     drawScaledNumber(defVal, 612, 897, 82, 90, 'Sv_numbers', -5, -0.2);
   }
 
+  // --- NEW: Draw Card Name and Class ---
   const classShadowColors = {
     "Neutral": "transparent",
     "Forestcraft": "#04742c",
@@ -2260,67 +2135,46 @@ async function drawBalanceCard() {
   ctx.font = "42px 'Memento'";
   ctx.textAlign = "center";
   ctx.fillStyle = "#efeee9";
-  
+  // Draw the Emblem to the left of the Class text
   if (emblemImg) {
+    // If your emblem image is exceptionally large, you can add width/height parameters: ctx.drawImage(emblemImg, 353, 856, 40, 40);
     ctx.drawImage(emblemImg, 280, 959, 46, 46); 
   }
-  
+  // Apply the specific shadow color based on the current class, defaulting to black just in case
   ctx.shadowColor = classShadowColors[currentClass] || "black"; 
   ctx.shadowBlur = 10;
+  
+// --- SET THE STROKE PROPERTIES ---
   ctx.lineWidth = 5;
   ctx.strokeStyle = classShadowColors[currentClass] || "black";
 
+  // Draw Class Text
   ctx.strokeText(currentClass, 439, 998);
   ctx.fillText(currentClass, 439, 998);
 
+  // Draw Card Name Text
   ctx.strokeText(cardNameText, 412, 1059);
   ctx.fillText(cardNameText, 412, 1059);
 
-  ctx.restore(); 
+  ctx.restore(); // End of 81% scaling block
 
-  // 5. Draw the Box Elements
+  // 3. Draw the two Text Boxes
   if (textChangeImg) {
+    const boxX = 701; // Standard X coordinate for right-side text boxes
+    const box1Y = 181; // Starting Y coordinate
     
-    // --- BOX 1 ("Before" Text) ---
-    drawStretchBox(textChangeImg, boxX, startYBox1, stretchBox1Pixels / 50, "text_change");
+    // Draw Box 1 (e.g., for 'Before' text)
+    ctx.drawImage(textChangeImg, boxX, box1Y);
     
-    let currentYBox1 = startYBox1;
-    for (const { key, box } of textOrder) {
-      const text = textBefore[key].trim();
-      if (!text) continue; 
-      if ((key === 'evolve' || key === 'superEvolve') && !isFollower) continue;
+    // Draw Box 2 exactly 33 pixels below Box 1 (e.g., for 'After' text)
+    const box2Y = box1Y + textChangeImg.height + 33;
+    ctx.drawImage(textChangeImg, boxX, box2Y);
 
-      const blockHeight = await drawTextBlock(key, box, boxX, currentYBox1, text);
-      await drawSpecialIcons(key, boxX, currentYBox1, selectedCard?.names, selectedCard?.costs);
-
-      currentYBox1 += blockHeight - 10;
-    }
-
-    // --- BOX 2 ("After" Text) ---
-    drawStretchBox(textChangeImg, boxX, startYBox2, stretchBox2Pixels / 50, "text_change");
-    
-    let currentYBox2 = startYBox2;
-
-    const afterNames = {
-      crest: document.getElementById('adjCrestText').value ? (document.getElementById("crestName").value || "Crest") : "",
-      faith: document.getElementById('adjFaithText').value ? (document.getElementById("faithName").value || "Faith") : ""
-    };
-
-    const afterCosts = {
-      accelerate: document.getElementById('adjAccelerateCost').value || "1",
-      crystallize: document.getElementById('adjCrystallizeCost').value || "1"
-    };
-
-    for (const { key, box } of textOrder) {
-      const text = textAfter[key].trim();
-      if (!text) continue; 
-      if ((key === 'evolve' || key === 'superEvolve') && !isFollower) continue;
-
-      const blockHeight = await drawTextBlock(key, box, boxX, currentYBox2, text);
-      await drawSpecialIcons(key, boxX, currentYBox2, afterNames, afterCosts);
-
-      currentYBox2 += blockHeight - 10;
-    }
+    /* TODO: Implement your text drawing logic here for both boxes. 
+      You can map 'adjCardText.value' or official card original text to these boxes 
+      using your existing drawTextWithHyphenSwap or drawTextBlock functions, 
+      adjusting the starting Y values to match box1Y and box2Y.
+    */
   }
 }
 
@@ -2382,3 +2236,9 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
+
+
+
+
+
