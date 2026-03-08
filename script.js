@@ -2067,7 +2067,7 @@ async function drawBalanceCard() {
 
   if (strokeImg) {
     // Coordinates match the fullCardImg placement. Tweak these if the stroke asset dimensions differ.
-    ctx.drawImage(strokeImg, 147, 254);
+    ctx.drawImage(strokeImg, 77, 163);
   }
 
   // Draw uploaded art if it exists
@@ -2244,6 +2244,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
