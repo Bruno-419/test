@@ -2093,14 +2093,7 @@ async function drawBalanceCard() {
   // Draw the full official card image
   if (fullCardImg) {
     ctx.save();
-    
-    // Set the shadow properties for the image
-    ctx.shadowColor = "#27698b"; 
-    ctx.shadowBlur = 25;
-    
-    // Draw the image with the shadow applied
     ctx.drawImage(fullCardImg, 147, 254);
-    
     ctx.restore();
   } else {
     // Optional fallback: Draw a placeholder rectangle if the image isn't found
@@ -2244,6 +2237,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
