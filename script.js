@@ -2158,43 +2158,23 @@ async function drawBalanceCard() {
 
   ctx.restore(); // End of 81% scaling block
 
-  // 3. Draw the Text Boxes
+  // 3. Draw the two Text Boxes
   if (textChangeImg) {
     const boxX = 701; // Standard X coordinate for right-side text boxes
     const box1Y = 181; // Starting Y coordinate
     
-    // Grab the original text and the adjusted text
-    const origText = (selectedCard && selectedCard.text.card) ? selectedCard.text.card : "";
-    const changedText = document.getElementById("adjCardText").value;
-    
-    // Check if the text actually changed
-    const hasChanges = origText !== changedText;
-
-    // Draw Box 1 (Original Text)
+    // Draw Box 1 (e.g., for 'Before' text)
     ctx.drawImage(textChangeImg, boxX, box1Y);
     
-    // Add a black box at 20% opacity to overlay the top box
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-    ctx.fillRect(boxX, box1Y, textChangeImg.width, textChangeImg.height);
+    // Draw Box 2 exactly 33 pixels below Box 1 (e.g., for 'After' text)
+    const box2Y = box1Y + textChangeImg.height + 33;
+    ctx.drawImage(textChangeImg, boxX, box2Y);
 
-    // Temporarily hijack the main card text input to reuse your text drawing logic
-    const mainTextBackup = textInputs.card.value;
-    
-    // Draw the original text on the top box (passing 'null' prevents it from drawing the standard background)
-    textInputs.card.value = origText;
-    await drawTextBlock("card", null, boxX, box1Y);
-
-    // If there are changes, draw Box 2 and the changed text
-    if (hasChanges) {
-      const box2Y = box1Y + textChangeImg.height + 33;
-      ctx.drawImage(textChangeImg, boxX, box2Y);
-      
-      textInputs.card.value = changedText;
-      await drawTextBlock("card", null, boxX, box2Y);
-    }
-
-    // Restore the main text input to its original state so we don't break the main generator
-    textInputs.card.value = mainTextBackup;
+    /* TODO: Implement your text drawing logic here for both boxes. 
+      You can map 'adjCardText.value' or official card original text to these boxes 
+      using your existing drawTextWithHyphenSwap or drawTextBlock functions, 
+      adjusting the starting Y values to match box1Y and box2Y.
+    */
   }
 }
 
@@ -2256,37 +2236,6 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
