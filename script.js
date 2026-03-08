@@ -2111,13 +2111,13 @@ async function drawBalanceCard() {
   ctx.shadowBlur = 4;
   
   const costVal = document.getElementById('adjCost').value || document.getElementById('costValue').value;
-  drawScaledNumber(costVal, 197, 335, 80, 95, 'Sv_numbers', -5, -0.2);
+  drawScaledNumber(costVal, 209, 370, 80, 95, 'Sv_numbers', -5, -0.2);
 
   if (currentType === "follower") {
     const atkVal = document.getElementById('adjAttack').value || document.getElementById('attackValue').value;
     const defVal = document.getElementById('adjDefense').value || document.getElementById('defenseValue').value;
-    drawScaledNumber(atkVal, 201, 922, 82, 90, 'Sv_numbers', -5, -0.2);
-    drawScaledNumber(defVal, 642, 917, 82, 90, 'Sv_numbers', -5, -0.2);
+    drawScaledNumber(atkVal, 211, 902, 82, 90, 'Sv_numbers', -5, -0.2);
+    drawScaledNumber(defVal, 612, 897, 82, 90, 'Sv_numbers', -5, -0.2);
   }
 
   // --- NEW: Draw Card Name and Class ---
@@ -2137,7 +2137,6 @@ async function drawBalanceCard() {
   ctx.fillStyle = "#efeee9";
   // Draw the Emblem to the left of the Class text
   if (emblemImg) {
-    // X is shifted left by 45px. Y is shifted up by 36px from the text baseline to align vertically.
     // If your emblem image is exceptionally large, you can add width/height parameters: ctx.drawImage(emblemImg, 353, 856, 40, 40);
     ctx.drawImage(emblemImg, 280, 959, 46, 46); 
   }
@@ -2237,6 +2236,7 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
 
 
 
