@@ -132,13 +132,11 @@ function applySharpen(ctx, w, h, amount) {
 function getPartsAndWidths(text, fontSize, baseFont = "Memento", hyphenFont = "Roboto") {
   const parts = text.split(/(-)/g);
   let totalWidth = 0;
-  // Define extra spacing for the hyphen in titles
   const hyphenPadding = 8; 
 
   const widths = parts.map(part => {
     ctx.font = `${fontSize}px '${part === "-" ? hyphenFont : baseFont}'`;
     let w = ctx.measureText(part).width;
-    // If it's a hyphen, add the padding to the width calculation
     if (part === "-") w += hyphenPadding;
     totalWidth += w;
     return w;
@@ -158,11 +156,8 @@ function drawTextWithHyphenSwap(text, x, y, fontSize, align = "left", baseFont =
   
   parts.forEach((part, i) => {
     ctx.font = `${fontSize}px '${part === "-" ? hyphenFont : baseFont}'`;
-    
-    // If it's a hyphen, nudge it to the right so it is centered in the extra space
     let drawX = currentX;
-    if (part === "-") drawX += 4; // Half of the padding defined in getPartsAndWidths
-
+    if (part === "-") drawX += 4; 
     ctx.fillText(part, drawX, y);
     currentX += widths[i];
   });
@@ -262,7 +257,8 @@ const HIGHLIGHT_REGEX = new RegExp(`\\b(${HIGHLIGHT_KEYWORDS.join("|")})\\b`, "g
 // --- drawStretchBox ---
 function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   const stretchPerBreak = 50;
-  const stretchAmount = stretchCount * stretchPerBreak;
+  // Use Math.ceil to prevent subpixel math gaps when slicing
+  const stretchAmount = Math.ceil(stretchCount * stretchPerBreak);
   let topHeight = 40, bottomHeight = 40;
   let middleStartY = topHeight;
   let middleHeight = img.height - topHeight - bottomHeight;
@@ -284,18 +280,24 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
     middleHeight = img.height - topHeight - bottomHeight;
   }
 
-  ctx.drawImage(img, 0, 0, img.width, topHeight, x, y, img.width, topHeight);
+  // Draw Top (extend height by 1px to overlap)
+  ctx.drawImage(img, 0, 0, img.width, topHeight, x, y, img.width, topHeight + 1);
+  
+  // Draw Middle (overlap top by 1px, extend height by 2px to overlap bottom)
   ctx.drawImage(
     img,
     0, middleStartY, img.width, middleHeight,
-    x, y + middleStartY, img.width, middleHeight + stretchAmount
+    x, y + middleStartY - 1, img.width, middleHeight + stretchAmount + 2
   );
+  
+  // Draw Bottom (overlap middle by 1px)
   ctx.drawImage(
     img,
     0, img.height - bottomHeight, img.width, bottomHeight,
-    x, y + middleStartY + middleHeight + stretchAmount,
-    img.width, bottomHeight
+    x, y + middleStartY + middleHeight + stretchAmount - 1,
+    img.width, bottomHeight + 1
   );
+  
   return topHeight + middleHeight + bottomHeight + stretchAmount;
 }
 
@@ -724,10 +726,12 @@ async function drawCard() {
       const slicePointY = 200;
       const topHeight = Math.min(slicePointY, bg.height);
       const bottomPartHeight = bg.height - topHeight;
-      ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
+      
+      // Overlap background slices by 1px to prevent black lines
+      ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight + 1);
       if (bottomPartHeight > 0) {
         const newBottomHeight = bottomPartHeight + bgStretchPixels;
-        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
+        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight - 1, bg.width, newBottomHeight + 2);
       }
   }
 
@@ -2094,7 +2098,6 @@ async function drawBalanceCard() {
 
   const boxX = 701;
   const box1Y = 181;
-  // Use textChangeImg's height as a baseline, assuming 300px if it can't be fetched
   const stretchThreshold = textChangeImg ? textChangeImg.height - 40 : 300; 
   
   // Calculate Internal Component Heights
@@ -2137,10 +2140,12 @@ async function drawBalanceCard() {
     const slicePointY = 200;
     const topHeight = Math.min(slicePointY, bgImg.height);
     const bottomPartHeight = bgImg.height - topHeight;
-    ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight);
+    
+    // Overlap background slices by 1px to prevent black lines
+    ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight + 1);
     if (bottomPartHeight > 0) {
       const newBottomHeight = bottomPartHeight + bgStretchPixels;
-      ctx.drawImage(bgImg, 0, topHeight, bgImg.width, bottomPartHeight, 0, topHeight, bgImg.width, newBottomHeight);
+      ctx.drawImage(bgImg, 0, topHeight, bgImg.width, bottomPartHeight, 0, topHeight - 1, bgImg.width, newBottomHeight + 2);
     }
   } else {
     ctx.fillStyle = "#1a1a1a";
