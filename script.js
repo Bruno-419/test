@@ -2113,7 +2113,8 @@ async function drawBalanceCard() {
   const costVal = document.getElementById('adjCost').value || document.getElementById('costValue').value;
   drawScaledNumber(costVal, 209, 370, 80, 95, 'Sv_numbers', -5, -0.2);
 
-  if (currentType === "follower") {
+  // FIX: This now uses actualType from the searched card instead of currentType from the dropdown
+  if (actualType === "follower") {
     const atkVal = document.getElementById('adjAttack').value || document.getElementById('attackValue').value;
     const defVal = document.getElementById('adjDefense').value || document.getElementById('defenseValue').value;
     drawScaledNumber(atkVal, 211, 902, 82, 90, 'Sv_numbers', -5, -0.2);
@@ -2236,9 +2237,3 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
-
-
-
-
-
-
