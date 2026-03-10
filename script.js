@@ -2171,11 +2171,139 @@ async function drawBalanceCard() {
     const box2Y = box1Y + textChangeImg.height + 33;
     ctx.drawImage(textChangeImg, boxX, box2Y);
 
-    /* TODO: Implement your text drawing logic here for both boxes. 
-      You can map 'adjCardText.value' or official card original text to these boxes 
-      using your existing drawTextWithHyphenSwap or drawTextBlock functions, 
-      adjusting the starting Y values to match box1Y and box2Y.
-    */
+    // --- Collect Original Text Parts ---
+    let originalParts = [];
+    if (selectedCard && selectedCard.text) {
+        if (selectedCard.text.card) originalParts.push(selectedCard.text.card);
+        if (selectedCard.text.accelerate) originalParts.push(`Accelerate (${selectedCard.costs?.accelerate || 1})\n${selectedCard.text.accelerate}`);
+        if (selectedCard.text.crystallize) originalParts.push(`Crystallize (${selectedCard.costs?.crystallize || 1})\n${selectedCard.text.crystallize}`);
+        if (selectedCard.text.crest) originalParts.push(`Crest\n${selectedCard.text.crest}`);
+        if (selectedCard.text.faith) originalParts.push(`Faith\n${selectedCard.text.faith}`);
+        if (selectedCard.text.evolve) originalParts.push(`Evolve\n${selectedCard.text.evolve}`);
+        if (selectedCard.text.superEvolve) originalParts.push(`Super-Evolve\n${selectedCard.text.superEvolve}`);
+    }
+    const originalTextStr = originalParts.join('\n----------\n');
+
+    // --- Collect Adjusted Text Parts ---
+    let adjustedParts = [];
+    const adjCard = document.getElementById('adjCardText').value.trim();
+    const adjAcc = document.getElementById('adjAccelerateText').value.trim();
+    const adjAccCost = document.getElementById('adjAccelerateCost').value;
+    const adjCry = document.getElementById('adjCrystallizeText').value.trim();
+    const adjCryCost = document.getElementById('adjCrystallizeCost').value;
+    const adjCrest = document.getElementById('adjCrestText').value.trim();
+    const adjFaith = document.getElementById('adjFaithText').value.trim();
+    const adjEvo = document.getElementById('adjEvolveText').value.trim();
+    const adjSEvo = document.getElementById('adjSuperEvolveText').value.trim();
+
+    if (adjCard) adjustedParts.push(adjCard);
+    if (adjAcc && document.getElementById('adjAccelerateSection').style.display !== 'none') adjustedParts.push(`Accelerate (${adjAccCost})\n${adjAcc}`);
+    if (adjCry && document.getElementById('adjCrystallizeSection').style.display !== 'none') adjustedParts.push(`Crystallize (${adjCryCost})\n${adjCry}`);
+    if (adjCrest) adjustedParts.push(`Crest\n${adjCrest}`);
+    if (adjFaith) adjustedParts.push(`Faith\n${adjFaith}`);
+    if (adjEvo && document.getElementById('adjEvolveTextField').style.display !== 'none') adjustedParts.push(`Evolve\n${adjEvo}`);
+    if (adjSEvo && document.getElementById('adjSuperEvolveTextField').style.display !== 'none') adjustedParts.push(`Super-Evolve\n${adjSEvo}`);
+
+    const adjustedTextStr = adjustedParts.join('\n----------\n');
+
+    // --- Custom Balance Text Renderer ---
+    async function renderBalanceText(textValue, startX, startY) {
+        if (!textValue) return;
+
+        let processedText = textValue.replace(HIGHLIGHT_REGEX, "<K>$&</K>");
+        
+        // Re-highlight sub-headers as keywords
+        processedText = processedText.replace(/^Evolve/gm, "<K>Evolve</K>");
+        processedText = processedText.replace(/^Super-Evolve/gm, "<K>Super-Evolve</K>");
+        processedText = processedText.replace(/^Accelerate \(\d+\)/gm, "<K>$&</K>");
+        processedText = processedText.replace(/^Crystallize \(\d+\)/gm, "<K>$&</K>");
+        processedText = processedText.replace(/^Crest/gm, "<K>Crest</K>");
+        processedText = processedText.replace(/^Faith/gm, "<K>Faith</K>");
+
+        const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|[^\S\r\n]+|-)/g;
+        const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
+
+        const wrapLimitX = boxX + textChangeImg.width - 40; 
+        const lineHeight = 38; // Slightly smaller to fit balance boxes
+        const baseFont = "28px 'Memento'";
+
+        ctx.textAlign = "left";
+        ctx.shadowColor = "black";
+        ctx.shadowBlur = 4;
+
+        let xPos = startX;
+        let textY = startY;
+        let wetStyle = { bold: false, italic: false, color: null, isKeyword: false };
+
+        const dividerToUse = await getImage(assets.boxes.small_divider).catch(() => null);
+
+        const setWetStyle = () => {
+          const weight = wetStyle.bold || wetStyle.isKeyword ? "bold " : "";
+          const style = wetStyle.italic ? "italic " : "";
+          ctx.font = `${weight}${style}${baseFont}`;
+          ctx.fillStyle = wetStyle.color || (wetStyle.isKeyword ? "#f3d87d" : "#efeee9");
+        };
+
+        for (const token of allTokens) {
+          if (token === "**") { wetStyle.bold = !wetStyle.bold; continue; }
+          if (token === "_") { wetStyle.italic = !wetStyle.italic; continue; }
+          if (token === "<c>") { wetStyle.color = "#f3d87d"; continue; }
+          if (token === "</c>") { wetStyle.color = null; continue; }
+          if (token === "<K>") { wetStyle.isKeyword = true; continue; }
+          if (token === "</K>") { wetStyle.isKeyword = false; continue; }
+
+          if (token === "\n") {
+            textY += lineHeight;
+            xPos = startX;
+            continue;
+          }
+
+          if (token.trim() === "----------") {
+            textY += 15;
+            if (dividerToUse) {
+                ctx.drawImage(dividerToUse, startX - 10, textY - 10); 
+            }
+            textY += 25;
+            xPos = startX;
+            continue;
+          }
+
+          setWetStyle();
+
+          if (token === "-") {
+            const weight = wetStyle.bold || wetStyle.isKeyword ? "bold " : "";
+            const style = wetStyle.italic ? "italic " : "";
+            ctx.font = `${weight}${style}28px 'Roboto'`;
+          }
+
+          let tokenWidth = ctx.measureText(token).width;
+          let drawX = xPos;
+
+          if (token === "-") {
+              tokenWidth += 4;
+              drawX += 2;
+          }
+
+          if (xPos > startX && xPos + tokenWidth > wrapLimitX && token.trim() !== "") {
+            textY += lineHeight;
+            xPos = startX;
+            drawX = xPos + (token === "-" ? 2 : 0);
+          }
+          if (xPos === startX && token.trim() === "") continue;
+          ctx.fillText(token, drawX, textY);
+          xPos += tokenWidth;
+          if (wetStyle.italic) xPos += 0;
+        }
+    }
+
+    const textPaddingX = 35;
+    const textPaddingY = 55;
+
+    // Draw Top Box (Original)
+    await renderBalanceText(originalTextStr, boxX + textPaddingX, box1Y + textPaddingY);
+
+    // Draw Bottom Box (Adjusted)
+    await renderBalanceText(adjustedTextStr, boxX + textPaddingX, box2Y + textPaddingY);
   }
 }
 
@@ -2237,3 +2365,4 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
