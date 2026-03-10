@@ -59,14 +59,17 @@
                 <span class="field-label">Cost</span>
                 <input type="number" id="adjCost" min="0">
               </label>
-              <label class="field small-field">
-                <span class="field-label">Attack</span>
-                <input type="number" id="adjAttack" min="0">
-              </label>
-              <label class="field small-field">
-                <span class="field-label">Defense</span>
-                <input type="number" id="adjDefense" min="0">
-              </label>
+              
+              <div id="adjStatExtraFields" style="display: flex; gap: 10px; flex: 1;">
+                <label class="field small-field" style="flex: 1;">
+                  <span class="field-label">Attack</span>
+                  <input type="number" id="adjAttack" min="0">
+                </label>
+                <label class="field small-field" style="flex: 1;">
+                  <span class="field-label">Defense</span>
+                  <input type="number" id="adjDefense" min="0">
+                </label>
+              </div>
             </div>
           
             <label class="field">
@@ -85,7 +88,7 @@
               <textarea id="adjCardText"></textarea>
             </div>
           
-            <div class="field">
+            <div class="field" id="adjEvolveTextField">
               <div class="text-toolbar">
                 <label class="field-label" for="adjEvolveText">Evolve Text</label>
                 <button type="button" data-format="bold">B</button>
@@ -96,7 +99,7 @@
               <textarea id="adjEvolveText"></textarea>
             </div>
           
-            <div class="field">
+            <div class="field" id="adjSuperEvolveTextField">
               <div class="text-toolbar">
                 <label class="field-label" for="adjSuperEvolveText">Super-Evolve Text</label>
                 <button type="button" data-format="bold">B</button>
@@ -129,7 +132,7 @@
               <textarea id="adjFaithText"></textarea>
             </div>
 
-            <div class="accelerate-section adorned-accelerate">
+            <div class="accelerate-section adorned-accelerate" id="adjAccelerateSection">
               <div class="field" style="max-width: 120px;">
                 <span class="field-label">Accelerate Cost</span>
                 <input id="adjAccelerateCost" type="number" min="0" value="1">
@@ -146,7 +149,7 @@
               </div>
             </div>
 
-            <div class="crystallize-section adorned-crystallize">
+            <div class="crystallize-section adorned-crystallize" id="adjCrystallizeSection">
               <div class="field" style="max-width: 120px;">
                 <span class="field-label">Crystallize Cost</span>
                 <input id="adjCrystallizeCost" type="number" min="0" value="1">
@@ -558,14 +561,29 @@
 
     toggleFieldVisibility();
     cardTypeSelect.addEventListener('change', toggleFieldVisibility);
+
+    // === BALANCE PAGE TOGGLE LOGIC ===
+    const originalPopulate = window.populateBalanceForm;
+    window.populateBalanceForm = function(card) {
+      // 1. Run the original script.js population logic first
+      if (originalPopulate) originalPopulate(card);
+
+      // 2. Control visibility based on the database card type
+      const typeVal = card.type ? card.type.toLowerCase() : 'follower';
+      const isFollower = (typeVal === 'follower');
+      const isSpell = (typeVal === 'spell');
+      const isAmulet = (typeVal === 'amulet');
+
+      document.getElementById('adjStatExtraFields').style.display = isFollower ? 'flex' : 'none';
+      document.getElementById('adjEvolveTextField').style.display = isFollower ? 'block' : 'none';
+      document.getElementById('adjSuperEvolveTextField').style.display = isFollower ? 'block' : 'none';
+
+      const accSec = document.getElementById('adjAccelerateSection');
+      if (accSec) accSec.style.display = isSpell ? 'none' : '';
+
+      const crySec = document.getElementById('adjCrystallizeSection');
+      if (crySec) crySec.style.display = isAmulet ? 'none' : '';
+    };
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
