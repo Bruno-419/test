@@ -254,7 +254,6 @@ const HIGHLIGHT_KEYWORDS = [
 ];
 const HIGHLIGHT_REGEX = new RegExp(`\\b(${HIGHLIGHT_KEYWORDS.join("|")})\\b`, "g");
 
-// --- drawStretchBox ---
 function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   const stretchPerBreak = 50;
   // Use Math.ceil to prevent subpixel math gaps when slicing
@@ -280,23 +279,29 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
     middleHeight = img.height - topHeight - bottomHeight;
   }
 
-  // Draw Top (extend height by 1px to overlap)
-  ctx.drawImage(img, 0, 0, img.width, topHeight, x, y, img.width, topHeight + 1);
+  // Temporarily disable smoothing to prevent sub-pixel gaps without using alpha overlaps
+  const prevSmoothing = ctx.imageSmoothingEnabled;
+  ctx.imageSmoothingEnabled = false;
+
+  // Draw Top (exact bounds)
+  ctx.drawImage(img, 0, 0, img.width, topHeight, x, y, img.width, topHeight);
   
-  // Draw Middle (overlap top by 1px, extend height by 2px to overlap bottom)
+  // Draw Middle (exact bounds)
   ctx.drawImage(
     img,
     0, middleStartY, img.width, middleHeight,
-    x, y + middleStartY - 1, img.width, middleHeight + stretchAmount + 2
+    x, y + middleStartY, img.width, middleHeight + stretchAmount
   );
   
-  // Draw Bottom (overlap middle by 1px)
+  // Draw Bottom (exact bounds)
   ctx.drawImage(
     img,
     0, img.height - bottomHeight, img.width, bottomHeight,
-    x, y + middleStartY + middleHeight + stretchAmount - 1,
-    img.width, bottomHeight + 1
+    x, y + middleStartY + middleHeight + stretchAmount,
+    img.width, bottomHeight
   );
+
+  ctx.imageSmoothingEnabled = prevSmoothing;
   
   return topHeight + middleHeight + bottomHeight + stretchAmount;
 }
@@ -688,8 +693,7 @@ async function drawCard() {
       const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
       
       // Calculate how much the text box needs to stretch to fit the text
-      // Added Math.round() to prevent sub-pixel canvas rendering gaps
-      textStretchPixels = Math.round(Math.max(0, calculatedTotalY - stretchThreshold));
+      textStretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
 
       // Calculate the absolute bottom Y coordinate of the stretched text box
       let currentBottomY = 206 + mainBoxImg.height + textStretchPixels;
@@ -700,8 +704,7 @@ async function drawCard() {
       }
       
       // Only stretch the background canvas if it exceeds the 1050 threshold
-      // Added Math.round() to prevent sub-pixel canvas rendering gaps
-      bgStretchPixels = Math.round(Math.max(0, currentBottomY - 1050));
+      bgStretchPixels = Math.max(0, currentBottomY - 1050);
   }
 
   const stretchCount = textStretchPixels / 50;
@@ -729,12 +732,17 @@ async function drawCard() {
       const topHeight = Math.min(slicePointY, bg.height);
       const bottomPartHeight = bg.height - topHeight;
       
-      // Overlap background slices by 1px to prevent black lines
-      ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight + 1);
+      const prevSmoothing = ctx.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = false;
+
+      // Draw exact bounds
+      ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
       if (bottomPartHeight > 0) {
         const newBottomHeight = bottomPartHeight + bgStretchPixels;
-        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight - 1, bg.width, newBottomHeight + 2);
+        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
       }
+
+      ctx.imageSmoothingEnabled = prevSmoothing;
   }
 
   const [gem, frame] = await Promise.all([
@@ -2114,18 +2122,18 @@ async function drawBalanceCard() {
   }
 
   // Calculate Stretches
-  const origStretchPixels = Math.round(Math.max(0, origInnerHeight - stretchThreshold));
+  const origStretchPixels = Math.max(0, origInnerHeight - stretchThreshold);
   const origStretchCount = origStretchPixels / 50;
-  const box1ActualHeight = Math.round((textChangeImg ? textChangeImg.height : 300) + origStretchPixels);
+  const box1ActualHeight = (textChangeImg ? textChangeImg.height : 300) + origStretchPixels;
 
-  const box2Y = Math.round(box1Y + box1ActualHeight + 33);
+  const box2Y = box1Y + box1ActualHeight + 33;
   
-  const adjStretchPixels = Math.round(Math.max(0, adjInnerHeight - stretchThreshold));
+  const adjStretchPixels = Math.max(0, adjInnerHeight - stretchThreshold);
   const adjStretchCount = adjStretchPixels / 50;
-  const box2ActualHeight = Math.round((textChangeImg ? textChangeImg.height : 300) + adjStretchPixels);
+  const box2ActualHeight = (textChangeImg ? textChangeImg.height : 300) + adjStretchPixels;
 
   // Determine Background Stretch & Canvas Reset
-  let bgStretchPixels = Math.round(Math.max(0, (box2Y + box2ActualHeight + 50) - 1080));
+  let bgStretchPixels = Math.max(0, (box2Y + box2ActualHeight + 50) - 1080);
   
   const newWidth = 1920;
   const newHeight = 1080 + bgStretchPixels;
@@ -2136,19 +2144,24 @@ async function drawBalanceCard() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
-
+  
   // 1. Draw Background (stretched)
   if (bgImg) {
     const slicePointY = 200;
     const topHeight = Math.min(slicePointY, bgImg.height);
     const bottomPartHeight = bgImg.height - topHeight;
     
-    // Overlap background slices by 1px to prevent black lines
-    ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight + 1);
+    const prevSmoothing = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = false;
+
+    // Draw exact bounds
+    ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight);
     if (bottomPartHeight > 0) {
       const newBottomHeight = bottomPartHeight + bgStretchPixels;
-      ctx.drawImage(bgImg, 0, topHeight, bgImg.width, bottomPartHeight, 0, topHeight - 1, bgImg.width, newBottomHeight + 2);
+      ctx.drawImage(bgImg, 0, topHeight, bgImg.width, bottomPartHeight, 0, topHeight, bgImg.width, newBottomHeight);
     }
+
+    ctx.imageSmoothingEnabled = prevSmoothing;
   } else {
     ctx.fillStyle = "#1a1a1a";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -2325,4 +2338,3 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
-
