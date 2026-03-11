@@ -132,6 +132,7 @@ function applySharpen(ctx, w, h, amount) {
 function getPartsAndWidths(text, fontSize, baseFont = "Memento", hyphenFont = "Roboto") {
   const parts = text.split(/(-)/g);
   let totalWidth = 0;
+  // Define extra spacing for the hyphen in titles
   const hyphenPadding = 8; 
 
   const widths = parts.map(part => {
@@ -254,10 +255,15 @@ const HIGHLIGHT_KEYWORDS = [
 ];
 const HIGHLIGHT_REGEX = new RegExp(`\\b(${HIGHLIGHT_KEYWORDS.join("|")})\\b`, "g");
 
+// --- drawStretchBox ---
 function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   const stretchPerBreak = 50;
-  // Use Math.ceil to prevent subpixel math gaps when slicing
   const stretchAmount = Math.ceil(stretchCount * stretchPerBreak);
+  
+  // Round coordinates to prevent subpixel antialiasing gaps
+  const drawX = Math.round(x);
+  const drawY = Math.round(y);
+
   let topHeight = 40, bottomHeight = 40;
   let middleStartY = topHeight;
   let middleHeight = img.height - topHeight - bottomHeight;
@@ -279,29 +285,19 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
     middleHeight = img.height - topHeight - bottomHeight;
   }
 
-  // Temporarily disable smoothing to prevent sub-pixel gaps without using alpha overlaps
-  const prevSmoothing = ctx.imageSmoothingEnabled;
-  ctx.imageSmoothingEnabled = false;
-
-  // Draw Top (exact bounds)
-  ctx.drawImage(img, 0, 0, img.width, topHeight, x, y, img.width, topHeight);
-  
-  // Draw Middle (exact bounds)
+  // Overlap top, middle, and bottom slices by 1 pixel to perfectly seal any rendering gaps
+  ctx.drawImage(img, 0, 0, img.width, topHeight, drawX, drawY, img.width, topHeight + 1);
   ctx.drawImage(
     img,
     0, middleStartY, img.width, middleHeight,
-    x, y + middleStartY, img.width, middleHeight + stretchAmount
+    drawX, drawY + middleStartY - 1, img.width, middleHeight + stretchAmount + 2
   );
-  
-  // Draw Bottom (exact bounds)
   ctx.drawImage(
     img,
     0, img.height - bottomHeight, img.width, bottomHeight,
-    x, y + middleStartY + middleHeight + stretchAmount,
-    img.width, bottomHeight
+    drawX, drawY + middleStartY + middleHeight + stretchAmount - 1,
+    img.width, bottomHeight + 1
   );
-
-  ctx.imageSmoothingEnabled = prevSmoothing;
   
   return topHeight + middleHeight + bottomHeight + stretchAmount;
 }
@@ -671,7 +667,6 @@ async function drawCard() {
   let textStretchPixels = 0;
   let bgStretchPixels = 0;
 
-  // We fetch the mainBoxImg earlier so we can use its height in the stretch calculations
   const illustrator = document.getElementById("illustratorName").value.trim();
   const showBottomBar = wordCountCheckbox.checked || illustrator;
   const boxAsset = showBottomBar ? assets.boxes.text_box : assets.boxes.text_box_no_bottom;
@@ -692,18 +687,14 @@ async function drawCard() {
       const bottomBarStretchThreshold = 825;
       const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
       
-      // Calculate how much the text box needs to stretch to fit the text
       textStretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
 
-      // Calculate the absolute bottom Y coordinate of the stretched text box
       let currentBottomY = 206 + mainBoxImg.height + textStretchPixels;
       
-      // Account for the "token card" text
       if (tokenCheckbox.checked) {
           currentBottomY += 35; 
       }
       
-      // Only stretch the background canvas if it exceeds the 1050 threshold
       bgStretchPixels = Math.max(0, currentBottomY - 1050);
   }
 
@@ -714,8 +705,9 @@ async function drawCard() {
   const newWidth = saveCardOnly ? 729 : baseWidth;
   const newHeight = saveCardOnly ? 882 : (baseHeight + bgStretchPixels);
 
-  if (canvas.height !== newHeight) canvas.height = newHeight;
-  if (canvas.width !== newWidth) canvas.width = newWidth;
+  // Unconditionally assigning canvas width forces a full context wipe/reset
+  canvas.width = newWidth;
+  canvas.height = newHeight;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.imageSmoothingEnabled = true;
@@ -732,17 +724,12 @@ async function drawCard() {
       const topHeight = Math.min(slicePointY, bg.height);
       const bottomPartHeight = bg.height - topHeight;
       
-      const prevSmoothing = ctx.imageSmoothingEnabled;
-      ctx.imageSmoothingEnabled = false;
-
-      // Draw exact bounds
-      ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
+      // Overlap background slices by 1px to prevent black lines
+      ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight + 1);
       if (bottomPartHeight > 0) {
-        const newBottomHeight = bottomPartHeight + bgStretchPixels;
-        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
+        const newBottomHeight = Math.ceil(bottomPartHeight + bgStretchPixels);
+        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight - 1, bg.width, newBottomHeight + 2);
       }
-
-      ctx.imageSmoothingEnabled = prevSmoothing;
   }
 
   const [gem, frame] = await Promise.all([
@@ -2126,7 +2113,7 @@ async function drawBalanceCard() {
   const origStretchCount = origStretchPixels / 50;
   const box1ActualHeight = (textChangeImg ? textChangeImg.height : 300) + origStretchPixels;
 
-  const box2Y = box1Y + box1ActualHeight + 33;
+  const box2Y = Math.floor(box1Y + box1ActualHeight + 33);
   
   const adjStretchPixels = Math.max(0, adjInnerHeight - stretchThreshold);
   const adjStretchCount = adjStretchPixels / 50;
@@ -2136,32 +2123,28 @@ async function drawBalanceCard() {
   let bgStretchPixels = Math.max(0, (box2Y + box2ActualHeight + 50) - 1080);
   
   const newWidth = 1920;
-  const newHeight = 1080 + bgStretchPixels;
+  const newHeight = 1080 + Math.ceil(bgStretchPixels);
 
-  if (canvas.width !== newWidth) canvas.width = newWidth;
-  if (canvas.height !== newHeight) canvas.height = newHeight;
+  // Unconditionally assigning canvas width forces a full context wipe/reset
+  canvas.width = newWidth;
+  canvas.height = newHeight;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
-  
+
   // 1. Draw Background (stretched)
   if (bgImg) {
     const slicePointY = 200;
     const topHeight = Math.min(slicePointY, bgImg.height);
     const bottomPartHeight = bgImg.height - topHeight;
     
-    const prevSmoothing = ctx.imageSmoothingEnabled;
-    ctx.imageSmoothingEnabled = false;
-
-    // Draw exact bounds
-    ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight);
+    // Overlap background slices by 1px to prevent black lines
+    ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight + 1);
     if (bottomPartHeight > 0) {
-      const newBottomHeight = bottomPartHeight + bgStretchPixels;
-      ctx.drawImage(bgImg, 0, topHeight, bgImg.width, bottomPartHeight, 0, topHeight, bgImg.width, newBottomHeight);
+      const newBottomHeight = Math.ceil(bottomPartHeight + bgStretchPixels);
+      ctx.drawImage(bgImg, 0, topHeight, bgImg.width, bottomPartHeight, 0, topHeight - 1, bgImg.width, newBottomHeight + 2);
     }
-
-    ctx.imageSmoothingEnabled = prevSmoothing;
   } else {
     ctx.fillStyle = "#1a1a1a";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
