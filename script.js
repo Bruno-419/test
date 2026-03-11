@@ -688,7 +688,8 @@ async function drawCard() {
       const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
       
       // Calculate how much the text box needs to stretch to fit the text
-      textStretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
+      // Added Math.round() to prevent sub-pixel canvas rendering gaps
+      textStretchPixels = Math.round(Math.max(0, calculatedTotalY - stretchThreshold));
 
       // Calculate the absolute bottom Y coordinate of the stretched text box
       let currentBottomY = 206 + mainBoxImg.height + textStretchPixels;
@@ -699,7 +700,8 @@ async function drawCard() {
       }
       
       // Only stretch the background canvas if it exceeds the 1050 threshold
-      bgStretchPixels = Math.max(0, currentBottomY - 1050);
+      // Added Math.round() to prevent sub-pixel canvas rendering gaps
+      bgStretchPixels = Math.round(Math.max(0, currentBottomY - 1050));
   }
 
   const stretchCount = textStretchPixels / 50;
@@ -2112,18 +2114,18 @@ async function drawBalanceCard() {
   }
 
   // Calculate Stretches
-  const origStretchPixels = Math.max(0, origInnerHeight - stretchThreshold);
+  const origStretchPixels = Math.round(Math.max(0, origInnerHeight - stretchThreshold));
   const origStretchCount = origStretchPixels / 50;
-  const box1ActualHeight = (textChangeImg ? textChangeImg.height : 300) + origStretchPixels;
+  const box1ActualHeight = Math.round((textChangeImg ? textChangeImg.height : 300) + origStretchPixels);
 
-  const box2Y = box1Y + box1ActualHeight + 33;
+  const box2Y = Math.round(box1Y + box1ActualHeight + 33);
   
-  const adjStretchPixels = Math.max(0, adjInnerHeight - stretchThreshold);
+  const adjStretchPixels = Math.round(Math.max(0, adjInnerHeight - stretchThreshold));
   const adjStretchCount = adjStretchPixels / 50;
-  const box2ActualHeight = (textChangeImg ? textChangeImg.height : 300) + adjStretchPixels;
+  const box2ActualHeight = Math.round((textChangeImg ? textChangeImg.height : 300) + adjStretchPixels);
 
   // Determine Background Stretch & Canvas Reset
-  let bgStretchPixels = Math.max(0, (box2Y + box2ActualHeight + 50) - 1080);
+  let bgStretchPixels = Math.round(Math.max(0, (box2Y + box2ActualHeight + 50) - 1080));
   
   const newWidth = 1920;
   const newHeight = 1080 + bgStretchPixels;
@@ -2323,3 +2325,4 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
