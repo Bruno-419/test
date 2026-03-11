@@ -258,11 +258,12 @@ const HIGHLIGHT_REGEX = new RegExp(`\\b(${HIGHLIGHT_KEYWORDS.join("|")})\\b`, "g
 // --- drawStretchBox ---
 function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   const stretchPerBreak = 50;
+  // Ensure integer scaling to prevent decimal gaps
   const stretchAmount = Math.ceil(stretchCount * stretchPerBreak);
   
-  // Round coordinates to prevent subpixel antialiasing gaps
-  const drawX = Math.round(x);
-  const drawY = Math.round(y);
+  // Force coordinates to integers
+  const drawX = Math.floor(x);
+  const drawY = Math.floor(y);
 
   let topHeight = 40, bottomHeight = 40;
   let middleStartY = topHeight;
@@ -285,16 +286,20 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
     middleHeight = img.height - topHeight - bottomHeight;
   }
 
-  // Overlap top, middle, and bottom slices by 1 pixel to perfectly seal any rendering gaps
-  ctx.drawImage(img, 0, 0, img.width, topHeight, drawX, drawY, img.width, topHeight + 1);
+  // Draw Top
+  ctx.drawImage(img, 0, 0, img.width, topHeight, drawX, drawY, img.width, topHeight);
+  
+  // Draw Middle: Sample 1 extra pixel from source (middleStartY - 1) to perfectly overlap the seam
   ctx.drawImage(
     img,
-    0, middleStartY, img.width, middleHeight,
-    drawX, drawY + middleStartY - 1, img.width, middleHeight + stretchAmount + 2
+    0, middleStartY - 1, img.width, middleHeight + 1,
+    drawX, drawY + middleStartY - 1, img.width, middleHeight + stretchAmount + 1
   );
+  
+  // Draw Bottom: Sample 1 extra pixel from source (bottomHeight + 1) to perfectly overlap the seam
   ctx.drawImage(
     img,
-    0, img.height - bottomHeight, img.width, bottomHeight,
+    0, img.height - bottomHeight - 1, img.width, bottomHeight + 1,
     drawX, drawY + middleStartY + middleHeight + stretchAmount - 1,
     img.width, bottomHeight + 1
   );
@@ -687,7 +692,7 @@ async function drawCard() {
       const bottomBarStretchThreshold = 825;
       const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
       
-      textStretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
+      textStretchPixels = Math.ceil(Math.max(0, calculatedTotalY - stretchThreshold));
 
       let currentBottomY = 206 + mainBoxImg.height + textStretchPixels;
       
@@ -695,7 +700,7 @@ async function drawCard() {
           currentBottomY += 35; 
       }
       
-      bgStretchPixels = Math.max(0, currentBottomY - 1050);
+      bgStretchPixels = Math.ceil(Math.max(0, currentBottomY - 1050));
   }
 
   const stretchCount = textStretchPixels / 50;
@@ -705,7 +710,7 @@ async function drawCard() {
   const newWidth = saveCardOnly ? 729 : baseWidth;
   const newHeight = saveCardOnly ? 882 : (baseHeight + bgStretchPixels);
 
-  // Unconditionally assigning canvas width forces a full context wipe/reset
+  // Forcing properties unconditionally prevents context contamination across page logic
   canvas.width = newWidth;
   canvas.height = newHeight;
 
@@ -724,11 +729,11 @@ async function drawCard() {
       const topHeight = Math.min(slicePointY, bg.height);
       const bottomPartHeight = bg.height - topHeight;
       
-      // Overlap background slices by 1px to prevent black lines
-      ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight + 1);
+      // Sample 1 exact pixel row from source seam to perfectly avoid tearing without scaling
+      ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
       if (bottomPartHeight > 0) {
-        const newBottomHeight = Math.ceil(bottomPartHeight + bgStretchPixels);
-        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight - 1, bg.width, newBottomHeight + 2);
+        const newBottomHeight = bottomPartHeight + bgStretchPixels;
+        ctx.drawImage(bg, 0, topHeight - 1, bg.width, bottomPartHeight + 1, 0, topHeight - 1, bg.width, newBottomHeight + 1);
       }
   }
 
@@ -762,8 +767,9 @@ async function drawCard() {
   if (!saveCardOnly) {
       const textBoxX = 722;
       const textBoxY = 206;
-      const dynamicBoxWidth = mainBoxImg.width;
-      const dynamicBoxHeight = mainBoxImg.height + textStretchPixels; 
+      // Int values for blur coordinates
+      const dynamicBoxWidth = Math.floor(mainBoxImg.width);
+      const dynamicBoxHeight = Math.floor(mainBoxImg.height + textStretchPixels); 
 
       const offCanvas = document.createElement("canvas");
       offCanvas.width = dynamicBoxWidth - 18;
@@ -2139,11 +2145,11 @@ async function drawBalanceCard() {
     const topHeight = Math.min(slicePointY, bgImg.height);
     const bottomPartHeight = bgImg.height - topHeight;
     
-    // Overlap background slices by 1px to prevent black lines
-    ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight + 1);
+    // Sample 1 exact pixel row from source seam to perfectly avoid tearing without scaling
+    ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight);
     if (bottomPartHeight > 0) {
       const newBottomHeight = Math.ceil(bottomPartHeight + bgStretchPixels);
-      ctx.drawImage(bgImg, 0, topHeight, bgImg.width, bottomPartHeight, 0, topHeight - 1, bgImg.width, newBottomHeight + 2);
+      ctx.drawImage(bgImg, 0, topHeight - 1, bgImg.width, bottomPartHeight + 1, 0, topHeight - 1, bgImg.width, newBottomHeight + 1);
     }
   } else {
     ctx.fillStyle = "#1a1a1a";
