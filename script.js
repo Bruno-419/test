@@ -132,6 +132,7 @@ function applySharpen(ctx, w, h, amount) {
 function getPartsAndWidths(text, fontSize, baseFont = "Memento", hyphenFont = "Roboto") {
   const parts = text.split(/(-)/g);
   let totalWidth = 0;
+  // Define extra spacing for the hyphen in titles
   const hyphenPadding = 8; 
 
   const widths = parts.map(part => {
@@ -258,11 +259,11 @@ const HIGHLIGHT_REGEX = new RegExp(`\\b(${HIGHLIGHT_KEYWORDS.join("|")})\\b`, "g
 function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   const stretchPerBreak = 50;
   // Ensure integer scaling to prevent decimal gaps
-  const stretchAmount = Math.ceil(stretchCount * stretchPerBreak);
+  const stretchAmount = Math.round(stretchCount * stretchPerBreak);
   
   // Force coordinates to integers
-  const drawX = Math.floor(x);
-  const drawY = Math.floor(y);
+  const drawX = Math.round(x);
+  const drawY = Math.round(y);
 
   let topHeight = 40, bottomHeight = 40;
   let middleStartY = topHeight;
@@ -286,19 +287,19 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   // Draw Top
   ctx.drawImage(img, 0, 0, img.width, topHeight, drawX, drawY, img.width, topHeight);
   
-  // Draw Middle: Overlap by 1px visually on the destination canvas without altering source
+  // Draw Middle: Sample exact original pixels, but shift the destination up by 1px and extend its height by 2px
   ctx.drawImage(
     img,
     0, middleStartY, img.width, middleHeight,
     drawX, drawY + middleStartY - 1, img.width, middleHeight + stretchAmount + 2
   );
   
-  // Draw Bottom: Overlap by 1px visually on the destination canvas without altering source
+  // Draw Bottom: Place it exactly where it needs to be (the middle overlaps it from above)
   ctx.drawImage(
     img,
     0, img.height - bottomHeight, img.width, bottomHeight,
-    drawX, drawY + middleStartY + middleHeight + stretchAmount - 1,
-    img.width, bottomHeight + 1
+    drawX, drawY + middleStartY + middleHeight + stretchAmount,
+    img.width, bottomHeight
   );
   
   return topHeight + middleHeight + bottomHeight + stretchAmount;
@@ -689,7 +690,7 @@ async function drawCard() {
       const bottomBarStretchThreshold = 825;
       const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
       
-      textStretchPixels = Math.ceil(Math.max(0, calculatedTotalY - stretchThreshold));
+      textStretchPixels = Math.round(Math.max(0, calculatedTotalY - stretchThreshold));
 
       let currentBottomY = 206 + mainBoxImg.height + textStretchPixels;
       
@@ -697,7 +698,7 @@ async function drawCard() {
           currentBottomY += 35; 
       }
       
-      bgStretchPixels = Math.ceil(Math.max(0, currentBottomY - 1050));
+      bgStretchPixels = Math.round(Math.max(0, currentBottomY - 1050));
   }
 
   const stretchCount = textStretchPixels / 50;
@@ -707,16 +708,9 @@ async function drawCard() {
   const newWidth = saveCardOnly ? 729 : baseWidth;
   const newHeight = saveCardOnly ? 882 : (baseHeight + bgStretchPixels);
 
+  // Hard wipe of canvas memory to guarantee clean renders
   canvas.width = newWidth;
   canvas.height = newHeight;
-
-  // --- HARD STATE RESET ---
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.filter = "none";
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
-  ctx.globalAlpha = 1.0;
-  ctx.globalCompositeOperation = 'source-over';
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.imageSmoothingEnabled = true;
@@ -733,9 +727,12 @@ async function drawCard() {
       const topHeight = Math.min(slicePointY, bg.height);
       const bottomPartHeight = bg.height - topHeight;
       
+      // Draw background top
       ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
+      
+      // Draw background bottom: exact original pixels, overlapping destination up by 1px
       if (bottomPartHeight > 0) {
-        const newBottomHeight = Math.ceil(bottomPartHeight + bgStretchPixels);
+        const newBottomHeight = Math.round(bottomPartHeight + bgStretchPixels);
         ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight - 1, bg.width, newBottomHeight + 2);
       }
   }
@@ -770,9 +767,9 @@ async function drawCard() {
   if (!saveCardOnly) {
       const textBoxX = 722;
       const textBoxY = 206;
-      // Int values for blur coordinates
-      const dynamicBoxWidth = Math.floor(mainBoxImg.width);
-      const dynamicBoxHeight = Math.floor(mainBoxImg.height + textStretchPixels); 
+      
+      const dynamicBoxWidth = Math.round(mainBoxImg.width);
+      const dynamicBoxHeight = Math.round(mainBoxImg.height + textStretchPixels); 
 
       const offCanvas = document.createElement("canvas");
       offCanvas.width = dynamicBoxWidth - 18;
@@ -2134,6 +2131,7 @@ async function drawBalanceCard() {
   const newWidth = 1920;
   const newHeight = 1080 + Math.ceil(bgStretchPixels);
 
+  // Hard wipe of canvas memory to guarantee clean renders
   canvas.width = newWidth;
   canvas.height = newHeight;
 
@@ -2155,9 +2153,12 @@ async function drawBalanceCard() {
     const topHeight = Math.min(slicePointY, bgImg.height);
     const bottomPartHeight = bgImg.height - topHeight;
     
+    // Draw background top
     ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight);
+    
+    // Draw background bottom: exact original pixels, overlapping destination up by 1px
     if (bottomPartHeight > 0) {
-      const newBottomHeight = Math.ceil(bottomPartHeight + bgStretchPixels);
+      const newBottomHeight = Math.round(bottomPartHeight + bgStretchPixels);
       ctx.drawImage(bgImg, 0, topHeight, bgImg.width, bottomPartHeight, 0, topHeight - 1, bgImg.width, newBottomHeight + 2);
     }
   } else {
