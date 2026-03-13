@@ -132,7 +132,6 @@ function applySharpen(ctx, w, h, amount) {
 function getPartsAndWidths(text, fontSize, baseFont = "Memento", hyphenFont = "Roboto") {
   const parts = text.split(/(-)/g);
   let totalWidth = 0;
-  // Define extra spacing for the hyphen in titles
   const hyphenPadding = 8; 
 
   const widths = parts.map(part => {
@@ -267,39 +266,37 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
 
   let topHeight = 40, bottomHeight = 40;
   let middleStartY = topHeight;
-  let middleHeight = img.height - topHeight - bottomHeight;
-
+  
   if (key === "crest" || key === "faith" || key === "accelerate" || key === "crystallize") {
     topHeight = 107;
     middleStartY = 107;
-    middleHeight = 38;
     bottomHeight = 28;
   } else if (key === "main") {
     topHeight = 60;
     bottomHeight = 120;
     middleStartY = topHeight;
-    middleHeight = img.height - topHeight - bottomHeight;
   } else if (key === "change") {
     topHeight = 40;
     bottomHeight = 40;
     middleStartY = topHeight;
-    middleHeight = img.height - topHeight - bottomHeight;
   }
+
+  let middleHeight = img.height - topHeight - bottomHeight;
 
   // Draw Top
   ctx.drawImage(img, 0, 0, img.width, topHeight, drawX, drawY, img.width, topHeight);
   
-  // Draw Middle: Sample 1 extra pixel from source (middleStartY - 1) to perfectly overlap the seam
+  // Draw Middle: Overlap by 1px visually on the destination canvas without altering source
   ctx.drawImage(
     img,
-    0, middleStartY - 1, img.width, middleHeight + 1,
-    drawX, drawY + middleStartY - 1, img.width, middleHeight + stretchAmount + 1
+    0, middleStartY, img.width, middleHeight,
+    drawX, drawY + middleStartY - 1, img.width, middleHeight + stretchAmount + 2
   );
   
-  // Draw Bottom: Sample 1 extra pixel from source (bottomHeight + 1) to perfectly overlap the seam
+  // Draw Bottom: Overlap by 1px visually on the destination canvas without altering source
   ctx.drawImage(
     img,
-    0, img.height - bottomHeight - 1, img.width, bottomHeight + 1,
+    0, img.height - bottomHeight, img.width, bottomHeight,
     drawX, drawY + middleStartY + middleHeight + stretchAmount - 1,
     img.width, bottomHeight + 1
   );
@@ -710,9 +707,16 @@ async function drawCard() {
   const newWidth = saveCardOnly ? 729 : baseWidth;
   const newHeight = saveCardOnly ? 882 : (baseHeight + bgStretchPixels);
 
-  // Forcing properties unconditionally prevents context contamination across page logic
   canvas.width = newWidth;
   canvas.height = newHeight;
+
+  // --- HARD STATE RESET ---
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.filter = "none";
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 1.0;
+  ctx.globalCompositeOperation = 'source-over';
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.imageSmoothingEnabled = true;
@@ -729,11 +733,10 @@ async function drawCard() {
       const topHeight = Math.min(slicePointY, bg.height);
       const bottomPartHeight = bg.height - topHeight;
       
-      // Sample 1 exact pixel row from source seam to perfectly avoid tearing without scaling
       ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
       if (bottomPartHeight > 0) {
-        const newBottomHeight = bottomPartHeight + bgStretchPixels;
-        ctx.drawImage(bg, 0, topHeight - 1, bg.width, bottomPartHeight + 1, 0, topHeight - 1, bg.width, newBottomHeight + 1);
+        const newBottomHeight = Math.ceil(bottomPartHeight + bgStretchPixels);
+        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight - 1, bg.width, newBottomHeight + 2);
       }
   }
 
@@ -2131,9 +2134,16 @@ async function drawBalanceCard() {
   const newWidth = 1920;
   const newHeight = 1080 + Math.ceil(bgStretchPixels);
 
-  // Unconditionally assigning canvas width forces a full context wipe/reset
   canvas.width = newWidth;
   canvas.height = newHeight;
+
+  // --- HARD STATE RESET ---
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.filter = "none";
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 1.0;
+  ctx.globalCompositeOperation = 'source-over';
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.imageSmoothingEnabled = true;
@@ -2145,11 +2155,10 @@ async function drawBalanceCard() {
     const topHeight = Math.min(slicePointY, bgImg.height);
     const bottomPartHeight = bgImg.height - topHeight;
     
-    // Sample 1 exact pixel row from source seam to perfectly avoid tearing without scaling
     ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight);
     if (bottomPartHeight > 0) {
       const newBottomHeight = Math.ceil(bottomPartHeight + bgStretchPixels);
-      ctx.drawImage(bgImg, 0, topHeight - 1, bgImg.width, bottomPartHeight + 1, 0, topHeight - 1, bgImg.width, newBottomHeight + 1);
+      ctx.drawImage(bgImg, 0, topHeight, bgImg.width, bottomPartHeight, 0, topHeight - 1, bgImg.width, newBottomHeight + 2);
     }
   } else {
     ctx.fillStyle = "#1a1a1a";
