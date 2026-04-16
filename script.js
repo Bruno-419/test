@@ -190,7 +190,18 @@ function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpa
 
 // --- Word Count Functions ---
 function calculateTotalWordCount() {
-  const allText = Object.values(textInputs).map(t => t.value).join(" ");
+  // Grab the current card name (or an empty string if left blank)
+  const currentCardName = nameInput.value.trim();
+
+  // Combine all text, replacing [$n] with the actual card name first
+  const allText = Object.values(textInputs).map(t => {
+    let text = t.value;
+    if (text.includes("[$n]")) {
+      text = text.replace(/\[\$n\]/g, currentCardName);
+    }
+    return text;
+  }).join(" ");
+
   const initialTokens = allText.split(/\s+/);
   let wordCount = 0;
   for (const token of initialTokens) {
@@ -244,6 +255,8 @@ Object.values(textInputs).forEach((textarea) => {
 
 wordCountCheckbox.addEventListener("change", updateLiveWordCount);
 saveCardOnlyCheckbox.addEventListener("change", () => drawCard());
+// NEW: Update the word count if the user changes the card's name
+nameInput.addEventListener("input", updateLiveWordCount);
 
 // --- Text highlight keywords ---
 const HIGHLIGHT_KEYWORDS = [
