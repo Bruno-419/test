@@ -235,7 +235,14 @@ async function getImage(src) {
 
 // --- RICH TEXT SYNC LOGIC ---
 
-// Converts rich HTML back to your custom syntax so the canvas drawer doesn't break
+// List of Shadowverse keywords to automatically highlight Gold
+const SV_KEYWORDS = [
+  "Fanfare", "Last Words", "Strike", "Clash", "Ward", "Storm", "Rush", "Bane", "Drain", 
+  "Aura", "Stealth", "Ambush", "Accelerate", "Crystallize", "Earth Rite", "Enhance", 
+  "Necromancy", "Combo", "Spellboost", "Invocation", "Evolve", "Super-Evolve", 
+  "Activates in hand", "Maneuver"
+];
+
 function htmlToCustomTags(html) {
   let text = html.replace(/<div><br><\/div>/gi, '\n')
                  .replace(/<div>/gi, '\n')
@@ -257,45 +264,118 @@ function htmlToCustomTags(html) {
              .replace(/&gt;/g, '>');
 }
 
-// Converts official cards/workshop data into visual HTML
 function customTagsToHtml(text) {
   if (!text) return "";
+  // Escape HTML brackets first, then replace custom formatting tags
   let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
   html = html.replace(/_(.*?)_/g, '<i>$1</i>');
-  html = html.replace(/<c>(.*?)<\/c>/g, '<span style="color: #f3d87d;">$1</span>');
+  html = html.replace(/&lt;c&gt;(.*?)&lt;\/c&gt;/g, '<span style="color: #f3d87d;">$1</span>');
   return html.replace(/\n/g, '<br>');
 }
 
-// Setup all rich text editors
+// Automatically wraps designated keywords in <c> tags (Gold)
+function formatKeywords(text) {
+    const kwPattern = SV_KEYWORDS.join('|');
+    const regex = new RegExp(`\\b(${kwPattern})\\b`, 'g');
+    
+    // Split by existing <c> tags to ensure we don't double-wrap manually formatted words
+    const parts = text.split(/(<c>.*?<\/c>)/g);
+    for (let i = 0; i < parts.length; i++) {
+        if (!parts[i].startsWith('<c>')) {
+            parts[i] = parts[i].replace(regex, '<c>$1</c>');
+        }
+    }
+    return parts.join('');
+}
+
+// --- Caret Save/Restore Helpers ---
+function saveCaretPosition(context) {
+    const selection = window.getSelection();
+    if (selection.rangeCount === 0) return 0;
+    const range = selection.getRangeAt(0);
+    const preSelectionRange = range.cloneRange();
+    preSelectionRange.selectNodeContents(context);
+    preSelectionRange.setEnd(range.startContainer, range.startOffset);
+    return preSelectionRange.toString().length;
+}
+
+function restoreCaretPosition(context, savedPosition) {
+    const selection = window.getSelection();
+    let charIndex = 0, range = document.createRange();
+    range.setStart(context, 0);
+    range.collapse(true);
+    let nodeStack = [context], node, foundStart = false, stop = false;
+
+    while (!stop && (node = nodeStack.pop())) {
+        if (node.nodeType === 3) {
+            const nextCharIndex = charIndex + node.length;
+            if (!foundStart && savedPosition >= charIndex && savedPosition <= nextCharIndex) {
+                range.setStart(node, savedPosition - charIndex);
+                range.collapse(true);
+                foundStart = true;
+                stop = true;
+            }
+            charIndex = nextCharIndex;
+        } else {
+            let i = node.childNodes.length;
+            while (i--) {
+                nodeStack.push(node.childNodes[i]);
+            }
+        }
+    }
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
+// --- Setup Editor Event Listeners ---
 document.querySelectorAll('.rich-editor').forEach(editor => {
   const hiddenInputId = editor.id.replace('_editor', '');
   const hiddenInput = document.getElementById(hiddenInputId);
 
-  // Prevent pasting giant unformatted blocks from breaking styling
   editor.addEventListener('paste', (e) => {
     e.preventDefault();
     const text = (e.originalEvent || e).clipboardData.getData('text/plain');
     document.execCommand('insertText', false, text);
   });
 
+  // Track if user is using an IME (like Japanese input) to prevent typing breakage
+  let isComposing = false;
+  editor.addEventListener('compositionstart', () => { isComposing = true; });
+  editor.addEventListener('compositionend', () => { 
+      isComposing = false; 
+      editor.dispatchEvent(new Event('input')); 
+  });
+
   editor.addEventListener('input', () => {
     if (!hiddenInput) return;
-    hiddenInput.value = htmlToCustomTags(editor.innerHTML);
+    
+    let originalTags = htmlToCustomTags(editor.innerHTML);
+    let newTags = originalTags;
 
-    // Auto-divider integration for rich text
-    if (autoDividerCheckbox && autoDividerCheckbox.checked && hiddenInput.value.endsWith('\n\n')) {
-        document.execCommand('insertText', false, '----------\n');
-        hiddenInput.value = htmlToCustomTags(editor.innerHTML);
+    if (!isComposing) {
+        if (typeof autoDividerCheckbox !== 'undefined' && autoDividerCheckbox.checked && newTags.endsWith('\n\n')) {
+            newTags = newTags.slice(0, -2) + '\n----------\n';
+        }
+
+        newTags = formatKeywords(newTags);
+
+        // Only redraw the HTML if keywords or dividers were actually added, 
+        // to prevent caret flickering during normal typing.
+        if (newTags !== originalTags) {
+            const caretPos = saveCaretPosition(editor);
+            editor.innerHTML = customTagsToHtml(newTags);
+            restoreCaretPosition(editor, caretPos);
+        }
     }
-    updateLiveWordCount();
+
+    hiddenInput.value = newTags;
+    if (typeof updateLiveWordCount === 'function') updateLiveWordCount();
   });
 });
 
-wordCountCheckbox.addEventListener("change", updateLiveWordCount);
-saveCardOnlyCheckbox.addEventListener("change", () => drawCard());
-// NEW: Update the word count if the user changes the card's name
-nameInput.addEventListener("input", updateLiveWordCount);
+if (typeof wordCountCheckbox !== 'undefined') wordCountCheckbox.addEventListener("change", updateLiveWordCount);
+if (typeof saveCardOnlyCheckbox !== 'undefined') saveCardOnlyCheckbox.addEventListener("change", () => drawCard());
 
 // --- Text highlight keywords ---
 const HIGHLIGHT_KEYWORDS = [
@@ -1306,17 +1386,24 @@ attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
-// New WYSIWYG Toolbar Logic
+// --- WYSIWYG Toolbar Logic ---
 document.querySelectorAll(".text-toolbar button").forEach((button) => {
   button.addEventListener("click", (e) => {
     e.preventDefault();
+    
+    const selection = window.getSelection();
+    
+    // FIX: If no text is actively highlighted, cancel the action to prevent format toggling
+    if (!selection || selection.isCollapsed) return; 
+
     const format = button.dataset.format;
     const field = button.closest(".field");
     if (!field) return;
     const editor = field.querySelector(".rich-editor");
     if (!editor) return;
 
-    editor.focus();
+    // Ensure the user's selection is actually inside the correct text box
+    if (!editor.contains(selection.anchorNode)) return;
 
     if (format === "bold") {
       document.execCommand("bold", false, null);
