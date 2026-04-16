@@ -233,22 +233,61 @@ async function getImage(src) {
   return img;
 }
 
-// --- Auto insert "----------" marker ---
-Object.values(textInputs).forEach((textarea) => {
-  textarea.addEventListener("input", () => {
-    if (autoDividerCheckbox.checked) {
-      const cursorPos = textarea.selectionStart;
-      const value = textarea.value;
-      const before = value.slice(0, cursorPos);
-      const after = value.slice(cursorPos);
-      if (before.endsWith("\n\n")) {
-        const newValue = before.slice(0, -1) + "----------\n" + after;
-        textarea.value = newValue;
-        textarea.selectionStart = textarea.selectionEnd = cursorPos + 10;
-      }
+// --- RICH TEXT SYNC LOGIC ---
+
+// Converts rich HTML back to your custom syntax so the canvas drawer doesn't break
+function htmlToCustomTags(html) {
+  let text = html.replace(/<div><br><\/div>/gi, '\n')
+                 .replace(/<div>/gi, '\n')
+                 .replace(/<\/div>/gi, '')
+                 .replace(/<br\s*\/?>/gi, '\n');
+
+  text = text.replace(/<b>(.*?)<\/b>/gi, '**$1**')
+             .replace(/<strong>(.*?)<\/strong>/gi, '**$1**')
+             .replace(/<i>(.*?)<\/i>/gi, '_$1_')
+             .replace(/<em>(.*?)<\/em>/gi, '_$1_');
+
+  text = text.replace(/<span[^>]*color:\s*(?:rgb\(243,\s*216,\s*125\)|#f3d87d)[^>]*>(.*?)<\/span>/gi, '<c>$1</c>')
+             .replace(/<font[^>]*color="(?:rgb\(243,\s*216,\s*125\)|#f3d87d)"[^>]*>(.*?)<\/font>/gi, '<c>$1</c>');
+
+  return text.replace(/<[^>]+>/g, '')
+             .replace(/&nbsp;/g, ' ')
+             .replace(/&amp;/g, '&')
+             .replace(/&lt;/g, '<')
+             .replace(/&gt;/g, '>');
+}
+
+// Converts official cards/workshop data into visual HTML
+function customTagsToHtml(text) {
+  if (!text) return "";
+  let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  html = html.replace(/_(.*?)_/g, '<i>$1</i>');
+  html = html.replace(/<c>(.*?)<\/c>/g, '<span style="color: #f3d87d;">$1</span>');
+  return html.replace(/\n/g, '<br>');
+}
+
+// Setup all rich text editors
+document.querySelectorAll('.rich-editor').forEach(editor => {
+  const hiddenInputId = editor.id.replace('_editor', '');
+  const hiddenInput = document.getElementById(hiddenInputId);
+
+  // Prevent pasting giant unformatted blocks from breaking styling
+  editor.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+  });
+
+  editor.addEventListener('input', () => {
+    if (!hiddenInput) return;
+    hiddenInput.value = htmlToCustomTags(editor.innerHTML);
+
+    // Auto-divider integration for rich text
+    if (autoDividerCheckbox && autoDividerCheckbox.checked && hiddenInput.value.endsWith('\n\n')) {
+        document.execCommand('insertText', false, '----------\n');
+        hiddenInput.value = htmlToCustomTags(editor.innerHTML);
     }
-    textarea.style.height = 'auto';
-    textarea.style.height = (textarea.scrollHeight) + 'px';
     updateLiveWordCount();
   });
 });
@@ -1267,52 +1306,32 @@ attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
+// New WYSIWYG Toolbar Logic
 document.querySelectorAll(".text-toolbar button").forEach((button) => {
   button.addEventListener("click", (e) => {
     e.preventDefault();
     const format = button.dataset.format;
     const field = button.closest(".field");
     if (!field) return;
-    const textarea = field.querySelector("textarea");
-    if (!textarea) return;
+    const editor = field.querySelector(".rich-editor");
+    if (!editor) return;
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const value = textarea.value;
-    const selected = value.slice(start, end);
+    editor.focus();
 
-    let openTag = "", closeTag = "";
-    if (format === "bold") { openTag = "**"; closeTag = "**"; }
-    else if (format === "italic") { openTag = "_"; closeTag = "_"; }
-    else if (format === "color") { openTag = "<c>"; closeTag = "</c>"; }
-    else if (format === "all") { openTag = "**_<c>"; closeTag = "</c>_**"; }
-    else return;
-
-    if (start !== end) {
-      const before = value.slice(0, start);
-      const after = value.slice(end);
-      const currentlyWrapped = before.endsWith(openTag) && after.startsWith(closeTag);
-      if (currentlyWrapped) {
-        const newBefore = before.slice(0, before.length - openTag.length);
-        const newAfter = after.slice(closeTag.length);
-        textarea.value = newBefore + selected + newAfter;
-        textarea.setSelectionRange(newBefore.length, newBefore.length + selected.length);
-      } else {
-        textarea.value = before + openTag + selected + closeTag + after;
-        textarea.setSelectionRange(start + openTag.length, end + openTag.length);
-      }
-      textarea.focus();
-      textarea.dispatchEvent(new Event("input"));
-      return;
+    if (format === "bold") {
+      document.execCommand("bold", false, null);
+    } else if (format === "italic") {
+      document.execCommand("italic", false, null);
+    } else if (format === "color") {
+      document.execCommand("styleWithCSS", false, true);
+      document.execCommand("foreColor", false, "#f3d87d");
+    } else if (format === "all") {
+      document.execCommand("bold", false, null);
+      document.execCommand("italic", false, null);
+      document.execCommand("styleWithCSS", false, true);
+      document.execCommand("foreColor", false, "#f3d87d");
     }
-
-    const before = value.slice(0, start);
-    const after = value.slice(start);
-    textarea.value = before + openTag + closeTag + after;
-    const caret = before.length + openTag.length;
-    textarea.setSelectionRange(caret, caret);
-    textarea.focus();
-    textarea.dispatchEvent(new Event("input"));
+    editor.dispatchEvent(new Event("input"));
   });
 });
 
@@ -2019,19 +2038,26 @@ function populateBalanceForm(card) {
   // Trait
   document.getElementById('adjTrait').value = (card.trait === '-' ? '' : card.trait) || '';
 
+  // Helper to sync hidden inputs and the rich text visual boxes
+  const syncRichField = (id, text) => {
+      document.getElementById(id).value = text || '';
+      const editor = document.getElementById(id + '_editor');
+      if (editor) editor.innerHTML = customTagsToHtml(text || '');
+  };
+
   // Text Fields
-  document.getElementById('adjCardText').value = card.text.card || '';
-  document.getElementById('adjEvolveText').value = card.text.evolve || '';
-  document.getElementById('adjSuperEvolveText').value = card.text.superEvolve || '';
-  document.getElementById('adjCrestText').value = card.text.crest || '';
-  document.getElementById('adjFaithText').value = card.text.faith || '';
+  syncRichField('adjCardText', card.text.card);
+  syncRichField('adjEvolveText', card.text.evolve);
+  syncRichField('adjSuperEvolveText', card.text.superEvolve);
+  syncRichField('adjCrestText', card.text.crest);
+  syncRichField('adjFaithText', card.text.faith);
 
   // Accelerate / Crystallize Fields
   document.getElementById('adjAccelerateCost').value = card.costs && card.costs.accelerate ? card.costs.accelerate : '';
-  document.getElementById('adjAccelerateText').value = card.text.accelerate || '';
+  syncRichField('adjAccelerateText', card.text.accelerate);
   
   document.getElementById('adjCrystallizeCost').value = card.costs && card.costs.crystallize ? card.costs.crystallize : '';
-  document.getElementById('adjCrystallizeText').value = card.text.crystallize || '';
+  syncRichField('adjCrystallizeText', card.text.crystallize);
 }
 
 // Initialize Search on Load
