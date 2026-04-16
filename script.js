@@ -328,6 +328,9 @@ async function calculateTextBlockHeight(key, textOverride = null, xOverride = nu
   if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) {
     processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
   }
+
+  const currentCardName = nameInput.value.trim() || "Unnamed Card";
+  processedText = processedText.replace(/\[\$n\]/g, currentCardName);
   
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|[^\S\r\n]+|-)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
@@ -430,6 +433,9 @@ async function drawTextBlock(key, box, x, startY, textOverride = null) {
   if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) {
     processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
   }
+
+  const currentCardName = nameInput.value.trim() || "Unnamed Card";
+  processedText = processedText.replace(/\[\$n\]/g, currentCardName);
 
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|[^\S\r\n]+|-)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
