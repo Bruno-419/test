@@ -234,15 +234,6 @@ async function getImage(src) {
 }
 
 // --- RICH TEXT SYNC LOGIC ---
-
-// List of Shadowverse keywords to automatically highlight Gold
-const SV_KEYWORDS = [
-  "Fanfare", "Last Words", "Strike", "Clash", "Ward", "Storm", "Rush", "Bane", "Drain", 
-  "Aura", "Stealth", "Ambush", "Accelerate", "Crystallize", "Earth Rite", "Enhance", 
-  "Necromancy", "Combo", "Spellboost", "Invocation", "Evolve", "Super-Evolve", 
-  "Activates in hand", "Maneuver"
-];
-
 function htmlToCustomTags(html) {
   let text = html.replace(/<div><br><\/div>/gi, '\n')
                  .replace(/<div>/gi, '\n')
@@ -276,7 +267,7 @@ function customTagsToHtml(text) {
 
 // Automatically wraps designated keywords in <c> tags (Gold)
 function formatKeywords(text) {
-    const kwPattern = SV_KEYWORDS.join('|');
+    const kwPattern = HIGHLIGHT_KEYWORDS.join('|');
     const regex = new RegExp(`\\b(${kwPattern})\\b`, 'g');
     
     // Split by existing <c> tags to ensure we don't double-wrap manually formatted words
