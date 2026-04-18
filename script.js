@@ -234,8 +234,11 @@ async function getImage(src) {
 }
 
 // --- RICH TEXT SYNC LOGIC ---
+
 function htmlToCustomTags(html) {
-  let text = html.replace(/<div><br><\/div>/gi, '\n')
+  // 1. Strip out zero-width boundary spaces before parsing
+  let text = html.replace(/\u200B/g, '')
+                 .replace(/<div><br><\/div>/gi, '\n')
                  .replace(/<div>/gi, '\n')
                  .replace(/<\/div>/gi, '')
                  .replace(/<br\s*\/?>/gi, '\n');
@@ -257,54 +260,61 @@ function htmlToCustomTags(html) {
 
 function customTagsToHtml(text) {
   if (!text) return "";
-  // Escape HTML brackets first, then replace custom formatting tags
   let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-  html = html.replace(/_(.*?)_/g, '<i>$1</i>');
-  html = html.replace(/&lt;c&gt;(.*?)&lt;\/c&gt;/g, '<span style="color: #f3d87d;">$1</span>');
+  
+  // 2. Append \u200B (Zero-Width Space) after formatting tags.
+  // This standard rich-text hack forces the browser to place the cursor outside the styling tag!
+  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>\u200B');
+  html = html.replace(/_(.*?)_/g, '<i>$1</i>\u200B');
+  html = html.replace(/&lt;c&gt;(.*?)&lt;\/c&gt;/g, '<span style="color: #f3d87d;">$1</span>\u200B');
+  
   return html.replace(/\n/g, '<br>');
 }
 
-// Automatically wraps designated keywords in <c> tags (Gold)
+// Automatically wraps designated keywords in <c>** tags (Bold Gold)
 function formatKeywords(text) {
     const kwPattern = HIGHLIGHT_KEYWORDS.join('|');
     const regex = new RegExp(`\\b(${kwPattern})\\b`, 'g');
     
-    // Split by existing <c> tags to ensure we don't double-wrap manually formatted words
     const parts = text.split(/(<c>.*?<\/c>)/g);
     for (let i = 0; i < parts.length; i++) {
         if (!parts[i].startsWith('<c>')) {
-            parts[i] = parts[i].replace(regex, '<c>$1</c>');
+            // Added ** inside the <c> tag to ensure it renders bold
+            parts[i] = parts[i].replace(regex, '<c>**$1**</c>');
         }
     }
     return parts.join('');
 }
 
-// --- Caret Save/Restore Helpers ---
-function saveCaretPosition(context) {
+// --- Caret Save/Restore Helpers (Upgraded to support highlighted ranges) ---
+function saveSelection(context) {
     const selection = window.getSelection();
-    if (selection.rangeCount === 0) return 0;
+    if (selection.rangeCount === 0) return { start: 0, end: 0 };
     const range = selection.getRangeAt(0);
     const preSelectionRange = range.cloneRange();
     preSelectionRange.selectNodeContents(context);
     preSelectionRange.setEnd(range.startContainer, range.startOffset);
-    return preSelectionRange.toString().length;
+    const start = preSelectionRange.toString().length;
+    return { start: start, end: start + range.toString().length };
 }
 
-function restoreCaretPosition(context, savedPosition) {
+function restoreSelection(context, savedSelection) {
     const selection = window.getSelection();
     let charIndex = 0, range = document.createRange();
     range.setStart(context, 0);
     range.collapse(true);
-    let nodeStack = [context], node, foundStart = false, stop = false;
+    let nodeStack = [context], node, foundStart = false, foundEnd = false, stop = false;
 
     while (!stop && (node = nodeStack.pop())) {
         if (node.nodeType === 3) {
             const nextCharIndex = charIndex + node.length;
-            if (!foundStart && savedPosition >= charIndex && savedPosition <= nextCharIndex) {
-                range.setStart(node, savedPosition - charIndex);
-                range.collapse(true);
+            if (!foundStart && savedSelection.start >= charIndex && savedSelection.start <= nextCharIndex) {
+                range.setStart(node, savedSelection.start - charIndex);
                 foundStart = true;
+            }
+            if (!foundEnd && savedSelection.end >= charIndex && savedSelection.end <= nextCharIndex) {
+                range.setEnd(node, savedSelection.end - charIndex);
+                foundEnd = true;
                 stop = true;
             }
             charIndex = nextCharIndex;
@@ -330,7 +340,6 @@ document.querySelectorAll('.rich-editor').forEach(editor => {
     document.execCommand('insertText', false, text);
   });
 
-  // Track if user is using an IME (like Japanese input) to prevent typing breakage
   let isComposing = false;
   editor.addEventListener('compositionstart', () => { isComposing = true; });
   editor.addEventListener('compositionend', () => { 
@@ -351,12 +360,10 @@ document.querySelectorAll('.rich-editor').forEach(editor => {
 
         newTags = formatKeywords(newTags);
 
-        // Only redraw the HTML if keywords or dividers were actually added, 
-        // to prevent caret flickering during normal typing.
         if (newTags !== originalTags) {
-            const caretPos = saveCaretPosition(editor);
+            const savedSel = saveSelection(editor);
             editor.innerHTML = customTagsToHtml(newTags);
-            restoreCaretPosition(editor, caretPos);
+            restoreSelection(editor, savedSel);
         }
     }
 
@@ -1379,12 +1386,13 @@ attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
 // --- WYSIWYG Toolbar Logic ---
 document.querySelectorAll(".text-toolbar button").forEach((button) => {
-  button.addEventListener("click", (e) => {
-    e.preventDefault();
+  // Changed to mousedown to prevent the text editor from losing focus!
+  button.addEventListener("mousedown", (e) => {
+    e.preventDefault(); 
     
     const selection = window.getSelection();
     
-    // FIX: If no text is actively highlighted, cancel the action to prevent format toggling
+    // Strictly enforce: if no text is actively highlighted, cancel the action.
     if (!selection || selection.isCollapsed) return; 
 
     const format = button.dataset.format;
@@ -1393,7 +1401,6 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
     const editor = field.querySelector(".rich-editor");
     if (!editor) return;
 
-    // Ensure the user's selection is actually inside the correct text box
     if (!editor.contains(selection.anchorNode)) return;
 
     if (format === "bold") {
@@ -1409,7 +1416,14 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
       document.execCommand("styleWithCSS", false, true);
       document.execCommand("foreColor", false, "#f3d87d");
     }
+    
     editor.dispatchEvent(new Event("input"));
+
+    // Force a DOM refresh to instantly inject the invisible boundaries
+    const tags = htmlToCustomTags(editor.innerHTML);
+    const savedSel = saveSelection(editor);
+    editor.innerHTML = customTagsToHtml(tags);
+    restoreSelection(editor, savedSel);
   });
 });
 
