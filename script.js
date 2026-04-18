@@ -234,23 +234,25 @@ async function getImage(src) {
 }
 
 // --- RICH TEXT SYNC LOGIC ---
-
 function htmlToCustomTags(html) {
-  // 1. Strip out zero-width boundary spaces before parsing
-  let text = html.replace(/\u200B/g, '')
-                 .replace(/<div><br><\/div>/gi, '\n')
+  // 1. Clean up line breaks
+  let text = html.replace(/<div><br><\/div>/gi, '\n')
                  .replace(/<div>/gi, '\n')
                  .replace(/<\/div>/gi, '')
                  .replace(/<br\s*\/?>/gi, '\n');
 
-  text = text.replace(/<b>(.*?)<\/b>/gi, '**$1**')
-             .replace(/<strong>(.*?)<\/strong>/gi, '**$1**')
-             .replace(/<i>(.*?)<\/i>/gi, '_$1_')
-             .replace(/<em>(.*?)<\/em>/gi, '_$1_');
+  // 2. Catch native <b>, <strong>, and browser-generated Bold Spans
+  text = text.replace(/<(b|strong)>(.*?)<\/\1>/gi, '**$2**')
+             .replace(/<span[^>]*style=["'][^"']*font-weight:\s*(bold|700)[^"']*["'][^>]*>(.*?)<\/span>/gi, '**$2**');
 
-  text = text.replace(/<span[^>]*color:\s*(?:rgb\(243,\s*216,\s*125\)|#f3d87d)[^>]*>(.*?)<\/span>/gi, '<c>$1</c>')
-             .replace(/<font[^>]*color="(?:rgb\(243,\s*216,\s*125\)|#f3d87d)"[^>]*>(.*?)<\/font>/gi, '<c>$1</c>');
+  // 3. Catch native <i>, <em>, and browser-generated Italic Spans
+  text = text.replace(/<(i|em)>(.*?)<\/\1>/gi, '_$2_')
+             .replace(/<span[^>]*style=["'][^"']*font-style:\s*italic[^"']*["'][^>]*>(.*?)<\/span>/gi, '_$2_');
 
+  // 4. Catch Gold color from both <font> and <span> tags (very forgiving regex)
+  text = text.replace(/<(font|span)[^>]*?(?:color|style)=["']?[^>]*?(?:#f3d87d|rgb\(\s*243\s*,\s*216\s*,\s*125\s*\))[^>]*>(.*?)<\/\1>/gi, '<c>$2</c>');
+
+  // 5. Strip any leftover HTML tags to keep the data clean
   return text.replace(/<[^>]+>/g, '')
              .replace(/&nbsp;/g, ' ')
              .replace(/&amp;/g, '&')
@@ -262,11 +264,9 @@ function customTagsToHtml(text) {
   if (!text) return "";
   let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   
-  // 2. Append \u200B (Zero-Width Space) after formatting tags.
-  // This standard rich-text hack forces the browser to place the cursor outside the styling tag!
-  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>\u200B');
-  html = html.replace(/_(.*?)_/g, '<i>$1</i>\u200B');
-  html = html.replace(/&lt;c&gt;(.*?)&lt;\/c&gt;/g, '<span style="color: #f3d87d;">$1</span>\u200B');
+  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  html = html.replace(/_(.*?)_/g, '<i>$1</i>');
+  html = html.replace(/&lt;c&gt;(.*?)&lt;\/c&gt;/g, '<span style="color: #f3d87d;">$1</span>');
   
   return html.replace(/\n/g, '<br>');
 }
@@ -279,14 +279,13 @@ function formatKeywords(text) {
     const parts = text.split(/(<c>.*?<\/c>)/g);
     for (let i = 0; i < parts.length; i++) {
         if (!parts[i].startsWith('<c>')) {
-            // Added ** inside the <c> tag to ensure it renders bold
             parts[i] = parts[i].replace(regex, '<c>**$1**</c>');
         }
     }
     return parts.join('');
 }
 
-// --- Caret Save/Restore Helpers (Upgraded to support highlighted ranges) ---
+// --- Caret Save/Restore Helpers ---
 function saveSelection(context) {
     const selection = window.getSelection();
     if (selection.rangeCount === 0) return { start: 0, end: 0 };
@@ -320,9 +319,7 @@ function restoreSelection(context, savedSelection) {
             charIndex = nextCharIndex;
         } else {
             let i = node.childNodes.length;
-            while (i--) {
-                nodeStack.push(node.childNodes[i]);
-            }
+            while (i--) nodeStack.push(node.childNodes[i]);
         }
     }
     selection.removeAllRanges();
@@ -360,6 +357,7 @@ document.querySelectorAll('.rich-editor').forEach(editor => {
 
         newTags = formatKeywords(newTags);
 
+        // Only override the DOM if we strictly altered the text (like injecting a keyword)
         if (newTags !== originalTags) {
             const savedSel = saveSelection(editor);
             editor.innerHTML = customTagsToHtml(newTags);
@@ -1386,23 +1384,14 @@ attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
 // --- WYSIWYG Toolbar Logic ---
 document.querySelectorAll(".text-toolbar button").forEach((button) => {
-  // Changed to mousedown to prevent the text editor from losing focus!
   button.addEventListener("mousedown", (e) => {
+    // CRITICAL: Prevent the text editor from losing focus!
     e.preventDefault(); 
     
-    const selection = window.getSelection();
-    
-    // Strictly enforce: if no text is actively highlighted, cancel the action.
-    if (!selection || selection.isCollapsed) return; 
-
     const format = button.dataset.format;
-    const field = button.closest(".field");
-    if (!field) return;
-    const editor = field.querySelector(".rich-editor");
-    if (!editor) return;
-
-    if (!editor.contains(selection.anchorNode)) return;
-
+    
+    // Use standard browser formatting. The 'input' event will naturally 
+    // fire after these commands and our script will silently sync it.
     if (format === "bold") {
       document.execCommand("bold", false, null);
     } else if (format === "italic") {
@@ -1411,19 +1400,11 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
       document.execCommand("styleWithCSS", false, true);
       document.execCommand("foreColor", false, "#f3d87d");
     } else if (format === "all") {
+      document.execCommand("styleWithCSS", false, true);
       document.execCommand("bold", false, null);
       document.execCommand("italic", false, null);
-      document.execCommand("styleWithCSS", false, true);
       document.execCommand("foreColor", false, "#f3d87d");
     }
-    
-    editor.dispatchEvent(new Event("input"));
-
-    // Force a DOM refresh to instantly inject the invisible boundaries
-    const tags = htmlToCustomTags(editor.innerHTML);
-    const savedSel = saveSelection(editor);
-    editor.innerHTML = customTagsToHtml(tags);
-    restoreSelection(editor, savedSel);
   });
 });
 
