@@ -190,18 +190,7 @@ function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpa
 
 // --- Word Count Functions ---
 function calculateTotalWordCount() {
-  // Grab the current card name (or an empty string if left blank)
-  const currentCardName = nameInput.value.trim();
-
-  // Combine all text, replacing [$n] with the actual card name first
-  const allText = Object.values(textInputs).map(t => {
-    let text = t.value;
-    if (text.includes("[$n]")) {
-      text = text.replace(/\[\$n\]/g, currentCardName);
-    }
-    return text;
-  }).join(" ");
-
+  const allText = Object.values(textInputs).map(t => t.value).join(" ");
   const initialTokens = allText.split(/\s+/);
   let wordCount = 0;
   for (const token of initialTokens) {
@@ -233,127 +222,28 @@ async function getImage(src) {
   return img;
 }
 
-// --- CARET SAVE & RESTORE ---
-// This ensures your cursor doesn't jump to the beginning when the HTML updates
-function saveCaretPosition(context) {
-    const selection = window.getSelection();
-    if (selection.rangeCount === 0) return null;
-    const range = selection.getRangeAt(0);
-    const preSelectionRange = range.cloneRange();
-    preSelectionRange.selectNodeContents(context);
-    preSelectionRange.setEnd(range.startContainer, range.startOffset);
-    const start = preSelectionRange.toString().length;
-    return { start: start, end: start + range.toString().length };
-}
-
-function restoreCaretPosition(context, savedPosition) {
-    if (!savedPosition) return;
-    let charIndex = 0, range = document.createRange();
-    range.setStart(context, 0);
-    range.collapse(true);
-    let nodeStack = [context], node, foundStart = false, foundEnd = false;
-
-    while (!foundEnd && (node = nodeStack.pop())) {
-        if (node.nodeType === 3) {
-            const nextCharIndex = charIndex + node.length;
-            if (!foundStart && savedPosition.start >= charIndex && savedPosition.start <= nextCharIndex) {
-                range.setStart(node, savedPosition.start - charIndex);
-                foundStart = true;
-            }
-            if (!foundEnd && savedPosition.end >= charIndex && savedPosition.end <= nextCharIndex) {
-                range.setEnd(node, savedPosition.end - charIndex);
-                foundEnd = true;
-            }
-            charIndex = nextCharIndex;
-        } else {
-            let i = node.childNodes.length;
-            while (i--) nodeStack.push(node.childNodes[i]);
-        }
+// --- Auto insert "----------" marker ---
+Object.values(textInputs).forEach((textarea) => {
+  textarea.addEventListener("input", () => {
+    if (autoDividerCheckbox.checked) {
+      const cursorPos = textarea.selectionStart;
+      const value = textarea.value;
+      const before = value.slice(0, cursorPos);
+      const after = value.slice(cursorPos);
+      if (before.endsWith("\n\n")) {
+        const newValue = before.slice(0, -1) + "----------\n" + after;
+        textarea.value = newValue;
+        textarea.selectionStart = textarea.selectionEnd = cursorPos + 10;
+      }
     }
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-}
-
-// --- GOAL 2: AUTO-FORMAT KEYWORDS ---
-function applyKeywordFormatting(html) {
-    // 1. Strip existing auto-keyword tags so we don't double-wrap them
-    let cleanHtml = html.replace(/<span class="auto-keyword"[^>]*>(.*?)<\/span>/g, '$1');
-    
-    // 2. Build the regex using your existing HIGHLIGHT_KEYWORDS array
-    const kwPattern = HIGHLIGHT_KEYWORDS.join('|');
-    const regex = new RegExp(`\\b(${kwPattern})\\b`, 'g');
-    
-    // 3. Split by HTML tags so we ONLY format plain text, not HTML attributes
-    let parts = cleanHtml.split(/(<[^>]*>)/g);
-    for (let i = 0; i < parts.length; i++) {
-        // Even indices are plain text nodes
-        if (i % 2 === 0) {
-            // Wrap the keyword and add a zero-width space (\u200B) to free the cursor
-            parts[i] = parts[i].replace(regex, '<span class="auto-keyword" style="color: #f3d87d; font-weight: bold;">$1</span>\u200B');
-        }
-    }
-    
-    return parts.join('');
-}
-
-// --- GOAL 1: FORMATTING BUTTONS ---
-document.querySelectorAll('.text-toolbar button').forEach(button => {
-    // MUST use mousedown to prevent the text editor from losing focus
-    button.addEventListener('mousedown', (e) => {
-        e.preventDefault(); 
-
-        const selection = window.getSelection();
-        // If no text is highlighted, cancel the action
-        if (!selection || selection.isCollapsed) return; 
-
-        const format = button.dataset.format;
-
-        if (format === 'bold') {
-            document.execCommand('bold', false, null);
-        } else if (format === 'italic') {
-            document.execCommand('italic', false, null);
-        } else if (format === 'color') {
-            document.execCommand('styleWithCSS', false, true);
-            document.execCommand('foreColor', false, '#f3d87d');
-        }
-
-        // Manually trigger the input event so our keyword auto-formatter and word counts update
-        const editor = button.closest('.field').querySelector('.rich-editor');
-        if (editor) editor.dispatchEvent(new Event('input'));
-    });
+    textarea.style.height = 'auto';
+    textarea.style.height = (textarea.scrollHeight) + 'px';
+    updateLiveWordCount();
+  });
 });
 
-// --- EDITOR INPUT LISTENER ---
-document.querySelectorAll('.rich-editor').forEach(editor => {
-    let isComposing = false; // Prevents formatting from breaking non-English keyboards
-    editor.addEventListener('compositionstart', () => { isComposing = true; });
-    editor.addEventListener('compositionend', () => { 
-        isComposing = false; 
-        editor.dispatchEvent(new Event('input')); 
-    });
-
-    editor.addEventListener('input', () => {
-        if (isComposing) return;
-
-        const originalHtml = editor.innerHTML;
-        const formattedHtml = applyKeywordFormatting(originalHtml);
-
-        if (originalHtml !== formattedHtml) {
-            const savedPosition = saveCaretPosition(editor);
-            editor.innerHTML = formattedHtml;
-            restoreCaretPosition(editor, savedPosition);
-        }
-
-        // Sync to hidden input for your card generator logic (if applicable)
-        const hiddenInputId = editor.id.replace('_editor', '');
-        const hiddenInput = document.getElementById(hiddenInputId);
-        if (hiddenInput) {
-            // Strip the zero-width spaces before saving to your backend/hidden inputs
-            hiddenInput.value = editor.innerHTML.replace(/\u200B/g, ''); 
-        }
-    });
-});
+wordCountCheckbox.addEventListener("change", updateLiveWordCount);
+saveCardOnlyCheckbox.addEventListener("change", () => drawCard());
 
 // --- Text highlight keywords ---
 const HIGHLIGHT_KEYWORDS = [
@@ -438,9 +328,6 @@ async function calculateTextBlockHeight(key, textOverride = null, xOverride = nu
   if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) {
     processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
   }
-
-  const currentCardName = nameInput.value.trim() || "Unnamed Card";
-  processedText = processedText.replace(/\[\$n\]/g, currentCardName);
   
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|[^\S\r\n]+|-)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
@@ -543,9 +430,6 @@ async function drawTextBlock(key, box, x, startY, textOverride = null) {
   if (key === "superEvolve" && processedText.startsWith("Super-Evolve")) {
     processedText = processedText.replace(/^Super-Evolve/, "<K>Super-Evolve</K>");
   }
-
-  const currentCardName = nameInput.value.trim() || "Unnamed Card";
-  processedText = processedText.replace(/\[\$n\]/g, currentCardName);
 
   const tokenizerRegex = /(\*\*|_|<c>|<\/c>|<K>|<\/K>|----------|\n|[^\S\r\n]+|-)/g;
   const allTokens = processedText.split(tokenizerRegex).filter(Boolean);
@@ -1364,29 +1248,52 @@ attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
-// --- WYSIWYG Toolbar Logic ---
 document.querySelectorAll(".text-toolbar button").forEach((button) => {
-  button.addEventListener("mousedown", (e) => {
-    // CRITICAL: Prevent the text editor from losing focus!
-    e.preventDefault(); 
-    
+  button.addEventListener("click", (e) => {
+    e.preventDefault();
     const format = button.dataset.format;
-    
-    // Use standard browser formatting. The 'input' event will naturally 
-    // fire after these commands and our script will silently sync it.
-    if (format === "bold") {
-      document.execCommand("bold", false, null);
-    } else if (format === "italic") {
-      document.execCommand("italic", false, null);
-    } else if (format === "color") {
-      document.execCommand("styleWithCSS", false, true);
-      document.execCommand("foreColor", false, "#f3d87d");
-    } else if (format === "all") {
-      document.execCommand("styleWithCSS", false, true);
-      document.execCommand("bold", false, null);
-      document.execCommand("italic", false, null);
-      document.execCommand("foreColor", false, "#f3d87d");
+    const field = button.closest(".field");
+    if (!field) return;
+    const textarea = field.querySelector("textarea");
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const value = textarea.value;
+    const selected = value.slice(start, end);
+
+    let openTag = "", closeTag = "";
+    if (format === "bold") { openTag = "**"; closeTag = "**"; }
+    else if (format === "italic") { openTag = "_"; closeTag = "_"; }
+    else if (format === "color") { openTag = "<c>"; closeTag = "</c>"; }
+    else if (format === "all") { openTag = "**_<c>"; closeTag = "</c>_**"; }
+    else return;
+
+    if (start !== end) {
+      const before = value.slice(0, start);
+      const after = value.slice(end);
+      const currentlyWrapped = before.endsWith(openTag) && after.startsWith(closeTag);
+      if (currentlyWrapped) {
+        const newBefore = before.slice(0, before.length - openTag.length);
+        const newAfter = after.slice(closeTag.length);
+        textarea.value = newBefore + selected + newAfter;
+        textarea.setSelectionRange(newBefore.length, newBefore.length + selected.length);
+      } else {
+        textarea.value = before + openTag + selected + closeTag + after;
+        textarea.setSelectionRange(start + openTag.length, end + openTag.length);
+      }
+      textarea.focus();
+      textarea.dispatchEvent(new Event("input"));
+      return;
     }
+
+    const before = value.slice(0, start);
+    const after = value.slice(start);
+    textarea.value = before + openTag + closeTag + after;
+    const caret = before.length + openTag.length;
+    textarea.setSelectionRange(caret, caret);
+    textarea.focus();
+    textarea.dispatchEvent(new Event("input"));
   });
 });
 
@@ -2093,26 +2000,19 @@ function populateBalanceForm(card) {
   // Trait
   document.getElementById('adjTrait').value = (card.trait === '-' ? '' : card.trait) || '';
 
-  // Helper to sync hidden inputs and the rich text visual boxes
-  const syncRichField = (id, text) => {
-      document.getElementById(id).value = text || '';
-      const editor = document.getElementById(id + '_editor');
-      if (editor) editor.innerHTML = customTagsToHtml(text || '');
-  };
-
   // Text Fields
-  syncRichField('adjCardText', card.text.card);
-  syncRichField('adjEvolveText', card.text.evolve);
-  syncRichField('adjSuperEvolveText', card.text.superEvolve);
-  syncRichField('adjCrestText', card.text.crest);
-  syncRichField('adjFaithText', card.text.faith);
+  document.getElementById('adjCardText').value = card.text.card || '';
+  document.getElementById('adjEvolveText').value = card.text.evolve || '';
+  document.getElementById('adjSuperEvolveText').value = card.text.superEvolve || '';
+  document.getElementById('adjCrestText').value = card.text.crest || '';
+  document.getElementById('adjFaithText').value = card.text.faith || '';
 
   // Accelerate / Crystallize Fields
   document.getElementById('adjAccelerateCost').value = card.costs && card.costs.accelerate ? card.costs.accelerate : '';
-  syncRichField('adjAccelerateText', card.text.accelerate);
+  document.getElementById('adjAccelerateText').value = card.text.accelerate || '';
   
   document.getElementById('adjCrystallizeCost').value = card.costs && card.costs.crystallize ? card.costs.crystallize : '';
-  syncRichField('adjCrystallizeText', card.text.crystallize);
+  document.getElementById('adjCrystallizeText').value = card.text.crystallize || '';
 }
 
 // Initialize Search on Load
