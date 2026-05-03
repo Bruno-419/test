@@ -233,62 +233,11 @@ async function getImage(src) {
   return img;
 }
 
-// --- RICH TEXT SYNC LOGIC ---
-function htmlToCustomTags(html) {
-  // 1. Clean up line breaks
-  let text = html.replace(/<div><br><\/div>/gi, '\n')
-                 .replace(/<div>/gi, '\n')
-                 .replace(/<\/div>/gi, '')
-                 .replace(/<br\s*\/?>/gi, '\n');
-
-  // 2. Catch native <b>, <strong>, and browser-generated Bold Spans
-  text = text.replace(/<(b|strong)>(.*?)<\/\1>/gi, '**$2**')
-             .replace(/<span[^>]*style=["'][^"']*font-weight:\s*(bold|700)[^"']*["'][^>]*>(.*?)<\/span>/gi, '**$2**');
-
-  // 3. Catch native <i>, <em>, and browser-generated Italic Spans
-  text = text.replace(/<(i|em)>(.*?)<\/\1>/gi, '_$2_')
-             .replace(/<span[^>]*style=["'][^"']*font-style:\s*italic[^"']*["'][^>]*>(.*?)<\/span>/gi, '_$2_');
-
-  // 4. Catch Gold color from both <font> and <span> tags (very forgiving regex)
-  text = text.replace(/<(font|span)[^>]*?(?:color|style)=["']?[^>]*?(?:#f3d87d|rgb\(\s*243\s*,\s*216\s*,\s*125\s*\))[^>]*>(.*?)<\/\1>/gi, '<c>$2</c>');
-
-  // 5. Strip any leftover HTML tags to keep the data clean
-  return text.replace(/<[^>]+>/g, '')
-             .replace(/&nbsp;/g, ' ')
-             .replace(/&amp;/g, '&')
-             .replace(/&lt;/g, '<')
-             .replace(/&gt;/g, '>');
-}
-
-function customTagsToHtml(text) {
-  if (!text) return "";
-  let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  
-  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-  html = html.replace(/_(.*?)_/g, '<i>$1</i>');
-  html = html.replace(/&lt;c&gt;(.*?)&lt;\/c&gt;/g, '<span style="color: #f3d87d;">$1</span>');
-  
-  return html.replace(/\n/g, '<br>');
-}
-
-// Automatically wraps designated keywords in <c>** tags (Bold Gold)
-function formatKeywords(text) {
-    const kwPattern = HIGHLIGHT_KEYWORDS.join('|');
-    const regex = new RegExp(`\\b(${kwPattern})\\b`, 'g');
-    
-    const parts = text.split(/(<c>.*?<\/c>)/g);
-    for (let i = 0; i < parts.length; i++) {
-        if (!parts[i].startsWith('<c>')) {
-            parts[i] = parts[i].replace(regex, '<c>**$1**</c>');
-        }
-    }
-    return parts.join('');
-}
-
-// --- Caret Save/Restore Helpers ---
-function saveSelection(context) {
+// --- CARET SAVE & RESTORE ---
+// This ensures your cursor doesn't jump to the beginning when the HTML updates
+function saveCaretPosition(context) {
     const selection = window.getSelection();
-    if (selection.rangeCount === 0) return { start: 0, end: 0 };
+    if (selection.rangeCount === 0) return null;
     const range = selection.getRangeAt(0);
     const preSelectionRange = range.cloneRange();
     preSelectionRange.selectNodeContents(context);
@@ -297,24 +246,23 @@ function saveSelection(context) {
     return { start: start, end: start + range.toString().length };
 }
 
-function restoreSelection(context, savedSelection) {
-    const selection = window.getSelection();
+function restoreCaretPosition(context, savedPosition) {
+    if (!savedPosition) return;
     let charIndex = 0, range = document.createRange();
     range.setStart(context, 0);
     range.collapse(true);
-    let nodeStack = [context], node, foundStart = false, foundEnd = false, stop = false;
+    let nodeStack = [context], node, foundStart = false, foundEnd = false;
 
-    while (!stop && (node = nodeStack.pop())) {
+    while (!foundEnd && (node = nodeStack.pop())) {
         if (node.nodeType === 3) {
             const nextCharIndex = charIndex + node.length;
-            if (!foundStart && savedSelection.start >= charIndex && savedSelection.start <= nextCharIndex) {
-                range.setStart(node, savedSelection.start - charIndex);
+            if (!foundStart && savedPosition.start >= charIndex && savedPosition.start <= nextCharIndex) {
+                range.setStart(node, savedPosition.start - charIndex);
                 foundStart = true;
             }
-            if (!foundEnd && savedSelection.end >= charIndex && savedSelection.end <= nextCharIndex) {
-                range.setEnd(node, savedSelection.end - charIndex);
+            if (!foundEnd && savedPosition.end >= charIndex && savedPosition.end <= nextCharIndex) {
+                range.setEnd(node, savedPosition.end - charIndex);
                 foundEnd = true;
-                stop = true;
             }
             charIndex = nextCharIndex;
         } else {
@@ -322,56 +270,90 @@ function restoreSelection(context, savedSelection) {
             while (i--) nodeStack.push(node.childNodes[i]);
         }
     }
-    selection.removeAllRanges();
-    selection.addRange(range);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
 }
 
-// --- Setup Editor Event Listeners ---
-document.querySelectorAll('.rich-editor').forEach(editor => {
-  const hiddenInputId = editor.id.replace('_editor', '');
-  const hiddenInput = document.getElementById(hiddenInputId);
-
-  editor.addEventListener('paste', (e) => {
-    e.preventDefault();
-    const text = (e.originalEvent || e).clipboardData.getData('text/plain');
-    document.execCommand('insertText', false, text);
-  });
-
-  let isComposing = false;
-  editor.addEventListener('compositionstart', () => { isComposing = true; });
-  editor.addEventListener('compositionend', () => { 
-      isComposing = false; 
-      editor.dispatchEvent(new Event('input')); 
-  });
-
-  editor.addEventListener('input', () => {
-    if (!hiddenInput) return;
+// --- GOAL 2: AUTO-FORMAT KEYWORDS ---
+function applyKeywordFormatting(html) {
+    // 1. Strip existing auto-keyword tags so we don't double-wrap them
+    let cleanHtml = html.replace(/<span class="auto-keyword"[^>]*>(.*?)<\/span>/g, '$1');
     
-    let originalTags = htmlToCustomTags(editor.innerHTML);
-    let newTags = originalTags;
-
-    if (!isComposing) {
-        if (typeof autoDividerCheckbox !== 'undefined' && autoDividerCheckbox.checked && newTags.endsWith('\n\n')) {
-            newTags = newTags.slice(0, -2) + '\n----------\n';
-        }
-
-        newTags = formatKeywords(newTags);
-
-        // Only override the DOM if we strictly altered the text (like injecting a keyword)
-        if (newTags !== originalTags) {
-            const savedSel = saveSelection(editor);
-            editor.innerHTML = customTagsToHtml(newTags);
-            restoreSelection(editor, savedSel);
+    // 2. Build the regex using your existing HIGHLIGHT_KEYWORDS array
+    const kwPattern = HIGHLIGHT_KEYWORDS.join('|');
+    const regex = new RegExp(`\\b(${kwPattern})\\b`, 'g');
+    
+    // 3. Split by HTML tags so we ONLY format plain text, not HTML attributes
+    let parts = cleanHtml.split(/(<[^>]*>)/g);
+    for (let i = 0; i < parts.length; i++) {
+        // Even indices are plain text nodes
+        if (i % 2 === 0) {
+            // Wrap the keyword and add a zero-width space (\u200B) to free the cursor
+            parts[i] = parts[i].replace(regex, '<span class="auto-keyword" style="color: #f3d87d; font-weight: bold;">$1</span>\u200B');
         }
     }
+    
+    return parts.join('');
+}
 
-    hiddenInput.value = newTags;
-    if (typeof updateLiveWordCount === 'function') updateLiveWordCount();
-  });
+// --- GOAL 1: FORMATTING BUTTONS ---
+document.querySelectorAll('.text-toolbar button').forEach(button => {
+    // MUST use mousedown to prevent the text editor from losing focus
+    button.addEventListener('mousedown', (e) => {
+        e.preventDefault(); 
+
+        const selection = window.getSelection();
+        // If no text is highlighted, cancel the action
+        if (!selection || selection.isCollapsed) return; 
+
+        const format = button.dataset.format;
+
+        if (format === 'bold') {
+            document.execCommand('bold', false, null);
+        } else if (format === 'italic') {
+            document.execCommand('italic', false, null);
+        } else if (format === 'color') {
+            document.execCommand('styleWithCSS', false, true);
+            document.execCommand('foreColor', false, '#f3d87d');
+        }
+
+        // Manually trigger the input event so our keyword auto-formatter and word counts update
+        const editor = button.closest('.field').querySelector('.rich-editor');
+        if (editor) editor.dispatchEvent(new Event('input'));
+    });
 });
 
-if (typeof wordCountCheckbox !== 'undefined') wordCountCheckbox.addEventListener("change", updateLiveWordCount);
-if (typeof saveCardOnlyCheckbox !== 'undefined') saveCardOnlyCheckbox.addEventListener("change", () => drawCard());
+// --- EDITOR INPUT LISTENER ---
+document.querySelectorAll('.rich-editor').forEach(editor => {
+    let isComposing = false; // Prevents formatting from breaking non-English keyboards
+    editor.addEventListener('compositionstart', () => { isComposing = true; });
+    editor.addEventListener('compositionend', () => { 
+        isComposing = false; 
+        editor.dispatchEvent(new Event('input')); 
+    });
+
+    editor.addEventListener('input', () => {
+        if (isComposing) return;
+
+        const originalHtml = editor.innerHTML;
+        const formattedHtml = applyKeywordFormatting(originalHtml);
+
+        if (originalHtml !== formattedHtml) {
+            const savedPosition = saveCaretPosition(editor);
+            editor.innerHTML = formattedHtml;
+            restoreCaretPosition(editor, savedPosition);
+        }
+
+        // Sync to hidden input for your card generator logic (if applicable)
+        const hiddenInputId = editor.id.replace('_editor', '');
+        const hiddenInput = document.getElementById(hiddenInputId);
+        if (hiddenInput) {
+            // Strip the zero-width spaces before saving to your backend/hidden inputs
+            hiddenInput.value = editor.innerHTML.replace(/\u200B/g, ''); 
+        }
+    });
+});
 
 // --- Text highlight keywords ---
 const HIGHLIGHT_KEYWORDS = [
@@ -1381,32 +1363,6 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
 attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
-
-// --- WYSIWYG Toolbar Logic ---
-document.querySelectorAll(".text-toolbar button").forEach((button) => {
-  button.addEventListener("mousedown", (e) => {
-    // CRITICAL: Prevent the text editor from losing focus!
-    e.preventDefault(); 
-    
-    const format = button.dataset.format;
-    
-    // Use standard browser formatting. The 'input' event will naturally 
-    // fire after these commands and our script will silently sync it.
-    if (format === "bold") {
-      document.execCommand("bold", false, null);
-    } else if (format === "italic") {
-      document.execCommand("italic", false, null);
-    } else if (format === "color") {
-      document.execCommand("styleWithCSS", false, true);
-      document.execCommand("foreColor", false, "#f3d87d");
-    } else if (format === "all") {
-      document.execCommand("styleWithCSS", false, true);
-      document.execCommand("bold", false, null);
-      document.execCommand("italic", false, null);
-      document.execCommand("foreColor", false, "#f3d87d");
-    }
-  });
-});
 
 document.fonts.ready.then(() => {
   setTimeout(() => {
