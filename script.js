@@ -295,7 +295,7 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   ctx.drawImage(
     img,
     0, middleStartY, img.width, middleHeight,
-    drawX, drawY + middleStartY - 1, img.width, middleHeight + stretchAmount + 2
+    drawX, drawY + middleStartY, img.width, middleHeight + stretchAmount
   );
   
   // Draw Bottom: Place it exactly where it needs to be (the middle overlaps it from above)
