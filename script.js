@@ -1364,6 +1364,32 @@ attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
+// --- WYSIWYG Toolbar Logic ---
+document.querySelectorAll(".text-toolbar button").forEach((button) => {
+  button.addEventListener("mousedown", (e) => {
+    // CRITICAL: Prevent the text editor from losing focus!
+    e.preventDefault(); 
+    
+    const format = button.dataset.format;
+    
+    // Use standard browser formatting. The 'input' event will naturally 
+    // fire after these commands and our script will silently sync it.
+    if (format === "bold") {
+      document.execCommand("bold", false, null);
+    } else if (format === "italic") {
+      document.execCommand("italic", false, null);
+    } else if (format === "color") {
+      document.execCommand("styleWithCSS", false, true);
+      document.execCommand("foreColor", false, "#f3d87d");
+    } else if (format === "all") {
+      document.execCommand("styleWithCSS", false, true);
+      document.execCommand("bold", false, null);
+      document.execCommand("italic", false, null);
+      document.execCommand("foreColor", false, "#f3d87d");
+    }
+  });
+});
+
 document.fonts.ready.then(() => {
   setTimeout(() => {
     updateAll();
