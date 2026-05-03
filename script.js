@@ -284,6 +284,10 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
 
   let middleHeight = img.height - topHeight - bottomHeight;
 
+  // Save the smoothing state and disable it
+  const prevSmoothing = ctx.imageSmoothingEnabled;
+  ctx.imageSmoothingEnabled = false;
+
   // Draw Top
   ctx.drawImage(img, 0, 0, img.width, topHeight, drawX, drawY, img.width, topHeight);
   
@@ -301,6 +305,9 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
     drawX, drawY + middleStartY + middleHeight + stretchAmount,
     img.width, bottomHeight
   );
+
+  // Restore the smoothing state
+  ctx.imageSmoothingEnabled = prevSmoothing;
   
   return topHeight + middleHeight + bottomHeight + stretchAmount;
 }
@@ -775,9 +782,8 @@ async function drawCard() {
       offCanvas.width = dynamicBoxWidth - 18;
       offCanvas.height = dynamicBoxHeight - 22;
       const offCtx = offCanvas.getContext("2d");
-      offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
       offCtx.filter = "blur(5px)";
-      offCtx.drawImage(offCanvas, 0, 0);
+      offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
       ctx.drawImage(offCanvas, textBoxX + 9, textBoxY + 11);
 
       drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
