@@ -1607,7 +1607,7 @@ function formatWorkshopHTML(text) {
 function openWorkshopModal(index) {
   if (index < 0 || index >= visibleCardsCache.length) return;
   
-  const card = workshopCardsCache[index];
+  const card = visibleCardsCache[index];
 
   document.getElementById("modalCardImage").src = card.image;
   document.getElementById("modalCardName").textContent = card.name;
