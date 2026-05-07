@@ -1606,7 +1606,7 @@ body {
   right: 0; 
   bottom: 0;
   /* Adjust the '60px' to match your preferred x_icon.png size */
-  background: url('assets/misc/x_icon.png') center center / 60px no-repeat, rgba(200, 0, 0, 0.2);
+  background: url('assets/misc/checkmark_icon.png') center center / 60px no-repeat, rgba(200, 0, 0, 0.2);
   border-radius: 12px;
   z-index: 10;
   pointer-events: none;
