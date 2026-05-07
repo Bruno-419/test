@@ -1595,7 +1595,7 @@ body {
 }
 
 .workshop-card.delete-mode.to-delete img {
-  filter: grayscale(100%) brightness(50%);
+  filter: grayscale(0%);
 }
 
 .workshop-card.to-delete::after {
