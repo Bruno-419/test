@@ -442,7 +442,10 @@
             <h1>Workshop</h1>
             <p class="subheader">Cards are stored locally in your browser.</p>
             
-            <button id="deleteWorkshopBtn" class="nav-btn nav-right" style="background:#522;" onclick="toggleDeleteMode()">Delete</button>
+            <div class="nav-right" style="display: flex; gap: 10px;">
+              <button id="cancelDeleteBtn" class="nav-btn" style="background:#444; display:none;" onclick="cancelDeleteMode()">Cancel</button>
+              <button id="deleteWorkshopBtn" class="nav-btn" style="background:#522;" onclick="toggleDeleteMode()">Delete</button>
+            </div>
           </header>
 
           <div class="search-section">
