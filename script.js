@@ -1441,7 +1441,6 @@ async function toggleDeleteMode() {
     isDeleteMode = true;
     cardsToDelete.clear();
     btn.textContent = "Confirm Delete";
-    btn.style.background = "#a22"; // Brighten red to indicate active state
     
     // Grayscale current cards
     document.querySelectorAll(".workshop-card").forEach(card => card.classList.add("delete-mode"));
