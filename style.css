@@ -1613,7 +1613,38 @@ body {
 
 
 
+/* --------------------------
+   Modal Carousel Animations
+   -------------------------- */
+.slide-out-left {
+  animation: slideOutLeft 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.slide-in-right {
+  animation: slideInRight 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.slide-out-right {
+  animation: slideOutRight 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.slide-in-left {
+  animation: slideInLeft 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
 
+@keyframes slideOutLeft {
+  from { transform: translateX(0) scale(1); opacity: 1; }
+  to { transform: translateX(-60px) scale(0.98); opacity: 0; }
+}
+@keyframes slideInRight {
+  from { transform: translateX(60px) scale(0.98); opacity: 0; }
+  to { transform: translateX(0) scale(1); opacity: 1; }
+}
+@keyframes slideOutRight {
+  from { transform: translateX(0) scale(1); opacity: 1; }
+  to { transform: translateX(60px) scale(0.98); opacity: 0; }
+}
+@keyframes slideInLeft {
+  from { transform: translateX(-60px) scale(0.98); opacity: 0; }
+  to { transform: translateX(0) scale(1); opacity: 1; }
+}
 
 
 
