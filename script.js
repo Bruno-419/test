@@ -1458,7 +1458,6 @@ async function toggleDeleteMode() {
         isDeleteMode = false;
         cardsToDelete.clear();
         btn.textContent = "Delete";
-        btn.style.background = "#522";
         renderWorkshop(); // Refresh the grid
       };
       
@@ -1467,7 +1466,6 @@ async function toggleDeleteMode() {
       // Exit without deleting if none were selected
       isDeleteMode = false;
       btn.textContent = "Delete";
-      btn.style.background = "#522";
       document.querySelectorAll(".workshop-card").forEach(card => {
         card.classList.remove("delete-mode");
         card.classList.remove("to-delete");
