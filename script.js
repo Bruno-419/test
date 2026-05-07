@@ -1434,18 +1434,20 @@ async function getWorkshopData() {
 }
 
 async function toggleDeleteMode() {
-  const btn = document.getElementById("deleteWorkshopBtn");
+  const deleteBtn = document.getElementById("deleteWorkshopBtn");
+  const cancelBtn = document.getElementById("cancelDeleteBtn");
   
   if (!isDeleteMode) {
     // 1. Enter Delete Mode
     isDeleteMode = true;
     cardsToDelete.clear();
-    btn.textContent = "Confirm Delete";
+    deleteBtn.textContent = "Confirm Delete";
+    cancelBtn.style.display = "inline-block"; // Show the cancel button
     
     // Grayscale current cards
     document.querySelectorAll(".workshop-card").forEach(card => card.classList.add("delete-mode"));
   } else {
-    // 2. Execute Deletion or Exit Mode
+    // 2. Execute Deletion
     if (cardsToDelete.size > 0) {
       const db = await openDB();
       const transaction = db.transaction([STORE_NAME], "readwrite");
@@ -1457,21 +1459,36 @@ async function toggleDeleteMode() {
       transaction.oncomplete = () => {
         isDeleteMode = false;
         cardsToDelete.clear();
-        btn.textContent = "Delete";
+        deleteBtn.textContent = "Delete";
+        cancelBtn.style.display = "none"; // Hide the cancel button
         renderWorkshop(); // Refresh the grid
       };
       
       transaction.onerror = (e) => console.error("Error deleting cards:", e.target.error);
     } else {
-      // Exit without deleting if none were selected
-      isDeleteMode = false;
-      btn.textContent = "Delete";
-      document.querySelectorAll(".workshop-card").forEach(card => {
-        card.classList.remove("delete-mode");
-        card.classList.remove("to-delete");
-      });
+      // Exit without deleting if none were selected (acts like a cancel)
+      cancelDeleteMode();
     }
   }
+}
+
+function cancelDeleteMode() {
+  // Reset states
+  isDeleteMode = false;
+  cardsToDelete.clear();
+  
+  // Reset buttons
+  const deleteBtn = document.getElementById("deleteWorkshopBtn");
+  const cancelBtn = document.getElementById("cancelDeleteBtn");
+  
+  deleteBtn.textContent = "Delete";
+  cancelBtn.style.display = "none"; // Hide the cancel button
+  
+  // Remove visual states from cards
+  document.querySelectorAll(".workshop-card").forEach(card => {
+    card.classList.remove("delete-mode");
+    card.classList.remove("to-delete");
+  });
 }
 
 async function renderWorkshop() {
