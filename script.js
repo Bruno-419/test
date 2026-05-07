@@ -1381,6 +1381,8 @@ let workshopCardsCache = [];
 let visibleCardsCache = []; // New cache for filtered results
 let currentCardIndex = -1;
 let currentClassFilter = "All"; // Default filter
+let isDeleteMode = false;
+let cardsToDelete = new Set();
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -1431,20 +1433,47 @@ async function getWorkshopData() {
   });
 }
 
-async function clearWorkshop() {
-  if(confirm("Are you sure you want to clear your card history?")) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
+async function toggleDeleteMode() {
+  const btn = document.getElementById("deleteWorkshopBtn");
+  
+  if (!isDeleteMode) {
+    // 1. Enter Delete Mode
+    isDeleteMode = true;
+    cardsToDelete.clear();
+    btn.textContent = "Confirm Delete";
+    btn.style.background = "#a22"; // Brighten red to indicate active state
+    
+    // Grayscale current cards
+    document.querySelectorAll(".workshop-card").forEach(card => card.classList.add("delete-mode"));
+  } else {
+    // 2. Execute Deletion or Exit Mode
+    if (cardsToDelete.size > 0) {
+      const db = await openDB();
       const transaction = db.transaction([STORE_NAME], "readwrite");
       const store = transaction.objectStore(STORE_NAME);
-      const request = store.clear();
-
-      request.onsuccess = () => {
-        renderWorkshop();
-        resolve();
+      
+      // Delete all selected cards from IndexedDB
+      cardsToDelete.forEach(id => store.delete(id));
+      
+      transaction.oncomplete = () => {
+        isDeleteMode = false;
+        cardsToDelete.clear();
+        btn.textContent = "Delete";
+        btn.style.background = "#522";
+        renderWorkshop(); // Refresh the grid
       };
-      request.onerror = (e) => reject(e.target.error);
-    });
+      
+      transaction.onerror = (e) => console.error("Error deleting cards:", e.target.error);
+    } else {
+      // Exit without deleting if none were selected
+      isDeleteMode = false;
+      btn.textContent = "Delete";
+      btn.style.background = "#522";
+      document.querySelectorAll(".workshop-card").forEach(card => {
+        card.classList.remove("delete-mode");
+        card.classList.remove("to-delete");
+      });
+    }
   }
 }
 
@@ -1480,10 +1509,28 @@ async function renderWorkshop() {
       const cardEl = document.createElement("div");
       cardEl.className = "workshop-card";
       
-      // Update Click to use index tracking based on VISIBLE cache
+      // Keep mode active if filter is clicked during delete mode
+      if (isDeleteMode) {
+        cardEl.classList.add("delete-mode");
+        if (cardsToDelete.has(card.id)) {
+          cardEl.classList.add("to-delete");
+        }
+      }
+      
+      // Toggle selection in delete mode, open modal otherwise
       cardEl.onclick = () => {
-          currentCardIndex = index;
-          openWorkshopModal(index); 
+          if (isDeleteMode) {
+              if (cardsToDelete.has(card.id)) {
+                  cardsToDelete.delete(card.id);
+                  cardEl.classList.remove("to-delete");
+              } else {
+                  cardsToDelete.add(card.id);
+                  cardEl.classList.add("to-delete");
+              }
+          } else {
+              currentCardIndex = index;
+              openWorkshopModal(index); 
+          }
       };
 
       const img = document.createElement("img");
