@@ -1721,20 +1721,47 @@ function openWorkshopModal(index) {
   document.getElementById("workshopModal").style.display = "block";
 }
 
-// NEW: Navigation Function
+// NEW: Animation flag to prevent rapid clicking glitches
+let isModalAnimating = false;
+
 function navigateModal(direction) {
-  if (visibleCardsCache.length === 0) return;
+  // Prevent navigating if empty or if an animation is currently running
+  if (visibleCardsCache.length === 0 || isModalAnimating) return;
+  
+  isModalAnimating = true;
+  const modalContent = document.querySelector('.workshop-modal-content');
 
-  currentCardIndex += direction;
+  // Determine which way to slide based on the direction (1 for next, -1 for prev)
+  const outClass = direction === 1 ? 'slide-out-left' : 'slide-out-right';
+  const inClass = direction === 1 ? 'slide-in-right' : 'slide-in-left';
 
-  // Infinite loop logic
-  if (currentCardIndex < 0) {
-    currentCardIndex = visibleCardsCache.length - 1;
-  } else if (currentCardIndex >= visibleCardsCache.length) {
-    currentCardIndex = 0;
-  }
+  // 1. Slide out current content
+  modalContent.classList.add(outClass);
 
-  openWorkshopModal(currentCardIndex);
+  // 2. Wait for the slide-out animation to finish (250ms matches CSS)
+  setTimeout(() => {
+    // Update the index logic
+    currentCardIndex += direction;
+    if (currentCardIndex < 0) {
+      currentCardIndex = visibleCardsCache.length - 1;
+    } else if (currentCardIndex >= visibleCardsCache.length) {
+      currentCardIndex = 0;
+    }
+
+    // Load the new card data into the HTML while it's invisible
+    openWorkshopModal(currentCardIndex);
+
+    // 3. Swap the CSS classes to slide it back in
+    modalContent.classList.remove(outClass);
+    modalContent.classList.add(inClass);
+
+    // 4. Clean up the slide-in class once it's done so it's ready for next time
+    setTimeout(() => {
+      modalContent.classList.remove(inClass);
+      isModalAnimating = false;
+    }, 250);
+    
+  }, 250); 
 }
 
 // Attach Event Listeners for Navigation
@@ -1755,6 +1782,13 @@ document.addEventListener('keydown', (e) => {
 
 function closeWorkshopModal() {
   workshopModal.style.display = "none";
+  
+  // Clean up any lingering animation classes and reset the flag
+  const modalContent = document.querySelector('.workshop-modal-content');
+  if (modalContent) {
+      modalContent.classList.remove('slide-out-left', 'slide-in-right', 'slide-out-right', 'slide-in-left');
+  }
+  isModalAnimating = false;
 }
 
 window.addEventListener("click", (e) => {
