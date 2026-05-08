@@ -1381,6 +1381,7 @@ let workshopCardsCache = [];
 let visibleCardsCache = []; // New cache for filtered results
 let currentCardIndex = -1;
 let currentClassFilter = "All"; // Default filter
+let currentSearchQuery = "";    // NEW: Tracks the search bar text
 let isDeleteMode = false;
 let cardsToDelete = new Set();
 
@@ -1502,28 +1503,36 @@ async function renderWorkshop() {
     const data = await getWorkshopData();
     workshopCardsCache = data; 
 
-    // 2. Apply Filter
-    if (currentClassFilter === "All") {
-      visibleCardsCache = data;
-    } else {
-      visibleCardsCache = data.filter(card => card.class === currentClassFilter);
+    // 2. Apply Class Filter
+    let filteredData = data;
+    if (currentClassFilter !== "All") {
+      filteredData = filteredData.filter(card => card.class === currentClassFilter);
     }
+
+    // 3. Apply Search Filter (NEW)
+    if (currentSearchQuery.trim() !== "") {
+      const lowerQuery = currentSearchQuery.toLowerCase().trim();
+      filteredData = filteredData.filter(card => 
+        card.name.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    visibleCardsCache = filteredData;
 
     if (visibleCardsCache.length === 0) {
       if (data.length === 0) {
         grid.innerHTML = '<p class="placeholder-text">No cards generated yet. Create and download a card to see it here!</p>';
       } else {
-        grid.innerHTML = `<p class="placeholder-text">No ${currentClassFilter} cards found.</p>`;
+        grid.innerHTML = `<p class="placeholder-text">No cards found matching your criteria.</p>`;
       }
       return;
     }
 
-    // 3. Render only visible cards
+    // 4. Render only visible cards
     visibleCardsCache.forEach((card, index) => {
       const cardEl = document.createElement("div");
       cardEl.className = "workshop-card";
       
-      // Keep mode active if filter is clicked during delete mode
       if (isDeleteMode) {
         cardEl.classList.add("delete-mode");
         if (cardsToDelete.has(card.id)) {
@@ -1531,7 +1540,6 @@ async function renderWorkshop() {
         }
       }
       
-      // Toggle selection in delete mode, open modal otherwise
       cardEl.onclick = () => {
           if (isDeleteMode) {
               if (cardsToDelete.has(card.id)) {
@@ -1574,6 +1582,15 @@ document.addEventListener("DOMContentLoaded", () => {
       renderWorkshop();
     });
   });
+  
+  // NEW: Live Search Listener for Workshop
+  const workshopSearchInput = document.getElementById("workshopSearchInput");
+  if (workshopSearchInput) {
+    workshopSearchInput.addEventListener("input", (e) => {
+      currentSearchQuery = e.target.value;
+      renderWorkshop();
+    });
+  }
 });
 
 const workshopModal = document.getElementById("workshopModal");
@@ -2120,7 +2137,6 @@ function populateBalanceForm(card) {
 document.addEventListener("DOMContentLoaded", () => {
   fetchOfficialCards().then(() => {
     setupSearch('balanceSearchInput', 'balanceSearchResults');
-    setupSearch('workshopSearchInput', 'workshopSearchResults');
   });
 });
 
