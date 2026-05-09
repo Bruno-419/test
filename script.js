@@ -1856,6 +1856,140 @@ function openWorkshopModal(index) {
   document.getElementById("workshopModal").style.display = "block";
 }
 
+// --- WORKSHOP EDIT FUNCTION ---
+function editWorkshopCard() {
+  if (currentCardIndex < 0 || currentCardIndex >= visibleCardsCache.length) return;
+  const card = visibleCardsCache[currentCardIndex];
+
+  // 1. Close modal and navigate home
+  closeWorkshopModal();
+  navigateTo('home');
+
+  // 2. Populate Standard Fields
+  document.getElementById('cardName').value = card.name || "";
+  document.getElementById('cardTrait').value = card.trait || "";
+  document.getElementById('cardClass').value = card.class || "Neutral";
+  document.getElementById('cardType').value = card.type || "Follower";
+  document.getElementById('cardRarity').value = card.rarity || "Legendary";
+  document.getElementById('illustratorName').value = card.illustrator || "";
+
+  // Check if we need to set stats (Follower only)
+  if (card.type === "Follower" && card.attack !== undefined) {
+      document.getElementById('attackValue').value = card.attack;
+      document.getElementById('defenseValue').value = card.defense;
+  }
+
+  // 3. Populate Costs
+  document.getElementById('accelerateCost').value = card.costs?.accelerate || "1";
+  document.getElementById('crystallizeCost').value = card.costs?.crystallize || "1";
+
+  // 4. Populate Custom Names
+  document.getElementById('crestName').value = card.names?.crest || "";
+  document.getElementById('faithName').value = card.names?.faith || "";
+
+  // 5. Populate Text Fields
+  textInputs.card.value = card.text?.card || "";
+  textInputs.evolve.value = card.text?.evolve || "";
+  textInputs.superEvolve.value = card.text?.superEvolve || "";
+  textInputs.crest.value = card.text?.crest || "";
+  textInputs.faith.value = card.text?.faith || "";
+  textInputs.accelerate.value = card.text?.accelerate || "";
+  textInputs.crystallize.value = card.text?.crystallize || "";
+
+  // 6. Force Textareas to Auto-Resize
+  Object.values(textInputs).forEach(textarea => {
+    if(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = (textarea.scrollHeight) + 'px';
+    }
+  });
+
+  // 7. Update layout visibility based on newly set type
+  toggleFieldVisibility();
+
+  // Inform the user about the art limitation
+  alert("Card data loaded! \n\nNote: Because the Workshop history only saves the final generated image, you will need to re-upload the original art.");
+}
+
+// --- HOME PAGE SAVE BUTTON LOGIC ---
+const saveBtn = document.getElementById("saveBtn");
+if (saveBtn) {
+  saveBtn.addEventListener("click", async () => {
+    const originalText = saveBtn.textContent;
+    saveBtn.textContent = "Saving...";
+    saveBtn.disabled = true;
+
+    try {
+      // Ensure fonts are ready before drawing
+      await document.fonts.ready;
+      await Promise.all([
+          document.fonts.load("60px 'Memento'"),
+          document.fonts.load("60px 'Sv_numbers'"),
+          document.fonts.load("30px 'NotoSans'"),
+          document.fonts.load("30px 'Roboto'")
+      ]);
+
+      // Force canvas to save just the card
+      const wasChecked = saveCardOnlyCheckbox.checked;
+      saveCardOnlyCheckbox.checked = true;
+      await drawCard();
+      const workshopImageBase64 = canvas.toDataURL("image/png", 0.8);
+
+      // Package data for IndexedDB
+      const cardMetadata = {
+        id: Date.now(),
+        image: workshopImageBase64,
+        name: nameInput.value.trim() || "Unnamed Card",
+        trait: traitInput.value.trim(),
+        class: classSelect.value,
+        type: typeSelect.value,
+        rarity: raritySelect.value,
+        illustrator: document.getElementById("illustratorName").value.trim(),
+        names: {
+          crest: document.getElementById("crestName").value.trim(),
+          faith: document.getElementById("faithName").value.trim()
+        },
+        costs: {
+          accelerate: document.getElementById("accelerateCost").value,
+          crystallize: document.getElementById("crystallizeCost").value
+        },
+        text: {
+          card: textInputs.card.value.trim(),
+          evolve: textInputs.evolve.value.trim(),
+          superEvolve: textInputs.superEvolve.value.trim(),
+          crest: textInputs.crest.value.trim(),
+          faith: textInputs.faith.value.trim(),
+          accelerate: textInputs.accelerate.value.trim(),
+          crystallize: textInputs.crystallize.value.trim()
+        }
+      };
+
+      // Save to database and update grid
+      await saveToWorkshop(cardMetadata);
+      await renderWorkshop();
+
+      // Revert drawing state if necessary
+      if (!wasChecked) {
+        saveCardOnlyCheckbox.checked = false;
+        await drawCard();
+      }
+
+      // Success feedback
+      saveBtn.textContent = "Saved!";
+      setTimeout(() => {
+        saveBtn.textContent = originalText;
+        saveBtn.disabled = false;
+      }, 1500);
+
+    } catch (err) {
+      console.error("Save failed:", err);
+      alert("Error: Could not save card to Workshop. Try again.");
+      saveBtn.textContent = originalText;
+      saveBtn.disabled = false;
+    }
+  });
+}
+
 // NEW: Animation flag to prevent rapid clicking glitches
 let isModalAnimating = false;
 
