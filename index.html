@@ -201,8 +201,8 @@
               </label>
               
               <button id="previewBtn" type="button">Preview</button>
-
               <button id="downloadBtn" type="button">Download</button>
+              <button id="saveBtn" type="button" style="background: #2aa48a;">Save</button>
             </div>
           </header>
 
@@ -439,8 +439,8 @@
 
         <div class="page-content">
           <header>
-            <h1>Workshop</h1>
-            <p class="subheader">Cards are stored locally in your browser.</p>
+            <h1>Workshop (Beta)</h1>
+            <p class="subheader">Cards are stored locally in your browser cookies.</p>
             
             <div class="nav-right" style="display: flex; gap: 10px;">
               <button id="cancelDeleteBtn" class="nav-btn" style="background:#444; display:none;" onclick="cancelDeleteMode()">Cancel</button>
@@ -467,7 +467,7 @@
           </div>
           
           <div id="workshopGrid" class="workshop-grid">
-            <p class="placeholder-text">No cards created yet. Download a card to see it here!</p>
+            <p class="placeholder-text">No cards created yet. Save a card to see it here!</p>
           </div>
         </div>
       </section>
@@ -480,12 +480,12 @@
   </section>
   
   <div id="workshopModal" class="modal">
-    
     <div class="sv-modal-wrapper">
       
+      <button id="modalEditBtn" class="sv-edit-btn" onclick="editWorkshopCard()">✎ Edit</button>
       <img id="modalPrevBtn" class="sv-nav-arrow sv-arrow-left" src="assets/misc/arrow_left.png" alt="Previous">
       <img id="modalNextBtn" class="sv-nav-arrow sv-arrow-right" src="assets/misc/arrow_right.png" alt="Next">
-
+      
       <div class="modal-content workshop-modal-content sv-theme">
         
         <div class="sv-modal-header">
