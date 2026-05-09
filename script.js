@@ -1434,6 +1434,65 @@ async function getWorkshopData() {
   });
 }
 
+async function performDeleteAnimation(deletedIds) {
+  const grid = document.getElementById("workshopGrid");
+  const allCards = Array.from(grid.querySelectorAll('.workshop-card'));
+  
+  // 1. FIRST: Record the initial positions of all cards on the screen
+  const initialRects = new Map();
+  allCards.forEach(card => {
+    initialRects.set(card.dataset.id, card.getBoundingClientRect());
+  });
+  
+  // 2. Separate the cards being deleted from the ones staying
+  const deletedCards = allCards.filter(card => deletedIds.has(Number(card.dataset.id)));
+  const remainingCards = allCards.filter(card => !deletedIds.has(Number(card.dataset.id)));
+  
+  // 3. SHRINK: Apply the shrink animation to deleted cards
+  deletedCards.forEach(card => card.classList.add('shrink-out'));
+  
+  // Wait 300ms for the shrink animation to finish
+  await new Promise(r => setTimeout(r, 300));
+  
+  // 4. Trigger layout shift by removing deleted cards from the DOM entirely
+  deletedCards.forEach(card => card.remove());
+  
+  // If there are no cards left, exit early
+  if (remainingCards.length === 0) return;
+  
+  // 5. LAST & INVERT: Figure out where remaining cards moved to, and snap them back instantly
+  remainingCards.forEach(card => {
+    const oldRect = initialRects.get(card.dataset.id);
+    const newRect = card.getBoundingClientRect();
+    
+    const deltaX = oldRect.left - newRect.left;
+    const deltaY = oldRect.top - newRect.top;
+    
+    // Snap them backwards using transform
+    card.style.transition = 'none';
+    card.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+  });
+  
+  // Force the browser to register the snapped positions (Reflow)
+  grid.offsetHeight; 
+  
+  // 6. PLAY: Turn transitions back on and tell them to slide to their true positions (0,0)
+  remainingCards.forEach(card => {
+    card.classList.add('slide-move');
+    card.style.transform = 'translate(0, 0)';
+  });
+  
+  // Wait 400ms for the sliding to finish
+  await new Promise(r => setTimeout(r, 400));
+  
+  // Clean up the inline styles so the cards behave normally again
+  remainingCards.forEach(card => {
+    card.classList.remove('slide-move');
+    card.style.transition = '';
+    card.style.transform = '';
+  });
+}
+
 async function toggleDeleteMode() {
   const deleteBtn = document.getElementById("deleteWorkshopBtn");
   const cancelBtn = document.getElementById("cancelDeleteBtn");
@@ -1457,12 +1516,26 @@ async function toggleDeleteMode() {
       // Delete all selected cards from IndexedDB
       cardsToDelete.forEach(id => store.delete(id));
       
-      transaction.oncomplete = () => {
+      transaction.oncomplete = async () => {
+        // Save the IDs so we know what to animate before clearing the set
+        const deletedIds = new Set(cardsToDelete);
+        
+        // Reset states and hide the cancel button
         isDeleteMode = false;
         cardsToDelete.clear();
         deleteBtn.textContent = "Delete";
-        cancelBtn.style.display = "none"; // Hide the cancel button
-        renderWorkshop(); // Refresh the grid
+        cancelBtn.style.display = "none";
+        
+        // Remove the grayscale/hover classes so they look normal while sliding
+        document.querySelectorAll(".workshop-card").forEach(card => {
+          card.classList.remove("delete-mode", "to-delete");
+        });
+
+        // Run the Shrink and Slide animations
+        await performDeleteAnimation(deletedIds);
+        
+        // Run a final sync render from the database just to be safe
+        renderWorkshop(); 
       };
       
       transaction.onerror = (e) => console.error("Error deleting cards:", e.target.error);
@@ -1532,6 +1605,7 @@ async function renderWorkshop() {
     visibleCardsCache.forEach((card, index) => {
       const cardEl = document.createElement("div");
       cardEl.className = "workshop-card";
+      cardEl.dataset.id = card.id;
       
       if (isDeleteMode) {
         cardEl.classList.add("delete-mode");
