@@ -1534,8 +1534,35 @@ async function toggleDeleteMode() {
         // Run the Shrink and Slide animations
         await performDeleteAnimation(deletedIds);
         
-        // Run a final sync render from the database just to be safe
-        renderWorkshop(); 
+        // 1. Sync the caches silently instead of redrawing the DOM
+        workshopCardsCache = workshopCardsCache.filter(card => !deletedIds.has(card.id));
+        visibleCardsCache = visibleCardsCache.filter(card => !deletedIds.has(card.id));
+        
+        // 2. If the grid is completely empty, let renderWorkshop handle the "No cards" text
+        if (visibleCardsCache.length === 0) {
+            renderWorkshop();
+        } else {
+            // 3. Patch the remaining DOM elements with their new cache indexes 
+            // so clicking them opens the correct modal without needing a flickering redraw
+            const remainingCardEls = document.querySelectorAll(".workshop-card");
+            remainingCardEls.forEach((cardEl, newIndex) => {
+                const cardId = Number(cardEl.dataset.id);
+                cardEl.onclick = () => {
+                    if (isDeleteMode) {
+                        if (cardsToDelete.has(cardId)) {
+                            cardsToDelete.delete(cardId);
+                            cardEl.classList.remove("to-delete");
+                        } else {
+                            cardsToDelete.add(cardId);
+                            cardEl.classList.add("to-delete");
+                        }
+                    } else {
+                        currentCardIndex = newIndex;
+                        openWorkshopModal(newIndex); 
+                    }
+                };
+            });
+        }
       };
       
       transaction.onerror = (e) => console.error("Error deleting cards:", e.target.error);
