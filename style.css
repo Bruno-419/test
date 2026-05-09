@@ -1661,3 +1661,38 @@ body {
 .workshop-card.slide-move {
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
+
+
+
+/* --------------------------
+   Modal Edit Button
+   -------------------------- */
+.sv-edit-btn {
+  position: absolute;
+  top: -45px;
+  left: 0;
+  background: #2aa48a;
+  color: white;
+  border: 1px solid #1c7a65;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 30;
+  pointer-events: auto;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.sv-edit-btn:hover {
+  background: #3cb398;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 1200px) {
+  .sv-edit-btn {
+    top: -50px;
+    left: 20px;
+  }
+}
