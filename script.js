@@ -1875,10 +1875,10 @@ function openWorkshopModal(index) {
 
   // 6. Append the sub-boxes to the container and pass the cost down
   if (hasAccelerate) {
-    container.appendChild(createSubBox("Accelerate", "Accelerate " + (card.costs?.accelerate || "1"), card.text.accelerate, card.costs?.accelerate || "1"));
+    container.appendChild(createSubBox("Accelerate", "Accelerate", card.text.accelerate, card.costs?.accelerate || "1"));
   }
   if (hasCrystallize) {
-    container.appendChild(createSubBox("Crystallize", "Crystallize " + (card.costs?.crystallize || "1"), card.text.crystallize, card.costs?.crystallize || "1"));
+    container.appendChild(createSubBox("Crystallize", "Crystallize", card.text.crystallize, card.costs?.crystallize || "1"));
   }
   if (hasCrest) {
     container.appendChild(createSubBox("Crest", card.names.crest, card.text.crest));
