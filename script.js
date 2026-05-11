@@ -925,12 +925,28 @@ const previewState = {
 
 function loadImageFromFile(file) {
   return new Promise((res, rej) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => { URL.revokeObjectURL(url); res(img); };
-    img.onerror = e => { URL.revokeObjectURL(url); rej(e); };
-    img.src = url;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => res(img);
+      img.onerror = err => rej(err);
+      img.src = e.target.result;
+    };
+    reader.onerror = err => rej(err);
+    reader.readAsDataURL(file);
   });
+}
+
+// Add this new helper function right underneath it to extract the data we need to save:
+function getArtSaveData(state) {
+  if (!state.img) return null;
+  return {
+    src: state.img.src,
+    scale: state.scale,
+    tx: state.tx,
+    ty: state.ty,
+    minScale: state.minScale
+  };
 }
 
 function fitImageToMask(img, s) {
@@ -1857,7 +1873,7 @@ function openWorkshopModal(index) {
 }
 
 // --- WORKSHOP EDIT FUNCTION ---
-function editWorkshopCard() {
+async function editWorkshopCard() {
   if (currentCardIndex < 0 || currentCardIndex >= visibleCardsCache.length) return;
   const card = visibleCardsCache[currentCardIndex];
 
@@ -1907,8 +1923,46 @@ function editWorkshopCard() {
   // 7. Update layout visibility based on newly set type
   toggleFieldVisibility();
 
-  // Inform the user about the art limitation
-  alert("Card data loaded! \n\nNote: Because the Workshop history only saves the final generated image, you will need to re-upload the original art.");
+  // 8. Restore Art Data
+  async function restoreArtState(state, savedData, sliderEl, sliderMultiplier) {
+    if (!savedData) {
+      state.img = null;
+      return;
+    }
+    try {
+      const img = await loadImage(savedData.src);
+      state.img = img;
+      state.scale = savedData.scale;
+      state.tx = savedData.tx;
+      state.ty = savedData.ty;
+      state.minScale = savedData.minScale;
+      
+      if (sliderEl) {
+        const min = state.minScale;
+        const max = min * sliderMultiplier;
+        sliderEl.min = min;
+        sliderEl.max = max;
+        sliderEl.step = (max - min) / 100;
+        sliderEl.value = state.scale;
+      }
+    } catch (e) {
+      console.error("Could not restore image", e);
+    }
+  }
+
+  // Multiply the slider limits correctly (5x for main, 8x for crest/faith)
+  await restoreArtState(previewState.main, card.artState?.main, mainZoomSlider, 5);
+  await restoreArtState(previewState.crest, card.artState?.crest, crestZoomSlider, 8);
+  await restoreArtState(previewState.faith, card.artState?.faith, faithZoomSlider, 8);
+  
+  updateAll(); // Refresh canvases and globals
+
+  // Check if we restored from an older save before we added this feature
+  if (!card.artState) {
+    alert("Card text loaded! \n\nNote: This card was saved before the art-saving update. You will need to manually re-upload the original art.");
+  } else {
+    alert("Card and art loaded successfully!");
+  }
 }
 
 // --- HOME PAGE SAVE BUTTON LOGIC ---
@@ -1961,6 +2015,12 @@ if (saveBtn) {
           faith: textInputs.faith.value.trim(),
           accelerate: textInputs.accelerate.value.trim(),
           crystallize: textInputs.crystallize.value.trim()
+        },
+        // ADD THIS NEW PROPERTY:
+        artState: {
+          main: getArtSaveData(previewState.main),
+          crest: getArtSaveData(previewState.crest),
+          faith: getArtSaveData(previewState.faith)
         }
       };
 
@@ -2115,6 +2175,12 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
         faith: textInputs.faith.value.trim(),
         accelerate: textInputs.accelerate.value.trim(),
         crystallize: textInputs.crystallize.value.trim()
+      },
+      // ADD THIS NEW PROPERTY:
+      artState: {
+        main: getArtSaveData(previewState.main),
+        crest: getArtSaveData(previewState.crest),
+        faith: getArtSaveData(previewState.faith)
       }
     };
 
