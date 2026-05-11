@@ -1528,7 +1528,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-family: 'Memento', serif;
+  font-family: 'Sv_numbers';
   font-size: 20px;
   color: #fff;
   /* Double shadow to ensure readability on both light and dark parts of the icon */
