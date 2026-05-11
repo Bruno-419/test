@@ -1826,14 +1826,31 @@ function openWorkshopModal(index) {
   }
 
   // 5. Render Extras (New Sub-box Structure)
-  const createSubBox = (type, name, text) => {
+  const createSubBox = (type, name, text, cost = null) => {
     const wrapper = document.createElement("div");
     wrapper.className = "sv-sub-box";
 
     const header = document.createElement("div");
     header.className = "sv-sub-header";
 
-    if (type !== "Accelerate" && type !== "Crystallize") {
+    if (type === "Accelerate" || type === "Crystallize") {
+        // Accelerate/Crystallize: Build the wrapper with the image and overlaid text
+        const iconWrapper = document.createElement("div");
+        iconWrapper.className = "sv-accelcryst-icon";
+        
+        const img = document.createElement("img");
+        img.src = `assets/misc/accelcryst.png`;
+        img.alt = type;
+
+        const costSpan = document.createElement("span");
+        costSpan.className = "sv-accelcryst-cost";
+        costSpan.textContent = cost !== null ? cost : "1";
+
+        iconWrapper.appendChild(img);
+        iconWrapper.appendChild(costSpan);
+        header.appendChild(iconWrapper);
+    } else {
+        // Crest/Faith: Render normal images
         const img = document.createElement("img");
         img.src = `assets/misc/${type.toLowerCase()}.png`; // Expects 'crest.png' or 'faith.png'
         img.alt = type;
@@ -1856,11 +1873,12 @@ function openWorkshopModal(index) {
     return wrapper;
   };
 
+  // 6. Append the sub-boxes to the container and pass the cost down
   if (hasAccelerate) {
-    container.appendChild(createSubBox("Accelerate", "Accelerate " + (card.costs?.accelerate || "1"), card.text.accelerate));
+    container.appendChild(createSubBox("Accelerate", "Accelerate " + (card.costs?.accelerate || "1"), card.text.accelerate, card.costs?.accelerate || "1"));
   }
   if (hasCrystallize) {
-    container.appendChild(createSubBox("Crystallize", "Crystallize " + (card.costs?.crystallize || "1"), card.text.crystallize));
+    container.appendChild(createSubBox("Crystallize", "Crystallize " + (card.costs?.crystallize || "1"), card.text.crystallize, card.costs?.crystallize || "1"));
   }
   if (hasCrest) {
     container.appendChild(createSubBox("Crest", card.names.crest, card.text.crest));
@@ -1960,8 +1978,6 @@ async function editWorkshopCard() {
   // Check if we restored from an older save before we added this feature
   if (!card.artState) {
     alert("Card text loaded! \n\nNote: This card was saved before the art-saving update. You will need to manually re-upload the original art.");
-  } else {
-    alert("Card and art loaded successfully!");
   }
 }
 
