@@ -1741,7 +1741,7 @@ function formatWorkshopHTML(text) {
   // 5. Apply formatting codes
   html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); // Bold
   html = html.replace(/_(.*?)_/g, '<i>$1</i>');       // Italic
-  html = html.replace(/<c>(.*?)<\/c>/g, '<span style="color:#f3d87d">$1</span>'); // Color
+  html = html.replace(/<c>(.*?)<\/c>/g, '<span style="color:#dcbb78">$1</span>'); // Color
   
   // 6. Dividers (----------)
   // UPDATED: Consumes the optional newline (\n?) immediately following the divider
