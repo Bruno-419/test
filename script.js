@@ -1400,6 +1400,7 @@ let currentClassFilter = "All"; // Default filter
 let currentSearchQuery = "";    // NEW: Tracks the search bar text
 let isDeleteMode = false;
 let cardsToDelete = new Set();
+let renderSequenceId = 0; // ADD THIS LINE TO TRACK RENDERS
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -1611,12 +1612,18 @@ function cancelDeleteMode() {
 async function renderWorkshop() {
   const grid = document.getElementById("workshopGrid");
   if (!grid) return;
-  
-  grid.innerHTML = ""; 
+
+  // Increment sequence ID for every new keystroke/render call
+  const currentRenderId = ++renderSequenceId;
 
   try {
     // 1. Get fresh data
     const data = await getWorkshopData();
+
+    // RACE CONDITION FIX: Check if another search was triggered while we waited for the database.
+    // If so, abort this render to prevent appending duplicate or outdated results.
+    if (currentRenderId !== renderSequenceId) return;
+
     workshopCardsCache = data; 
 
     // 2. Apply Class Filter
@@ -1625,7 +1632,7 @@ async function renderWorkshop() {
       filteredData = filteredData.filter(card => card.class === currentClassFilter);
     }
 
-    // 3. Apply Search Filter (NEW)
+    // 3. Apply Search Filter
     if (currentSearchQuery.trim() !== "") {
       const lowerQuery = currentSearchQuery.toLowerCase().trim();
       filteredData = filteredData.filter(card => 
@@ -1634,6 +1641,9 @@ async function renderWorkshop() {
     }
 
     visibleCardsCache = filteredData;
+
+    // RACE CONDITION FIX: Clear the grid AFTER all data processing is complete
+    grid.innerHTML = ""; 
 
     if (visibleCardsCache.length === 0) {
       if (data.length === 0) {
@@ -1680,8 +1690,10 @@ async function renderWorkshop() {
       grid.appendChild(cardEl);
     });
   } catch (err) {
-    console.error("Error loading workshop:", err);
-    grid.innerHTML = '<p class="placeholder-text" style="color:#d55;">Error loading workshop history.</p>';
+    if (currentRenderId === renderSequenceId) {
+      console.error("Error loading workshop:", err);
+      grid.innerHTML = '<p class="placeholder-text" style="color:#d55;">Error loading workshop history.</p>';
+    }
   }
 }
 
