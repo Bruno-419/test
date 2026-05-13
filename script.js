@@ -1609,7 +1609,7 @@ function cancelDeleteMode() {
   });
 }
 
-async function renderWorkshop() {
+async function renderWorkshop(fetchData = true) {
   const grid = document.getElementById("workshopGrid");
   if (!grid) return;
 
@@ -1617,17 +1617,18 @@ async function renderWorkshop() {
   const currentRenderId = ++renderSequenceId;
 
   try {
-    // 1. Get fresh data
-    const data = await getWorkshopData();
+    // 1. Get fresh data ONLY if requested
+    if (fetchData) {
+        const data = await getWorkshopData();
 
-    // RACE CONDITION FIX: Check if another search was triggered while we waited for the database.
-    // If so, abort this render to prevent appending duplicate or outdated results.
-    if (currentRenderId !== renderSequenceId) return;
+        // RACE CONDITION FIX: Check if another search was triggered while we waited for the database.
+        if (currentRenderId !== renderSequenceId) return;
 
-    workshopCardsCache = data; 
+        workshopCardsCache = data; 
+    }
 
-    // 2. Apply Class Filter
-    let filteredData = data;
+    // 2. Apply Class Filter (Use workshopCardsCache instead of data)
+    let filteredData = workshopCardsCache;
     if (currentClassFilter !== "All") {
       filteredData = filteredData.filter(card => card.class === currentClassFilter);
     }
@@ -1642,11 +1643,11 @@ async function renderWorkshop() {
 
     visibleCardsCache = filteredData;
 
-    // RACE CONDITION FIX: Clear the grid AFTER all data processing is complete
+    // Clear the grid AFTER all data processing is complete
     grid.innerHTML = ""; 
 
     if (visibleCardsCache.length === 0) {
-      if (data.length === 0) {
+      if (workshopCardsCache.length === 0) {
         grid.innerHTML = '<p class="placeholder-text">No cards generated yet. Create and download a card to see it here!</p>';
       } else {
         grid.innerHTML = `<p class="placeholder-text">No cards found matching your criteria.</p>`;
@@ -1708,7 +1709,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       // Logic Update
       currentClassFilter = btn.dataset.filter;
-      renderWorkshop();
+      renderWorkshop(false); // <-- Pass false to skip DB fetch
     });
   });
   
@@ -1717,7 +1718,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (workshopSearchInput) {
     workshopSearchInput.addEventListener("input", (e) => {
       currentSearchQuery = e.target.value;
-      renderWorkshop();
+      renderWorkshop(false); // <-- Pass false to skip DB fetch
     });
   }
 });
