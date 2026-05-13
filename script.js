@@ -1920,6 +1920,11 @@ async function editWorkshopCard() {
   document.getElementById('cardRarity').value = card.rarity || "Legendary";
   document.getElementById('illustratorName').value = card.illustrator || "";
 
+  // Restore base cost
+  if (card.cost !== undefined) {
+      document.getElementById('costValue').value = card.cost;
+  }
+
   // Check if we need to set stats (Follower only)
   if (card.type === "Follower" && card.attack !== undefined) {
       document.getElementById('attackValue').value = card.attack;
@@ -2027,6 +2032,9 @@ if (saveBtn) {
         class: classSelect.value,
         type: typeSelect.value,
         rarity: raritySelect.value,
+        cost: costInput.value,
+        attack: attackInput.value,
+        defense: defenseInput.value,
         illustrator: document.getElementById("illustratorName").value.trim(),
         names: {
           crest: document.getElementById("crestName").value.trim(),
@@ -2187,6 +2195,9 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
       class: classSelect.value,
       type: typeSelect.value,
       rarity: raritySelect.value,
+      cost: costInput.value,
+      attack: attackInput.value,
+      defense: defenseInput.value,
       illustrator: document.getElementById("illustratorName").value.trim(),
       names: {
         crest: document.getElementById("crestName").value.trim(),
