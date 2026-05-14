@@ -1270,13 +1270,35 @@ attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
-document.querySelectorAll(".text-toolbar button").forEach((button) => {
+// --- Track the last active text area for the global formatting toolbar ---
+let activeTextarea = null;
+
+document.addEventListener("focusin", (e) => {
+  if (e.target.tagName.toLowerCase() === "textarea") {
+    activeTextarea = e.target;
+  }
+});
+
+// --- Formatting Button Logic (Global & Legacy support) ---
+document.querySelectorAll(".text-toolbar button, .global-text-toolbar button").forEach((button) => {
   button.addEventListener("click", (e) => {
     e.preventDefault();
     const format = button.dataset.format;
-    const field = button.closest(".field");
-    if (!field) return;
-    const textarea = field.querySelector("textarea");
+    
+    let textarea;
+    // If it's a bookmark button, apply to the globally tracked active text box
+    if (button.closest('.global-text-toolbar')) {
+      textarea = activeTextarea;
+      if (!textarea) {
+        return; // Fail silently if no text box is selected yet
+      }
+    } else {
+      // Legacy behavior (keeps Balance page formatting toolbars working)
+      const field = button.closest(".field");
+      if (!field) return;
+      textarea = field.querySelector("textarea");
+    }
+
     if (!textarea) return;
 
     const start = textarea.selectionStart;
@@ -1295,6 +1317,7 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
       const before = value.slice(0, start);
       const after = value.slice(end);
       const currentlyWrapped = before.endsWith(openTag) && after.startsWith(closeTag);
+      
       if (currentlyWrapped) {
         const newBefore = before.slice(0, before.length - openTag.length);
         const newAfter = after.slice(closeTag.length);
