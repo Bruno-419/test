@@ -961,6 +961,52 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   }
 }
 
+
+/* --- Global Bookmark Toolbar --- */
+.global-text-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  background: #252525;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  align-items: center;
+  position: sticky;
+  top: -20px; /* Sticks to the top as you scroll */
+  z-index: 50;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+
+.global-text-toolbar .toolbar-label {
+  font-size: 13px;
+  color: var(--accent);
+  margin-right: auto;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.global-text-toolbar button {
+  background: #1a1a1a;
+  border: 1px solid #444;
+  color: #ddd;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  transform: none; /* overrides the old text-toolbar transform */
+}
+
+.global-text-toolbar button:hover {
+  background: #333;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+
 /* --------------------------
    Carousel / Multi-page Logic
    -------------------------- */
