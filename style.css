@@ -962,20 +962,37 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
 }
 
 
-/* --- Global Bookmark Toolbar --- */
+
+/* --- Global Bookmark Toolbar (Attached Tab Style) --- */
+.right-column-wrapper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
 .global-text-toolbar {
   display: flex;
   gap: 8px;
-  margin-bottom: 24px;
-  background: #252525;
+  background: #1a1a1a; /* Matches the panel background */
   padding: 10px 16px;
-  border-radius: 8px;
-  border: 1px solid #444;
+  
+  /* Rounds the top, leaves the bottom flat to connect to the panel */
+  border-radius: 10px 10px 0 0; 
+  border: 1px solid #333;
+  border-bottom: none; 
+  
   align-items: center;
   position: sticky;
-  top: -20px; /* Sticks to the top as you scroll */
+  top: 0; 
   z-index: 50;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+  margin-bottom: 0;
+}
+
+/* Flatten the top corners of the right panel so it merges with the toolbar */
+.right-column-wrapper .right-panel {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-top: 0;
 }
 
 .global-text-toolbar .toolbar-label {
@@ -988,7 +1005,7 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
 }
 
 .global-text-toolbar button {
-  background: #1a1a1a;
+  background: #252525;
   border: 1px solid #444;
   color: #ddd;
   font-weight: bold;
@@ -997,7 +1014,7 @@ canvas { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #4
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  transform: none; /* overrides the old text-toolbar transform */
+  transform: none;
 }
 
 .global-text-toolbar button:hover {
