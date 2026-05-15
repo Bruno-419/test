@@ -1788,3 +1788,51 @@ body {
     left: 20px;
   }
 }
+
+
+
+/* --- Mobile Workshop Adjustments --- */
+@media (max-width: 768px) {
+  /* 1. Display 3 cards per row */
+  .workshop-grid {
+    gap: 8px; /* Slightly tighter gap for mobile */
+    justify-content: flex-start;
+  }
+  
+  .workshop-card {
+    /* Calculates exactly 3 cards across, subtracting the two 8px gaps */
+    width: calc((100% - 16px) / 3); 
+  }
+
+  /* 2. Center card images inside the modal & override hardcoded desktop margins */
+  .sv-theme .modal-image-col {
+    height: auto;
+    padding-top: 20px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .sv-theme .modal-image-col img {
+    max-height: 350px; /* Constrains height so the user can still reach the text */
+    width: auto;
+  }
+
+  .sv-theme .modal-info-col {
+    width: 100%;
+    margin-top: 15px;
+    margin-left: 0;
+    height: auto;
+    max-height: 40vh; /* Allows scrolling inside the text box on tiny screens */
+  }
+
+  /* Allow the modal wrapper to shrink around the stacked content */
+  .workshop-modal-content.sv-theme {
+    height: auto;
+    max-height: 95vh;
+  }
+
+  /* 3. Hide the Evolve box */
+  .sv-evolve-btn-container {
+    display: none !important;
+  }
+}
