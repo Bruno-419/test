@@ -1793,46 +1793,60 @@ body {
 
 /* --- Mobile Workshop Adjustments --- */
 @media (max-width: 768px) {
-  /* 1. Display 3 cards per row */
+  /* 1. Display 2 cards per row */
   .workshop-grid {
-    gap: 8px; /* Slightly tighter gap for mobile */
+    gap: 12px; 
     justify-content: flex-start;
   }
   
   .workshop-card {
-    /* Calculates exactly 3 cards across, subtracting the two 8px gaps */
-    width: calc((100% - 16px) / 3); 
+    /* Calculates exactly 2 cards across, subtracting the 12px gap */
+    width: calc((100% - 12px) / 2); 
   }
 
-  /* 2. Center card images inside the modal & override hardcoded desktop margins */
+  /* 2. & 3. Shrink overall modal size, but make card images larger */
   .sv-theme .modal-image-col {
     height: auto;
-    padding-top: 20px;
+    padding-top: 10px; /* Reduced padding to tighten the box */
     justify-content: center;
     align-items: center;
   }
 
   .sv-theme .modal-image-col img {
-    max-height: 350px; /* Constrains height so the user can still reach the text */
+    max-height: 50vh; /* Allows the image to scale much larger vertically */
     width: auto;
+    max-width: 95%; /* Ensures it doesn't overflow horizontally */
   }
 
   .sv-theme .modal-info-col {
     width: 100%;
-    margin-top: 15px;
+    margin-top: 10px; /* Tighter spacing between image and text */
     margin-left: 0;
     height: auto;
-    max-height: 40vh; /* Allows scrolling inside the text box on tiny screens */
+    max-height: 35vh; /* Constrains the text area so the modal doesn't stretch off-screen */
   }
 
-  /* Allow the modal wrapper to shrink around the stacked content */
   .workshop-modal-content.sv-theme {
     height: auto;
-    max-height: 95vh;
+    max-height: 90vh; /* Slightly smaller overall footprint */
   }
 
-  /* 3. Hide the Evolve box */
+  /* Hide the Evolve box */
   .sv-evolve-btn-container {
     display: none !important;
+  }
+
+  /* 4. Make left/right arrow buttons way smaller */
+  .sv-nav-arrow {
+    width: 30px; /* Half the size of the desktop arrows */
+  }
+  
+  /* Ensure the smaller arrows sit neatly inside the screen bounds */
+  .sv-arrow-left { 
+    left: 2px; 
+  }
+  
+  .sv-arrow-right { 
+    right: 2px; 
   }
 }
