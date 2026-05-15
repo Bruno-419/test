@@ -1793,42 +1793,47 @@ body {
 
 /* --- Mobile Workshop Adjustments --- */
 @media (max-width: 768px) {
-  /* 1. Display 2 cards per row */
+  /* Keep 2 cards per row */
   .workshop-grid {
     gap: 12px; 
     justify-content: flex-start;
   }
   
   .workshop-card {
-    /* Calculates exactly 2 cards across, subtracting the 12px gap */
     width: calc((100% - 12px) / 2); 
   }
 
-  /* 2. & 3. Shrink overall modal size, but make card images larger */
+  /* Target the main wrapper to restrict overall width to 84% of the screen */
+  .sv-modal-wrapper {
+    max-width: 84vw;
+  }
+
+  /* Restrict overall modal height to 84% of the screen */
+  .workshop-modal-content.sv-theme {
+    height: auto;
+    max-height: 84vh; 
+  }
+
+  /* Make card images 30% larger (bumped from 50vh to 65vh max) */
   .sv-theme .modal-image-col {
     height: auto;
-    padding-top: 10px; /* Reduced padding to tighten the box */
+    padding-top: 10px; 
     justify-content: center;
     align-items: center;
   }
 
   .sv-theme .modal-image-col img {
-    max-height: 50vh; /* Allows the image to scale much larger vertically */
+    max-height: 65vh; 
     width: auto;
-    max-width: 95%; /* Ensures it doesn't overflow horizontally */
+    max-width: 100%; 
   }
 
   .sv-theme .modal-info-col {
     width: 100%;
-    margin-top: 10px; /* Tighter spacing between image and text */
+    margin-top: 10px; 
     margin-left: 0;
     height: auto;
-    max-height: 35vh; /* Constrains the text area so the modal doesn't stretch off-screen */
-  }
-
-  .workshop-modal-content.sv-theme {
-    height: auto;
-    max-height: 90vh; /* Slightly smaller overall footprint */
+    max-height: 35vh; 
   }
 
   /* Hide the Evolve box */
@@ -1836,12 +1841,11 @@ body {
     display: none !important;
   }
 
-  /* 4. Make left/right arrow buttons way smaller */
+  /* Make left/right arrow buttons 30% smaller (reduced from 30px to 21px) */
   .sv-nav-arrow {
-    width: 30px; /* Half the size of the desktop arrows */
+    width: 21px; 
   }
   
-  /* Ensure the smaller arrows sit neatly inside the screen bounds */
   .sv-arrow-left { 
     left: 2px; 
   }
@@ -1850,4 +1854,3 @@ body {
     right: 2px; 
   }
 }
-
