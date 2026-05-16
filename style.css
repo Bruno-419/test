@@ -1909,7 +1909,7 @@ body {
 
   /* Maintain the card image size to match the Workshop grid */
   .sv-theme .modal-image-col img {
-    width: 36vw; 
+    width: calc((100vw - 16px) / 2);
     height: auto;
     max-height: none; 
   }
