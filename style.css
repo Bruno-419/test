@@ -1890,4 +1890,37 @@ body {
   .sv-arrow-right { 
     right: -20px !important; 
   }
+   
+   /* Force the modal body to stack its columns vertically */
+  .sv-body {
+    flex-direction: column !important;
+    align-items: center;
+    padding: 15px; 
+  }
+
+  /* Ensure the image column takes the full width to center the image perfectly */
+  .sv-theme .modal-image-col {
+    width: 100%;
+    height: auto;
+    padding: 10px 0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Maintain the card image size to match the Workshop grid */
+  .sv-theme .modal-image-col img {
+    width: calc((100vw - 32px) / 2); 
+    height: auto;
+    max-height: none; 
+  }
+
+  /* Ensure the text info column takes full width and drops below the image */
+  .sv-theme .modal-info-col {
+    width: 100%;
+    margin-top: 15px; 
+    margin-left: 0;
+    height: auto;
+    max-height: 35vh; 
+  }
 }
