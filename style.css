@@ -1823,7 +1823,7 @@ body {
   }
 
   .sv-modal-header {
-    padding: 10px 0; 
+    padding: 5px 0; 
   }
 
   .sv-modal-header h2 {
@@ -1834,7 +1834,7 @@ body {
   .sv-meta-bar {
     font-size: 11px;
     height: auto;
-    padding: 6px 10px;
+    padding: 10px 8px;
     gap: 8px; /* Tighter gaps to fit the smaller screen */
     flex-wrap: wrap; 
   }
@@ -1902,7 +1902,6 @@ body {
   .sv-theme .modal-image-col {
     width: 100%;
     height: auto;
-    padding: 10px 0; 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1910,7 +1909,7 @@ body {
 
   /* Maintain the card image size to match the Workshop grid */
   .sv-theme .modal-image-col img {
-    width: calc((100vw - 32px) / 2); 
+    width: 36vw; 
     height: auto;
     max-height: none; 
   }
@@ -1918,8 +1917,6 @@ body {
   /* Ensure the text info column takes full width and drops below the image */
   .sv-theme .modal-info-col {
     width: 100%;
-    margin-top: 15px; 
-    margin-left: 0;
     height: auto;
     max-height: 35vh; 
   }
