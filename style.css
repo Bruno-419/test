@@ -1883,11 +1883,11 @@ body {
   
   .sv-theme .sv-arrow-left,
   .sv-arrow-left { 
-    left: 2px !important; 
+    left: 22px !important; 
   }
   
   .sv-theme .sv-arrow-right,
   .sv-arrow-right { 
-    right: 2px !important; 
+    right: 22px !important; 
   }
 }
