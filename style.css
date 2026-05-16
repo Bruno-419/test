@@ -1803,54 +1803,73 @@ body {
     width: calc((100% - 12px) / 2); 
   }
 
-  /* Target the main wrapper to restrict overall width to 84% of the screen */
+  /* 1. Remove modal padding and center the wrapper perfectly H/V */
+  .modal {
+    padding: 0; 
+  }
+  
   .sv-modal-wrapper {
     max-width: 84vw;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 
-  /* Restrict overall modal height to 84% of the screen */
   .workshop-modal-content.sv-theme {
     height: auto;
     max-height: 84vh; 
   }
 
-  /* Make card images 30% larger (bumped from 50vh to 65vh max) */
+  /* 2. Lower the card name font size */
+  .sv-modal-header h2 {
+    font-size: 20px; /* Reduced for better mobile fit */
+  }
+  
+  .sv-modal-header {
+    padding: 10px 0; /* Tighter padding to save vertical space */
+  }
+
+  /* 3. Center the image H/V and make it 50% larger */
   .sv-theme .modal-image-col {
     height: auto;
-    padding-top: 10px; 
+    padding: 15px 0; 
+    display: flex;
     justify-content: center;
     align-items: center;
   }
 
   .sv-theme .modal-image-col img {
-    max-height: 65vh; 
+    max-height: 75vh; /* Expanded significantly to allow the image to scale up */
     width: auto;
     max-width: 100%; 
   }
 
   .sv-theme .modal-info-col {
     width: 100%;
-    margin-top: 10px; 
+    margin-top: 5px; 
     margin-left: 0;
     height: auto;
-    max-height: 35vh; 
+    max-height: 30vh; 
   }
 
-  /* Hide the Evolve box */
   .sv-evolve-btn-container {
     display: none !important;
   }
 
-  /* Make left/right arrow buttons 30% smaller (reduced from 30px to 21px) */
+  /* 4. Move arrows to the extreme left and right of the screen */
   .sv-nav-arrow {
-    width: 21px; 
+    width: 24px; 
+    position: fixed; /* Fixes them to the viewport edges instead of the wrapper */
+    z-index: 100;
   }
   
   .sv-arrow-left { 
-    left: 2px; 
+    left: 8px; 
   }
   
   .sv-arrow-right { 
-    right: 2px; 
+    right: 8px; 
   }
 }
