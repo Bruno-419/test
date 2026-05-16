@@ -1823,7 +1823,7 @@ body {
   }
 
   .sv-modal-header {
-    padding: 5px 0; 
+    padding: 8px 0; 
   }
 
   .sv-modal-header h2 {
@@ -1834,7 +1834,7 @@ body {
   .sv-meta-bar {
     font-size: 11px;
     height: auto;
-    padding: 10px 8px;
+    padding: 6px 8px;
     gap: 8px; /* Tighter gaps to fit the smaller screen */
     flex-wrap: wrap; 
   }
@@ -1846,7 +1846,6 @@ body {
   /* Match modal image size to the Workshop grid cards */
   .sv-theme .modal-image-col {
     height: auto;
-    padding: 15px 0; 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1874,7 +1873,7 @@ body {
    /* Force arrows to the extreme edges and center them vertically */
   .sv-theme .sv-nav-arrow,
   .sv-nav-arrow {
-    width: 24px !important;
+    width: 33px !important;
     position: fixed !important; 
     top: 50% !important; /* Centers them vertically on the screen */
     transform: translateY(-50%) !important;
@@ -1895,7 +1894,7 @@ body {
   .sv-body {
     flex-direction: column !important;
     align-items: center;
-    padding: 15px; 
+    padding: 0px 15px 15px; 
   }
 
   /* Ensure the image column takes the full width to center the image perfectly */
