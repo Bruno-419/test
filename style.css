@@ -1803,7 +1803,7 @@ body {
     width: calc((100% - 12px) / 2); 
   }
 
-  /* 1. Remove modal padding and center the wrapper perfectly H/V */
+  /* Center the wrapper perfectly H/V */
   .modal {
     padding: 0; 
   }
@@ -1822,16 +1822,28 @@ body {
     max-height: 84vh; 
   }
 
-  /* 2. Lower the card name font size */
-  .sv-modal-header h2 {
-    font-size: 20px; /* Reduced for better mobile fit */
-  }
-  
   .sv-modal-header {
-    padding: 10px 0; /* Tighter padding to save vertical space */
+    padding: 10px 0; 
   }
 
-  /* 3. Center the image H/V and make it 50% larger */
+  .sv-modal-header h2 {
+    font-size: 20px; 
+  }
+
+  /* Shrink the Trait, Class, and Illustrator info */
+  .sv-meta-bar {
+    font-size: 11px;
+    height: auto;
+    padding: 6px 10px;
+    gap: 8px; /* Tighter gaps to fit the smaller screen */
+    flex-wrap: wrap; 
+  }
+
+  #modalMetaString {
+    font-size: 11px;
+  }
+
+  /* Match modal image size to the Workshop grid cards */
   .sv-theme .modal-image-col {
     height: auto;
     padding: 15px 0; 
@@ -1841,9 +1853,10 @@ body {
   }
 
   .sv-theme .modal-image-col img {
-    max-height: 75vh; /* Expanded significantly to allow the image to scale up */
-    width: auto;
-    max-width: 100%; 
+    /* Matches the visual width of the 2-per-row grid cards */
+    width: calc((100vw - 32px) / 2); 
+    height: auto;
+    max-height: none; 
   }
 
   .sv-theme .modal-info-col {
@@ -1851,25 +1864,25 @@ body {
     margin-top: 5px; 
     margin-left: 0;
     height: auto;
-    max-height: 30vh; 
+    max-height: 35vh; 
   }
 
   .sv-evolve-btn-container {
     display: none !important;
   }
 
-  /* 4. Move arrows to the extreme left and right of the screen */
+  /* Push arrows almost touching the edges (2px from the sides) */
   .sv-nav-arrow {
     width: 24px; 
-    position: fixed; /* Fixes them to the viewport edges instead of the wrapper */
+    position: fixed; 
     z-index: 100;
   }
   
   .sv-arrow-left { 
-    left: 8px; 
+    left: 2px; 
   }
   
   .sv-arrow-right { 
-    right: 8px; 
+    right: 2px; 
   }
 }
