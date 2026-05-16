@@ -1871,18 +1871,23 @@ body {
     display: none !important;
   }
 
-  /* Push arrows almost touching the edges (2px from the sides) */
+   /* Force arrows to the extreme edges and center them vertically */
+  .sv-theme .sv-nav-arrow,
   .sv-nav-arrow {
-    width: 24px; 
-    position: fixed; 
-    z-index: 100;
+    width: 24px !important;
+    position: fixed !important; 
+    top: 50% !important; /* Centers them vertically on the screen */
+    transform: translateY(-50%) !important;
+    z-index: 105 !important;
   }
   
+  .sv-theme .sv-arrow-left,
   .sv-arrow-left { 
-    left: 52px; 
+    left: 2px !important; 
   }
   
+  .sv-theme .sv-arrow-right,
   .sv-arrow-right { 
-    right: 52px; 
+    right: 2px !important; 
   }
 }
