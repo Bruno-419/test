@@ -1858,14 +1858,6 @@ body {
     max-height: none; 
   }
 
-  .sv-theme .modal-info-col {
-    width: 100%;
-    margin-top: 5px; 
-    margin-left: 0;
-    height: auto;
-    max-height: 35vh; 
-  }
-
   .sv-evolve-btn-container {
     display: none !important;
   }
@@ -1916,7 +1908,7 @@ body {
   /* Ensure the text info column takes full width and drops below the image */
   .sv-theme .modal-info-col {
     width: 100%;
-    height: auto;
-    max-height: 35vh; 
+    height: 94px;
+    max-height: 94px; 
   }
 }
