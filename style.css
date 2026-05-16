@@ -1874,12 +1874,12 @@ body {
   
   .sv-theme .sv-arrow-left,
   .sv-arrow-left { 
-    left: -20px !important; 
+    left: -22px !important; 
   }
   
   .sv-theme .sv-arrow-right,
   .sv-arrow-right { 
-    right: -20px !important; 
+    right: -22px !important; 
   }
    
    /* Force the modal body to stack its columns vertically */
