@@ -1908,6 +1908,8 @@ body {
 /* Ensure the text info column takes full width and drops below the image */
   .sv-theme .modal-info-col {
     width: 100%;
+    margin-top: 0px; 
+    margin-left: 0;
     height: auto;
     max-height: 35vh; 
   }
