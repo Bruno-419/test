@@ -1905,12 +1905,18 @@ body {
     max-height: none; 
   }
 
-/* Ensure the text info column takes full width and drops below the image */
+   /* Ensure the text info column takes full width and drops below the image */
   .sv-theme .modal-info-col {
     width: 100%;
     margin-top: 0px; 
     margin-left: 0;
     height: auto;
     max-height: 35vh; 
+  }
+
+   /* Set info column text to 11px for mobile */
+  .sv-text-container,
+  .sv-sub-content {
+    font-size: 11px;
   }
 }
