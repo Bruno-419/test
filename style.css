@@ -1919,4 +1919,20 @@ body {
   .sv-sub-content {
     font-size: 11px;
   }
+
+   /* Remove top and bottom padding while keeping the 12px side padding */
+  .sv-sub-header {
+    padding: 0 12px;
+  }
+
+  /* Resize the Accelerate/Crystallize icon container */
+  .sv-accelcryst-icon {
+    width: 20px;
+    height: 22px;
+  }
+
+  /* Shrink the overlaid cost number to fit the smaller 20x22 icon */
+  .sv-accelcryst-cost {
+    font-size: 14px; /* Scaled down from the original 20px */
+  }
 }
