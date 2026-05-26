@@ -1590,7 +1590,7 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-48%, -58%);
+  transform: translate(-50%, -50%);
   font-family: 'Memento', serif;
   font-size: 20px;
   color: #fff;
