@@ -1935,6 +1935,6 @@ body {
   .sv-accelcryst-cost {
     font-size: 14px; /* Scaled down from the original 20px */
     /* Shift 1px left and 3px up from true center */
-    transform: translate(calc(-50% - 1px), calc(-50% - 3px));
+    transform: translate(-48%, -65%);
   }
 }
