@@ -225,6 +225,19 @@ async function getImage(src) {
 // --- Auto insert "----------" marker ---
 Object.values(textInputs).forEach((textarea) => {
   textarea.addEventListener("input", () => {
+    // NEW: Replace [$n] with the current card name
+    const currentName = nameInput.value.trim() || "Unnamed Card";
+    if (textarea.value.includes("[$n]")) {
+      const cursorPos = textarea.selectionStart;
+      const lengthDiff = currentName.length - 4; // "[$n]" is 4 characters
+      
+      textarea.value = textarea.value.replace(/\[\$n\]/g, currentName);
+      
+      // Keep the user's cursor in the correct position after replacement
+      textarea.selectionStart = textarea.selectionEnd = cursorPos + lengthDiff;
+    }
+
+    // Existing auto-divider logic
     if (autoDividerCheckbox.checked) {
       const cursorPos = textarea.selectionStart;
       const value = textarea.value;
