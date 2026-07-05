@@ -505,7 +505,7 @@
         accelerateSection.style.display = isSpell ? 'none' : '';
       }
       if (crystallizeSection) {
-        crystallizeSection.style.display = isAmulet ? 'none' : '';
+        crystallizeSection.style.display = (isSpell || isAmulet) ? 'none' : '';
       }
       
       let signatureOption = null;
