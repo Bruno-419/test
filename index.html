@@ -500,13 +500,8 @@
       statExtraFields.style.visibility = isFollower ? 'visible' : 'hidden';
       evolveTextField.style.display = isFollower ? 'block' : 'none';
       superEvolveTextField.style.display = isFollower ? 'block' : 'none';
-
-      if (accelerateSection) {
-        accelerateSection.style.display = isSpell ? 'block' : 'none';
-      }
-      if (crystallizeSection) {
-        crystallizeSection.style.display = (isSpell || isAmulet) ? 'block' : 'none';
-      }
+      accelerateSection.style.display = isSpell ? 'block' : 'none';
+      crystallizeSection.style.display = (isSpell || isAmulet) ? 'block' : 'none';
       
       let signatureOption = null;
       for (const option of cardRaritySelect.options) {
