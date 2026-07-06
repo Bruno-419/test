@@ -2286,6 +2286,32 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
   }
 });
 
+const resetBtn = document.getElementById('resetBtn');
+if (resetBtn) {
+  resetBtn.addEventListener('click', () => {
+    // Clear all text inputs, number inputs, and textareas
+    document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => {
+        el.value = '';
+    });
+    
+    // Reset all dropdowns to their default (first) option
+    document.querySelectorAll('select').forEach(el => {
+        el.selectedIndex = 0;
+    });
+    
+    // Clear the art upload field
+    const artUpload = document.getElementById('artUpload');
+    if (artUpload) {
+        artUpload.value = '';
+    }
+
+    // Re-run visibility logic so the fields reset to the default card type's layout
+    if (typeof toggleFieldVisibility === 'function') {
+        toggleFieldVisibility();
+    }
+  });
+}
+
 // ------------------------------------
 // OFFICIAL CARDS SEARCH FUNCTIONALITY
 // ------------------------------------
