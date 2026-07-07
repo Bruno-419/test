@@ -489,8 +489,8 @@
     const statExtraFields = document.getElementById('statExtraFields');
     const evolveTextField = document.getElementById('evolveTextField');
     const superEvolveTextField = document.getElementById('superEvolveTextField');
-    const accelerateSection = document.querySelector('.accelerate-section');
-    const crystallizeSection = document.querySelector('.crystallize-section');
+    const accelerateSection = document.querySelector('.accelerate-section adorned-accelerate');
+    const crystallizeSection = document.querySelector('.crystallize-section adorned-crystallize');
     const resetBtn = document.getElementById('resetBtn'); // Grab the new Reset Button
 
     function toggleFieldVisibility() {
@@ -503,15 +503,8 @@
       statExtraFields.style.visibility = isFollower ? 'visible' : 'hidden';
       evolveTextField.style.display = isFollower ? 'block' : 'none';
       superEvolveTextField.style.display = isFollower ? 'block' : 'none';
-
-      // Fix: Use an empty string ('') instead of 'block' to let your CSS handle the flex display
-      if (accelerateSection) {
-        accelerateSection.style.display = isSpell ? 'none' : 'flex';
-      }
-      
-      if (crystallizeSection) {
-        crystallizeSection.style.display = (isSpell || isAmulet) ? 'none' : 'flex';
-      }
+      accelerateSection.style.display = isSpell ? 'block' : 'none';
+      crystallizeSection.style.display = (isSpell || isAmulet) ? 'block' : 'none';
       
       let signatureOption = null;
       for (const option of cardRaritySelect.options) {
