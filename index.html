@@ -494,7 +494,9 @@
     const resetBtn = document.getElementById('resetBtn'); // Grab the new Reset Button
 
     function toggleFieldVisibility() {
-      // Use trim() to avoid HTML whitespace issues
+      // 1. Debugging: Check if the function is even running
+      console.log("Card Type Selected:", cardTypeSelect.value);
+      
       const typeValue = cardTypeSelect.value.trim().toLowerCase();
       const isFollower = (typeValue === 'follower');
       const isAmulet = (typeValue === 'amulet');
@@ -503,21 +505,29 @@
       statExtraFields.style.visibility = isFollower ? 'visible' : 'hidden';
       evolveTextField.style.display = isFollower ? 'block' : 'none';
       superEvolveTextField.style.display = isFollower ? 'block' : 'none';
-      // Forcing the display state with '!important' to override the stylesheet flex rules
+      
+      // 2. Safely toggle the Accelerate section using the CSS class
       if (accelerateSection) {
         if (isSpell) {
-          accelerateSection.style.setProperty('display', 'none', 'important');
+          accelerateSection.classList.add('hide-section');
+          console.log("Accelerate should be HIDDEN.");
         } else {
-          accelerateSection.style.setProperty('display', 'flex', 'important');
+          accelerateSection.classList.remove('hide-section');
         }
+      } else {
+        console.error("ERROR: JavaScript cannot find the Accelerate section in the HTML.");
       }
       
+      // 3. Safely toggle the Crystallize section using the CSS class
       if (crystallizeSection) {
         if (isSpell || isAmulet) {
-          crystallizeSection.style.setProperty('display', 'none', 'important');
+          crystallizeSection.classList.add('hide-section');
+          console.log("Crystallize should be HIDDEN.");
         } else {
-          crystallizeSection.style.setProperty('display', 'flex', 'important');
+          crystallizeSection.classList.remove('hide-section');
         }
+      } else {
+        console.error("ERROR: JavaScript cannot find the Crystallize section in the HTML.");
       }
       
       let signatureOption = null;
