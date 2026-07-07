@@ -489,8 +489,8 @@
     const statExtraFields = document.getElementById('statExtraFields');
     const evolveTextField = document.getElementById('evolveTextField');
     const superEvolveTextField = document.getElementById('superEvolveTextField');
-    const accelerateSection = document.querySelector('.accelerate-section adorned-accelerate');
-    const crystallizeSection = document.querySelector('.crystallize-section adorned-crystallize');
+    const accelerateSection = document.querySelector('.accelerate-section.adorned-accelerate');
+    const crystallizeSection = document.querySelector('.crystallize-section.adorned-crystallize');
     const resetBtn = document.getElementById('resetBtn'); // Grab the new Reset Button
 
     function toggleFieldVisibility() {
@@ -503,8 +503,22 @@
       statExtraFields.style.visibility = isFollower ? 'visible' : 'hidden';
       evolveTextField.style.display = isFollower ? 'block' : 'none';
       superEvolveTextField.style.display = isFollower ? 'block' : 'none';
-      accelerateSection.style.display = isSpell ? 'block' : 'none';
-      crystallizeSection.style.display = (isSpell || isAmulet) ? 'block' : 'none';
+      // Forcing the display state with '!important' to override the stylesheet flex rules
+      if (accelerateSection) {
+        if (isSpell) {
+          accelerateSection.style.setProperty('display', 'none', 'important');
+        } else {
+          accelerateSection.style.setProperty('display', 'flex', 'important');
+        }
+      }
+      
+      if (crystallizeSection) {
+        if (isSpell || isAmulet) {
+          crystallizeSection.style.setProperty('display', 'none', 'important');
+        } else {
+          crystallizeSection.style.setProperty('display', 'flex', 'important');
+        }
+      }
       
       let signatureOption = null;
       for (const option of cardRaritySelect.options) {
