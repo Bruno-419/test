@@ -506,11 +506,11 @@
 
       // Fix: Use an empty string ('') instead of 'block' to let your CSS handle the flex display
       if (accelerateSection) {
-        accelerateSection.style.display = isSpell ? 'none' : '';
+        accelerateSection.style.display = isSpell ? 'none' : 'flex';
       }
       
       if (crystallizeSection) {
-        crystallizeSection.style.display = (isSpell || isAmulet) ? 'none' : '';
+        crystallizeSection.style.display = (isSpell || isAmulet) ? 'none' : 'flex';
       }
       
       let signatureOption = null;
