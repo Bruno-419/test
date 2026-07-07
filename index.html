@@ -491,17 +491,27 @@
     const superEvolveTextField = document.getElementById('superEvolveTextField');
     const accelerateSection = document.querySelector('.accelerate-section');
     const crystallizeSection = document.querySelector('.crystallize-section');
+    const resetBtn = document.getElementById('resetBtn'); // Grab the new Reset Button
 
     function toggleFieldVisibility() {
-      const typeValue = cardTypeSelect.value.toLowerCase();
+      // Use trim() to avoid HTML whitespace issues
+      const typeValue = cardTypeSelect.value.trim().toLowerCase();
       const isFollower = (typeValue === 'follower');
       const isAmulet = (typeValue === 'amulet');
       const isSpell = (typeValue === 'spell');
+
       statExtraFields.style.visibility = isFollower ? 'visible' : 'hidden';
       evolveTextField.style.display = isFollower ? 'block' : 'none';
       superEvolveTextField.style.display = isFollower ? 'block' : 'none';
-      accelerateSection.style.display = isFollower ? 'block' : 'none';
-      crystallizeSection.style.display = isFollower ? 'block' : 'none';
+
+      // Fix: Use an empty string ('') instead of 'block' to let your CSS handle the flex display
+      if (accelerateSection) {
+        accelerateSection.style.display = isSpell ? 'none' : '';
+      }
+      
+      if (crystallizeSection) {
+        crystallizeSection.style.display = (isSpell || isAmulet) ? 'none' : '';
+      }
       
       let signatureOption = null;
       for (const option of cardRaritySelect.options) {
@@ -521,6 +531,34 @@
           signatureOption.disabled = false;
         }
       }
+    }
+
+    // Reset Button Logic
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        // Reset Text, Number, and Textarea inputs
+        document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => {
+            el.value = el.defaultValue || ''; 
+        });
+        
+        // Reset Dropdowns to option 0
+        document.querySelectorAll('select').forEach(el => {
+            el.selectedIndex = 0;
+        });
+        
+        // Reset Checkboxes to their initial load state
+        document.querySelectorAll('input[type="checkbox"]').forEach(el => {
+            el.checked = el.defaultChecked;
+        });
+        
+        // Clear Art Uploads
+        document.querySelectorAll('input[type="file"]').forEach(el => {
+            el.value = '';
+        });
+
+        // Re-trigger layout logic to match default dropdowns
+        toggleFieldVisibility();
+      });
     }
 
     toggleFieldVisibility();
