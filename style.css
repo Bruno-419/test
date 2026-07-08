@@ -1937,3 +1937,9 @@ body {
     transform: translate(-50%, -53%);
   }
 }
+
+
+
+  .hide-section {
+    display: none !important;
+}
