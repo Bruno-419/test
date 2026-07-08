@@ -498,6 +498,7 @@
     const superEvolveTextField = document.getElementById('superEvolveTextField');
     const accelerateSection = document.querySelector('.accelerate-section');
     const crystallizeSection = document.querySelector('.crystallize-section');
+    const resetBtn = document.getElementById('resetBtn');
 
     function toggleFieldVisibility() {
       const typeValue = cardTypeSelect.value.trim().toLowerCase();
@@ -545,6 +546,26 @@
           signatureOption.disabled = false;
         }
       }
+    }
+
+    // Reset Button Logic
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => {
+            el.value = el.defaultValue || ''; 
+        });
+        document.querySelectorAll('select').forEach(el => {
+            el.selectedIndex = 0;
+        });
+        document.querySelectorAll('input[type="checkbox"]').forEach(el => {
+            el.checked = el.defaultChecked;
+        });
+        document.querySelectorAll('input[type="file"]').forEach(el => {
+            el.value = '';
+        });
+        
+        toggleFieldVisibility();
+      });
     }
 
     toggleFieldVisibility();
