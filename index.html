@@ -500,7 +500,7 @@
     const crystallizeSection = document.querySelector('.crystallize-section');
 
     function toggleFieldVisibility() {
-      const typeValue = cardTypeSelect.value.toLowerCase();
+      const typeValue = cardTypeSelect.value.trim().toLowerCase();
       const isFollower = (typeValue === 'follower');
       const isAmulet = (typeValue === 'amulet');
       const isSpell = (typeValue === 'spell');
