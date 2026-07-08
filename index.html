@@ -27,12 +27,6 @@
       -webkit-user-select: none;
       -moz-user-select: none;
     }
-
-    /* === NUCLEAR HIDE CLASS === 
-       This will override any flexbox or display rules in style.css */
-    .hide-section {
-      display: none !important;
-    }
   </style>
 </head>
 <body>
@@ -49,59 +43,129 @@
           <header>
             <h1>Balance Adjustments</h1>
             </header>
-
-          <div class="search-section">
-            <div class="search-wrapper">
+          
+          <div class="search-section" style="display: flex; gap: 10px; align-items: flex-start;">
+            <div class="search-wrapper" style="flex: 1;">
               <input type="text" id="balanceSearchInput" class="card-search-input" placeholder="Search official cards database...">
               <ul id="balanceSearchResults" class="search-results-list"></ul>
             </div>
+            <button id="balancePreviewBtn" type="button" style="height: 45px;">Preview</button>
+            <button id="balanceDownloadBtn" type="button" style="height: 45px;">Download</button>
           </div>
           
           <div id="balanceAdjustmentForm" class="adjustment-form" style="display: none;">
-            <div class="adjustment-grid">
-              <div class="field">
-                <label>Cost</label>
-                <input type="number" id="adjCost">
-              </div>
-              <div class="field">
-                <label>Attack</label>
-                <input type="number" id="adjAttack">
-              </div>
-              <div class="field">
-                <label>Defense</label>
-                <input type="number" id="adjDefense">
+            <div class="stat-row">
+              <label class="field small-field">
+                <span class="field-label">Cost</span>
+                <input type="number" id="adjCost" min="0">
+              </label>
+              
+              <div id="adjStatExtraFields" style="display: flex; gap: 10px; flex: 1;">
+                <label class="field small-field" style="flex: 1;">
+                  <span class="field-label">Attack</span>
+                  <input type="number" id="adjAttack" min="0">
+                </label>
+                <label class="field small-field" style="flex: 1;">
+                  <span class="field-label">Defense</span>
+                  <input type="number" id="adjDefense" min="0">
+                </label>
               </div>
             </div>
-
-            <div class="field">
-              <label>Trait</label>
+          
+            <label class="field">
+              <span class="field-label">Trait</span>
               <input type="text" id="adjTrait">
+            </label>
+          
+            <div class="field">
+              <div class="text-toolbar">
+                <label class="field-label" for="adjCardText">Card Text</label>
+                <button type="button" data-format="bold">B</button>
+                <button type="button" data-format="italic">I</button>
+                <button type="button" data-format="color">Gold</button>
+                <button type="button" data-format="all">All</button>
+              </div>
+              <textarea id="adjCardText"></textarea>
+            </div>
+          
+            <div class="field" id="adjEvolveTextField">
+              <div class="text-toolbar">
+                <label class="field-label" for="adjEvolveText">Evolve Text</label>
+                <button type="button" data-format="bold">B</button>
+                <button type="button" data-format="italic">I</button>
+                <button type="button" data-format="color">Gold</button>
+                <button type="button" data-format="all">All</button>
+              </div>
+              <textarea id="adjEvolveText"></textarea>
+            </div>
+          
+            <div class="field" id="adjSuperEvolveTextField">
+              <div class="text-toolbar">
+                <label class="field-label" for="adjSuperEvolveText">Super-Evolve Text</label>
+                <button type="button" data-format="bold">B</button>
+                <button type="button" data-format="italic">I</button>
+                <button type="button" data-format="color">Gold</button>
+                <button type="button" data-format="all">All</button>
+              </div>
+              <textarea id="adjSuperEvolveText"></textarea>
+            </div>
+          
+            <div class="field">
+              <div class="text-toolbar">
+                <label class="field-label" for="adjCrestText">Crest Text</label>
+                <button type="button" data-format="bold">B</button>
+                <button type="button" data-format="italic">I</button>
+                <button type="button" data-format="color">Gold</button>
+                <button type="button" data-format="all">All</button>
+              </div>
+              <textarea id="adjCrestText"></textarea>
+            </div>
+          
+            <div class="field">
+              <div class="text-toolbar">
+                <label class="field-label" for="adjFaithText">Faith Text</label>
+                <button type="button" data-format="bold">B</button>
+                <button type="button" data-format="italic">I</button>
+                <button type="button" data-format="color">Gold</button>
+                <button type="button" data-format="all">All</button>
+              </div>
+              <textarea id="adjFaithText"></textarea>
             </div>
 
-            <div class="field">
-              <label>Card Text</label>
-              <textarea id="adjCardText" rows="4"></textarea>
+            <div class="accelerate-section adorned-accelerate" id="adjAccelerateSection">
+              <div class="field" style="max-width: 120px;">
+                <span class="field-label">Accelerate Cost</span>
+                <input id="adjAccelerateCost" type="number" min="0" value="1">
+              </div>
+              <div class="field">
+                <div class="text-toolbar">
+                  <label class="field-label" for="adjAccelerateText">Accelerate Text</label>
+                  <button type="button" data-format="bold">B</button>
+                  <button type="button" data-format="italic">I</button>
+                  <button type="button" data-format="color">Gold</button>
+                  <button type="button" data-format="all">All</button>
+                </div>
+                <textarea id="adjAccelerateText"></textarea>
+              </div>
             </div>
 
-            <div class="field">
-              <label>Evolve Text</label>
-              <textarea id="adjEvolveText" rows="3"></textarea>
+            <div class="crystallize-section adorned-crystallize" id="adjCrystallizeSection">
+              <div class="field" style="max-width: 120px;">
+                <span class="field-label">Crystallize Cost</span>
+                <input id="adjCrystallizeCost" type="number" min="0" value="1">
+              </div>
+              <div class="field">
+                <div class="text-toolbar">
+                  <label class="field-label" for="adjCrystallizeText">Crystallize Text</label>
+                  <button type="button" data-format="bold">B</button>
+                  <button type="button" data-format="italic">I</button>
+                  <button type="button" data-format="color">Gold</button>
+                  <button type="button" data-format="all">All</button>
+                </div>
+                <textarea id="adjCrystallizeText"></textarea>
+              </div>
             </div>
-
-            <div class="field">
-              <label>Super-Evolve Text</label>
-              <textarea id="adjSuperEvolveText" rows="3"></textarea>
-            </div>
-
-            <div class="field">
-              <label>Crest Text</label>
-              <textarea id="adjCrestText" rows="2"></textarea>
-            </div>
-
-            <div class="field">
-              <label>Faith Text</label>
-              <textarea id="adjFaithText" rows="2"></textarea>
-            </div>
+            
           </div>
 
           <div class="placeholder-content">
@@ -111,11 +175,19 @@
       </section>
 
       <section class="app-page" id="page-home">
-         <div class="page-content">
+        <div class="side-nav left" onclick="navigateTo('balance')">
+            <img src="assets/misc/balance_adjustments.png" alt="Balance">
+        </div> 
+
+        <div class="side-nav right" onclick="navigateTo('workshop')">
+            <img src="assets/misc/workshop.png" alt="Workshop">
+        </div> 
+
+        <div class="page-content">
           <header>
             <h1>Shadowverse: Worlds Beyond Card Generator</h1>
             <p class="subheader">
-              V1.8.0 — May not work on all browsers, probably works in Chrome/Firefox. Enable JavaScript or this website will explode! 
+              V1.8.2 — May not work on all browsers, probably works in Chrome/Firefox. Enable JavaScript or this website will explode! 
             </p>
 
             <p class="subheader">
@@ -123,16 +195,14 @@
             </p>
 
             <div class="top-buttons">
-              <button id="resetBtn" type="button" style="background-color: #d9534f; border-color: #d43f3a; color: white;">Reset</button>
-
               <label class="upload-btn">
                 Upload Art
                 <input type="file" id="artUpload" accept="image/*">
               </label>
               
               <button id="previewBtn" type="button">Preview</button>
-
               <button id="downloadBtn" type="button">Download</button>
+              <button id="saveBtn" type="button" style="background: #2aa48a;">Save</button>
             </div>
           </header>
 
@@ -225,38 +295,28 @@
                   <input id="illustratorName" type="text">
                 </label>
               </section>
-
+              
+              <div class="right-column-wrapper">
+                <div class="global-text-toolbar">
+                  <button type="button" data-format="bold">B</button>
+                  <button type="button" data-format="italic">I</button>
+                  <button type="button" data-format="color">Gold</button>
+                  <button type="button" data-format="all">All</button>
+                </div>
+              
               <section class="right-panel">
                 <div class="field">
-                  <div class="text-toolbar">
-                    <label class="field-label" for="cardText">Card Text</label>
-                    <button type="button" data-format="bold">B</button>
-                    <button type="button" data-format="italic">I</button>
-                    <button type="button" data-format="color">Gold</button>
-                    <button type="button" data-format="all">All</button>
-                  </div>
+                  <label class="field-label" for="cardText">Card Text</label>
                   <textarea id="cardText"></textarea>
                 </div>
 
                 <div class="field" id="evolveTextField">
-                  <div class="text-toolbar">
-                    <label class="field-label" for="evolveText">Evolve Text</label>
-                    <button type="button" data-format="bold">B</button>
-                    <button type="button" data-format="italic">I</button>
-                    <button type="button" data-format="color">Gold</button>
-                    <button type="button" data-format="all">All</button>
-                  </div>
+                  <label class="field-label" for="evolveText">Evolve Text</label>
                   <textarea id="evolveText"></textarea>
                 </div>
 
                 <div class="field" id="superEvolveTextField">
-                  <div class="text-toolbar">
-                    <label class="field-label" for="superEvolveText">Super-Evolve Text</label>
-                    <button type="button" data-format="bold">B</button>
-                    <button type="button" data-format="italic">I</button>
-                    <button type="button" data-format="color">Gold</button>
-                    <button type="button" data-format="all">All</button>
-                  </div>
+                  <label class="field-label" for="superEvolveText">Super-Evolve Text</label>
                   <textarea id="superEvolveText"></textarea>
                 </div>
 
@@ -279,13 +339,7 @@
                   </label>
 
                   <div class="field">
-                    <div class="text-toolbar">
-                      <label class="field-label" for="crestText">Crest Text</label>
-                      <button type="button" data-format="bold">B</button>
-                      <button type="button" data-format="italic">I</button>
-                      <button type="button" data-format="color">Gold</button>
-                      <button type="button" data-format="all">All</button>
-                    </div>
+                    <label class="field-label" for="crestText">Crest Text</label>
                     <textarea id="crestText"></textarea>
                   </div>
                 </div>
@@ -309,13 +363,7 @@
                   </label>
 
                   <div class="field">
-                    <div class="text-toolbar">
-                      <label class="field-label" for="faithText">Faith Text</label>
-                      <button type="button" data-format="bold">B</button>
-                      <button type="button" data-format="italic">I</button>
-                      <button type="button" data-format="color">Gold</button>
-                      <button type="button" data-format="all">All</button>
-                    </div>
+                    <label class="field-label" for="faithText">Faith Text</label>
                     <textarea id="faithText"></textarea>
                   </div>
                 </div>
@@ -327,13 +375,7 @@
                   </div>
 
                   <div class="field">
-                    <div class="text-toolbar">
-                      <label class="field-label" for="accelerateText">Accelerate Text</label>
-                      <button type="button" data-format="bold">B</button>
-                      <button type="button" data-format="italic">I</button>
-                      <button type="button" data-format="color">Gold</button>
-                      <button type="button" data-format="all">All</button>
-                    </div>
+                    <label class="field-label" for="accelerateText">Accelerate Text</label>
                     <textarea id="accelerateText"></textarea>
                   </div>
                 </div>
@@ -345,13 +387,7 @@
                   </div>
 
                   <div class="field">
-                    <div class="text-toolbar">
-                      <label class="field-label" for="crystallizeText">Crystallize Text</label>
-                      <button type="button" data-format="bold">B</button>
-                      <button type="button" data-format="italic">I</button>
-                      <button type="button" data-format="color">Gold</button>
-                      <button type="button" data-format="all">All</button>
-                    </div>
+                    <label class="field-label" for="crystallizeText">Crystallize Text</label>
                     <textarea id="crystallizeText"></textarea>
                   </div>
                 </div>
@@ -369,16 +405,18 @@
 
         <div class="page-content">
           <header>
-            <h1>Workshop</h1>
-            <p class="subheader">Cards are stored locally in your browser.</p>
+            <h1>Workshop (Beta)</h1>
+            <p class="subheader">Cards are stored locally in your browser cookies.</p>
             
-            <button class="nav-btn nav-right" style="background:#522;" onclick="clearWorkshop()">Clear All</button>
+            <div class="nav-right" style="display: flex; gap: 10px;">
+              <button id="cancelDeleteBtn" class="nav-btn" style="background:#444; display:none;" onclick="cancelDeleteMode()">Cancel</button>
+              <button id="deleteWorkshopBtn" class="nav-btn" style="background:#522;" onclick="toggleDeleteMode()">Delete</button>
+            </div>
           </header>
 
           <div class="search-section">
             <div class="search-wrapper">
               <input type="text" id="workshopSearchInput" class="card-search-input" placeholder="Search cards...">
-              <ul id="workshopSearchResults" class="search-results-list"></ul>
             </div>
           </div>
           
@@ -395,7 +433,7 @@
           </div>
           
           <div id="workshopGrid" class="workshop-grid">
-            <p class="placeholder-text">No cards created yet. Download a card to see it here!</p>
+            <p class="placeholder-text">No cards created yet. Save a card to see it here!</p>
           </div>
         </div>
       </section>
@@ -408,12 +446,12 @@
   </section>
   
   <div id="workshopModal" class="modal">
-    
     <div class="sv-modal-wrapper">
       
+      <button id="modalEditBtn" class="sv-edit-btn" onclick="editWorkshopCard()">✎ Edit</button>
       <img id="modalPrevBtn" class="sv-nav-arrow sv-arrow-left" src="assets/misc/arrow_left.png" alt="Previous">
       <img id="modalNextBtn" class="sv-nav-arrow sv-arrow-right" src="assets/misc/arrow_right.png" alt="Next">
-
+      
       <div class="modal-content workshop-modal-content sv-theme">
         
         <div class="sv-modal-header">
@@ -444,24 +482,20 @@
   </div>
 
   <script src="script.js"></script>
-  
   <script>
     const cardTypeSelect = document.getElementById('cardType');
     const cardRaritySelect = document.getElementById('cardRarity');
     const statExtraFields = document.getElementById('statExtraFields');
     const evolveTextField = document.getElementById('evolveTextField');
     const superEvolveTextField = document.getElementById('superEvolveTextField');
-    
     const accelerateSection = document.querySelector('.accelerate-section');
     const crystallizeSection = document.querySelector('.crystallize-section');
-    const resetBtn = document.getElementById('resetBtn');
 
     function toggleFieldVisibility() {
-      const typeValue = cardTypeSelect.value.trim().toLowerCase();
+      const typeValue = cardTypeSelect.value.toLowerCase();
       const isFollower = (typeValue === 'follower');
       const isAmulet = (typeValue === 'amulet');
       const isSpell = (typeValue === 'spell');
-
       // 1. Follower fields
       if (statExtraFields) statExtraFields.style.visibility = isFollower ? 'visible' : 'hidden';
       if (evolveTextField) evolveTextField.style.display = isFollower ? 'block' : 'none';
@@ -485,11 +519,10 @@
         }
       }
       
-      // Rarity constraints
       let signatureOption = null;
-      for (let i = 0; i < cardRaritySelect.options.length; i++) {
-        if (cardRaritySelect.options[i].value === "Signature") {
-          signatureOption = cardRaritySelect.options[i];
+      for (const option of cardRaritySelect.options) {
+        if (option.value === "Signature") {
+          signatureOption = option;
           break;
         }
       }
@@ -506,29 +539,31 @@
       }
     }
 
-    // Reset Button Logic
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => {
-            el.value = el.defaultValue || ''; 
-        });
-        document.querySelectorAll('select').forEach(el => {
-            el.selectedIndex = 0;
-        });
-        document.querySelectorAll('input[type="checkbox"]').forEach(el => {
-            el.checked = el.defaultChecked;
-        });
-        document.querySelectorAll('input[type="file"]').forEach(el => {
-            el.value = '';
-        });
-        
-        toggleFieldVisibility();
-      });
-    }
-
-    // Initialize layout and set up listener
     toggleFieldVisibility();
     cardTypeSelect.addEventListener('change', toggleFieldVisibility);
+
+    // === BALANCE PAGE TOGGLE LOGIC ===
+    const originalPopulate = window.populateBalanceForm;
+    window.populateBalanceForm = function(card) {
+      // 1. Run the original script.js population logic first
+      if (originalPopulate) originalPopulate(card);
+
+      // 2. Control visibility based on the database card type
+      const typeVal = card.type ? card.type.toLowerCase() : 'follower';
+      const isFollower = (typeVal === 'follower');
+      const isSpell = (typeVal === 'spell');
+      const isAmulet = (typeVal === 'amulet');
+
+      document.getElementById('adjStatExtraFields').style.display = isFollower ? 'flex' : 'none';
+      document.getElementById('adjEvolveTextField').style.display = isFollower ? 'block' : 'none';
+      document.getElementById('adjSuperEvolveTextField').style.display = isFollower ? 'block' : 'none';
+
+      const accSec = document.getElementById('adjAccelerateSection');
+      if (accSec) accSec.style.display = isSpell ? 'none' : '';
+
+      const crySec = document.getElementById('adjCrystallizeSection');
+      if (crySec) crySec.style.display = isAmulet ? 'none' : '';
+    };
   </script>
 </body>
 </html>
