@@ -1937,10 +1937,3 @@ body {
     transform: translate(-50%, -53%);
   }
 }
-
-
-
-/* Forces sections to hide, overriding any flexbox or inline rules */
-.hide-section {
-  display: none !important;
-}
