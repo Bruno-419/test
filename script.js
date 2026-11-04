@@ -1809,6 +1809,19 @@ function openWorkshopModal(index) {
   
   const card = visibleCardsCache[index];
 
+  // Reset evolve state on open
+  modalIsEvolved = false;
+  const stack = document.getElementById("svCardImageStack");
+  if (stack) stack.classList.remove("evolved");
+  const evolveBtn = document.getElementById("modalEvolveBtn");
+  if (evolveBtn) evolveBtn.textContent = "⟳ Evolve";
+
+  // Populate top and bottom image layers
+  const imgTop = document.getElementById("modalCardImageTop");
+  const imgBottom = document.getElementById("modalCardImageBottom");
+  if (imgTop) imgTop.src = card.image;
+  if (imgBottom) imgBottom.src = card.evolvedImage || card.image;
+
   document.getElementById("modalCardImage").src = card.image;
   document.getElementById("modalCardName").textContent = card.name;
 
@@ -1939,6 +1952,23 @@ function openWorkshopModal(index) {
   document.getElementById("workshopModal").style.display = "block";
 }
 
+let modalIsEvolved = false;
+
+function toggleEvolveModalImage() {
+  const stack = document.getElementById("svCardImageStack");
+  const evolveBtn = document.getElementById("modalEvolveBtn");
+  if (!stack) return;
+
+  modalIsEvolved = !modalIsEvolved;
+  if (modalIsEvolved) {
+    stack.classList.add("evolved");
+    if (evolveBtn) evolveBtn.textContent = "⟳ Base";
+  } else {
+    stack.classList.remove("evolved");
+    if (evolveBtn) evolveBtn.textContent = "⟳ Evolve";
+  }
+}
+
 // --- WORKSHOP EDIT FUNCTION ---
 async function editWorkshopCard() {
   if (currentCardIndex < 0 || currentCardIndex >= visibleCardsCache.length) return;
@@ -2064,6 +2094,7 @@ if (saveBtn) {
       const cardMetadata = {
         id: Date.now(),
         image: workshopImageBase64,
+        evolvedImage: workshopImageBase64, // Stores bottom layer art
         name: nameInput.value.trim() || "Unnamed Card",
         trait: traitInput.value.trim(),
         class: classSelect.value,
@@ -2228,6 +2259,7 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     const cardMetadata = {
       id: Date.now(),
       image: workshopImageBase64,
+      evolvedImage: workshopImageBase64, // Stores bottom layer art
       name: nameInput.value.trim() || "Unnamed Card",
       trait: traitInput.value.trim(),
       class: classSelect.value,
