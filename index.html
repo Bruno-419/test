@@ -474,9 +474,12 @@
         <div class="modal-body sv-body">
           
           <div class="modal-image-col">
-            <img id="modalCardImage" src="" alt="Card Image">
+            <div class="sv-card-image-stack" id="svCardImageStack">
+              <img id="modalCardImageTop" class="card-image-layer top" src="" alt="Card Image Top">
+              <img id="modalCardImageBottom" class="card-image-layer bottom" src="" alt="Card Image Bottom">
+            </div>
             <div class="sv-evolve-btn-container">
-                <button class="sv-evolve-btn">⟳ Evolve</button>
+                <button class="sv-evolve-btn" id="modalEvolveBtn" onclick="toggleEvolveModalImage()">⟳ Evolve</button>
             </div>
           </div>
     
