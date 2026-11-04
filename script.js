@@ -264,7 +264,7 @@ const HIGHLIGHT_KEYWORDS = [
   "On Spellboost","Clash","Mode","Intimidate","Aura","Barrier","Fuse","Fused","Necromancy","Combo",
   "Earth Rite","Rally","Countdown","Reanimate","Earth Sigil","Crystallize","Crystallized","Invoke",
   "Invoked","Sanguine","Skybound Art","Super Skybound Art","Maneuver","Maneuverable","Maneuvering",
-  "Enhance","Union Burst","Accelerate","Burial Rite"
+  "Enhance","Union Burst","Accelerate","Burial Rite","Clue"
 ];
 const HIGHLIGHT_REGEX = new RegExp(`\\b(${HIGHLIGHT_KEYWORDS.join("|")})\\b`, "g");
 
@@ -1954,6 +1954,7 @@ async function editWorkshopCard() {
   document.getElementById('cardClass').value = card.class || "Neutral";
   document.getElementById('cardType').value = card.type || "Follower";
   document.getElementById('cardRarity').value = card.rarity || "Legendary";
+  document.getElementById('tokenCheckbox').checked = !!card.isToken;
   document.getElementById('illustratorName').value = card.illustrator || "";
 
   // Restore base cost
@@ -2068,6 +2069,7 @@ if (saveBtn) {
         class: classSelect.value,
         type: typeSelect.value,
         rarity: raritySelect.value,
+        isToken: tokenCheckbox.checked,
         cost: costInput.value,
         attack: attackInput.value,
         defense: defenseInput.value,
@@ -2231,6 +2233,7 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
       class: classSelect.value,
       type: typeSelect.value,
       rarity: raritySelect.value,
+      isToken: tokenCheckbox.checked,
       cost: costInput.value,
       attack: attackInput.value,
       defense: defenseInput.value,
