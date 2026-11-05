@@ -1821,8 +1821,7 @@ function openWorkshopModal(index) {
   const imgBottom = document.getElementById("modalCardImageBottom");
   if (imgTop) imgTop.src = card.image;
   if (imgBottom) imgBottom.src = card.evolvedImage || card.image;
-
-  document.getElementById("modalCardImage").src = card.image;
+  
   document.getElementById("modalCardName").textContent = card.name;
 
   const traitVal = card.trait ? card.trait : "-";
