@@ -1990,3 +1990,26 @@ body {
   transform: translateY(0) scale(1) rotate(0deg);
   z-index: 2;
 }
+
+
+
+/* --- Home Page Evolve Preview Toggle Button --- */
+.home-evolve-btn {
+  width: 100%;
+  margin-top: 6px;
+  background: linear-gradient(to bottom, #315a73, #233f52);
+  border: 1px solid #e7cd9c;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: background 0.2s, transform 0.1s;
+}
+
+.home-evolve-btn:hover {
+  background: linear-gradient(to bottom, #3c6d8c, #29495f);
+  transform: translateY(-1px);
+}
