@@ -1094,21 +1094,29 @@ if (artInput) {
     if (!file) return;
     const mainArtTitleEl = document.getElementById("mainArtPreviewTitle");
     if (mainArtTitleEl) {
-      mainArtTitleEl.textContent = file.name;
+      mainArtTitleEl.textContent = `Card Art (${activeArtKey === 'base' ? 'Base' : 'Evolved'})`;
     }
     try {
       const img = await loadImageFromFile(file);
       
-      // Update Main Art
-      previewState.main.img = img;
-      fitImageToMask(img, previewState.main);
+      // Update active art layer
+      const activeState = previewState[activeArtKey];
+      activeState.img = img;
+      fitImageToMask(img, activeState);
+
+      // Convenience: If evolved art is empty when uploading base, pre-populate it too
+      if (activeArtKey === 'base' && !previewState.evolved.img) {
+        previewState.evolved.img = img;
+        fitImageToMask(img, previewState.evolved);
+      }
+      
       if (mainZoomSlider) {
-        const min = previewState.main.minScale;
+        const min = activeState.minScale;
         const max = min * 5; 
         mainZoomSlider.min = min;
         mainZoomSlider.max = max;
         mainZoomSlider.step = (max - min) / 100;
-        mainZoomSlider.value = previewState.main.scale;
+        mainZoomSlider.value = activeState.scale;
       }
 
       // Automatically update Crest Art
@@ -2152,6 +2160,32 @@ if (saveBtn) {
       saveBtn.textContent = originalText;
       saveBtn.disabled = false;
     }
+  });
+}
+
+const homeEvolveToggleBtn = document.getElementById("homeEvolveToggleBtn");
+if (homeEvolveToggleBtn) {
+  homeEvolveToggleBtn.addEventListener("click", () => {
+    activeArtKey = activeArtKey === 'base' ? 'evolved' : 'base';
+    
+    // Update button text and title header
+    const titleEl = document.getElementById("mainArtPreviewTitle");
+    if (activeArtKey === 'evolved') {
+      homeEvolveToggleBtn.textContent = "Switch to Base Art";
+      if (titleEl) titleEl.textContent = "Card Art (Evolved)";
+    } else {
+      homeEvolveToggleBtn.textContent = "Switch to Evolved Art";
+      if (titleEl) titleEl.textContent = "Card Art (Base)";
+    }
+
+    // Sync zoom slider to the active state's scale
+    const activeState = previewState[activeArtKey];
+    if (mainZoomSlider) {
+      mainZoomSlider.min = activeState.minScale;
+      mainZoomSlider.max = activeState.minScale * 5;
+      mainZoomSlider.value = activeState.scale;
+    }
+    updateAll();
   });
 }
 
