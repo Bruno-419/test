@@ -2059,13 +2059,19 @@ async function editWorkshopCard() {
       console.error("Could not restore image", e);
     }
   }
-
-  // Multiply the slider limits correctly (5x for main, 8x for crest/faith)
-  await restoreArtState(previewState.main, card.artState?.main, mainZoomSlider, 5);
+  
+  // Restore Art Data
+  await restoreArtState(previewState.base, card.artState?.base || card.artState?.main, mainZoomSlider, 5);
+  await restoreArtState(previewState.evolved, card.artState?.evolved || card.artState?.base || card.artState?.main, mainZoomSlider, 5);
   await restoreArtState(previewState.crest, card.artState?.crest, crestZoomSlider, 8);
   await restoreArtState(previewState.faith, card.artState?.faith, faithZoomSlider, 8);
   
-  updateAll(); // Refresh canvases and globals
+  activeArtKey = 'base';
+  if (homeEvolveToggleBtn) homeEvolveToggleBtn.textContent = "Switch to Evolved Art";
+  const titleEl = document.getElementById("mainArtPreviewTitle");
+  if (titleEl) titleEl.textContent = "Card Art (Base)";
+
+  updateAll();
 
   // Check if we restored from an older save before we added this feature
   if (!card.artState) {
@@ -2091,17 +2097,28 @@ if (saveBtn) {
           document.fonts.load("30px 'Roboto'")
       ]);
 
-      // Force canvas to save just the card
-      const wasChecked = saveCardOnlyCheckbox.checked;
+      // Generate Base Image
+      activeArtKey = 'base';
+      updateAll();
       saveCardOnlyCheckbox.checked = true;
       await drawCard();
-      const workshopImageBase64 = canvas.toDataURL("image/png", 0.8);
+      const baseImageBase64 = canvas.toDataURL("image/png", 0.8); 
+  
+      // Generate Evolved Image (fallback to base if evolved art isn't set)
+      activeArtKey = 'evolved';
+      updateAll();
+      await drawCard();
+      const evolvedImageBase64 = previewState.evolved.img ? canvas.toDataURL("image/png", 0.8) : baseImageBase64;
+  
+      // Switch back to base view
+      activeArtKey = 'base';
+      updateAll();
 
       // Package data for IndexedDB
       const cardMetadata = {
         id: Date.now(),
-        image: workshopImageBase64,
-        evolvedImage: workshopImageBase64, // Stores bottom layer art
+        image: baseImageBase64,
+        evolvedImage: evolvedImageBase64, // Stores bottom layer art
         name: nameInput.value.trim() || "Unnamed Card",
         trait: traitInput.value.trim(),
         class: classSelect.value,
@@ -2129,9 +2146,9 @@ if (saveBtn) {
           accelerate: textInputs.accelerate.value.trim(),
           crystallize: textInputs.crystallize.value.trim()
         },
-        // ADD THIS NEW PROPERTY:
         artState: {
-          main: getArtSaveData(previewState.main),
+          base: getArtSaveData(previewState.base),
+          evolved: getArtSaveData(previewState.evolved),
           crest: getArtSaveData(previewState.crest),
           faith: getArtSaveData(previewState.faith)
         }
@@ -2284,15 +2301,28 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     ]);
 
     const wasChecked = saveCardOnlyCheckbox.checked;
-    
+
+    // Generate Base Image
+    activeArtKey = 'base';
+    updateAll();
     saveCardOnlyCheckbox.checked = true;
     await drawCard();
-    const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); 
+    const baseImageBase64 = canvas.toDataURL("image/png", 0.8); 
+
+    // Generate Evolved Image (fallback to base if evolved art isn't set)
+    activeArtKey = 'evolved';
+    updateAll();
+    await drawCard();
+    const evolvedImageBase64 = previewState.evolved.img ? canvas.toDataURL("image/png", 0.8) : baseImageBase64;
+
+    // Switch back to base view
+    activeArtKey = 'base';
+    updateAll();
     
     const cardMetadata = {
       id: Date.now(),
-      image: workshopImageBase64,
-      evolvedImage: workshopImageBase64, // Stores bottom layer art
+      image: baseImageBase64,
+      evolvedImage: evolvedImageBase64, // Stores bottom layer art
       name: nameInput.value.trim() || "Unnamed Card",
       trait: traitInput.value.trim(),
       class: classSelect.value,
@@ -2322,7 +2352,8 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
       },
       // ADD THIS NEW PROPERTY:
       artState: {
-        main: getArtSaveData(previewState.main),
+        base: getArtSaveData(previewState.base),
+        evolved: getArtSaveData(previewState.evolved),
         crest: getArtSaveData(previewState.crest),
         faith: getArtSaveData(previewState.faith)
       }
