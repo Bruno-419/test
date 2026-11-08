@@ -105,31 +105,6 @@ function loadImage(src) {
   });
 }
 
-function loadImageFromFile(file) {
-  return new Promise((res, rej) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => res(img);
-      img.onerror = err => rej(err);
-      img.src = e.target.result;
-    };
-    reader.onerror = err => rej(err);
-    reader.readAsDataURL(file);
-  });
-}
-
-function getArtSaveData(state) {
-  if (!state.img) return null;
-  return {
-    src: state.img.src,
-    scale: state.scale,
-    tx: state.tx,
-    ty: state.ty,
-    minScale: state.minScale
-  };
-}
-
 // Sharpening Helper
 function applySharpen(ctx, w, h, amount) {
   const imgData = ctx.getImageData(0, 0, w, h);
@@ -157,6 +132,7 @@ function applySharpen(ctx, w, h, amount) {
 function getPartsAndWidths(text, fontSize, baseFont = "Memento", hyphenFont = "Roboto") {
   const parts = text.split(/(-)/g);
   let totalWidth = 0;
+  // Define extra spacing for the hyphen in titles
   const hyphenPadding = 8; 
 
   const widths = parts.map(part => {
@@ -190,6 +166,9 @@ function drawTextWithHyphenSwap(text, x, y, fontSize, align = "left", baseFont =
   ctx.restore();
 }
 
+/**
+ * Draws a number, scaling down the font size to fit a max width.
+ */
 function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpacing = 0, yNudgeCoefficient) {
   ctx.textAlign = "center";
   ctx.letterSpacing = `${letterSpacing}px`;
@@ -246,6 +225,19 @@ async function getImage(src) {
 // --- Auto insert "----------" marker ---
 Object.values(textInputs).forEach((textarea) => {
   textarea.addEventListener("input", () => {
+    // NEW: Replace [$n] with the current card name
+    const currentName = nameInput.value.trim() || "Unnamed Card";
+    if (textarea.value.includes("[$n]")) {
+      const cursorPos = textarea.selectionStart;
+      const lengthDiff = currentName.length - 4; // "[$n]" is 4 characters
+      
+      textarea.value = textarea.value.replace(/\[\$n\]/g, currentName);
+      
+      // Keep the user's cursor in the correct position after replacement
+      textarea.selectionStart = textarea.selectionEnd = cursorPos + lengthDiff;
+    }
+
+    // Existing auto-divider logic
     if (autoDividerCheckbox.checked) {
       const cursorPos = textarea.selectionStart;
       const value = textarea.value;
@@ -272,48 +264,70 @@ const HIGHLIGHT_KEYWORDS = [
   "On Spellboost","Clash","Mode","Intimidate","Aura","Barrier","Fuse","Fused","Necromancy","Combo",
   "Earth Rite","Rally","Countdown","Reanimate","Earth Sigil","Crystallize","Crystallized","Invoke",
   "Invoked","Sanguine","Skybound Art","Super Skybound Art","Maneuver","Maneuverable","Maneuvering",
-  "Enhance","Union Burst","Accelerate","Burial Rite"
+  "Enhance","Union Burst","Accelerate","Burial Rite","Clue"
 ];
 const HIGHLIGHT_REGEX = new RegExp(`\\b(${HIGHLIGHT_KEYWORDS.join("|")})\\b`, "g");
 
 // --- drawStretchBox ---
 function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
   const stretchPerBreak = 50;
-  const stretchAmount = stretchCount * stretchPerBreak;
+  // Ensure integer scaling to prevent decimal gaps
+  const stretchAmount = Math.round(stretchCount * stretchPerBreak);
+  
+  // Force coordinates to integers
+  const drawX = Math.round(x);
+  const drawY = Math.round(y);
+
   let topHeight = 40, bottomHeight = 40;
   let middleStartY = topHeight;
-  let middleHeight = img.height - topHeight - bottomHeight;
-
+  
   if (key === "crest" || key === "faith" || key === "accelerate" || key === "crystallize") {
     topHeight = 107;
     middleStartY = 107;
-    middleHeight = 38;
     bottomHeight = 28;
   } else if (key === "main") {
     topHeight = 60;
     bottomHeight = 120;
     middleStartY = topHeight;
-    middleHeight = img.height - topHeight - bottomHeight;
+  } else if (key === "change") {
+    topHeight = 40;
+    bottomHeight = 40;
+    middleStartY = topHeight;
   }
 
-  ctx.drawImage(img, 0, 0, img.width, topHeight, x, y, img.width, topHeight);
+  let middleHeight = img.height - topHeight - bottomHeight;
+
+  // Save the smoothing state and disable it
+  const prevSmoothing = ctx.imageSmoothingEnabled;
+  ctx.imageSmoothingEnabled = false;
+
+  // Draw Top
+  ctx.drawImage(img, 0, 0, img.width, topHeight, drawX, drawY, img.width, topHeight);
+  
+  // Draw Middle: Sample exact original pixels, but shift the destination up by 1px and extend its height by 2px
   ctx.drawImage(
     img,
     0, middleStartY, img.width, middleHeight,
-    x, y + middleStartY, img.width, middleHeight + stretchAmount
+    drawX, drawY + middleStartY, img.width, middleHeight + stretchAmount
   );
+  
+  // Draw Bottom: Place it exactly where it needs to be (the middle overlaps it from above)
   ctx.drawImage(
     img,
     0, img.height - bottomHeight, img.width, bottomHeight,
-    x, y + middleStartY + middleHeight + stretchAmount,
+    drawX, drawY + middleStartY + middleHeight + stretchAmount,
     img.width, bottomHeight
   );
+
+  // Restore the smoothing state
+  ctx.imageSmoothingEnabled = prevSmoothing;
+  
   return topHeight + middleHeight + bottomHeight + stretchAmount;
 }
 
 // --- Calculate Height ---
-async function calculateTextBlockHeight(key, startY) {
-  const textValue = textInputs[key].value.trim();
+async function calculateTextBlockHeight(key, textOverride = null, xOverride = null) {
+  const textValue = textOverride !== null ? textOverride : textInputs[key].value.trim();
   if (!textValue) return 0;
 
   const isSpecialBox = (key !== "card");
@@ -322,8 +336,8 @@ async function calculateTextBlockHeight(key, startY) {
   const cardLineHeightBefore = 30;
   const cardLineHeightAfter = 40;
   
-  const textStartX = 769 + 30;
-  const wrapLimitX = 1716;
+  const textStartX = (xOverride !== null ? xOverride : 769) + 30;
+  const wrapLimitX = (xOverride !== null ? xOverride + 948 : 1716);
   const lineHeight = 50;
   const baseFont = "33px 'Memento'";
   
@@ -410,8 +424,8 @@ async function calculateTextBlockHeight(key, startY) {
 }
 
 // --- drawTextBlock ---
-async function drawTextBlock(key, box, x, startY) {
-  const textValue = textInputs[key].value.trim();
+async function drawTextBlock(key, box, x, startY, textOverride = null) {
+  const textValue = textOverride !== null ? textOverride : textInputs[key].value.trim();
   if (!textValue) return 0;
 
   const isSpecialBox = (key !== "card");
@@ -425,7 +439,7 @@ async function drawTextBlock(key, box, x, startY) {
   ctx.shadowColor = "transparent";
   ctx.shadowBlur = 0;
   const textStartX = x + 30;
-  const wrapLimitX = 1716;
+  const wrapLimitX = x + 948;
   const lineHeight = 50;
   const baseFont = "33px 'Memento'";
 
@@ -521,7 +535,7 @@ async function drawTextBlock(key, box, x, startY) {
     const weight = wetStyle.bold || wetStyle.isKeyword ? "bold " : "";
     const style = wetStyle.italic ? "italic " : "";
     ctx.font = `${weight}${style}${baseFont}`;
-    ctx.fillStyle = wetStyle.color || (wetStyle.isKeyword ? "#dcbb78" : "#efeee9");
+    ctx.fillStyle = wetStyle.color || (wetStyle.isKeyword ? "#f3d87d" : "#efeee9");
   };
 
   const dividerToUse = await getImage(
@@ -531,7 +545,7 @@ async function drawTextBlock(key, box, x, startY) {
   for (const token of allTokens) {
     if (token === "**") { wetStyle.bold = !wetStyle.bold; continue; }
     if (token === "_") { wetStyle.italic = !wetStyle.italic; continue; }
-    if (token === "<c>") { wetStyle.color = "#dcbb78"; continue; }
+    if (token === "<c>") { wetStyle.color = "#f3d87d"; continue; }
     if (token === "</c>") { wetStyle.color = null; continue; }
     if (token === "<K>") { wetStyle.isKeyword = true; continue; }
     if (token === "</K>") { wetStyle.isKeyword = false; continue; }
@@ -588,6 +602,72 @@ async function drawTextBlock(key, box, x, startY) {
   return Math.max(boxHeight, textY - startY + 40);
 }
 
+// --- drawSpecialIcon ---
+async function drawSpecialIcon(key, boxX, currentY, extras) {
+  const isCrest = key === "crest";
+  const isFaith = key === "faith";
+  const isAccelerate = key === "accelerate";
+  const isCrystallize = key === "crystallize";
+
+  if (!(isCrest || isFaith || isAccelerate || isCrystallize)) return;
+
+  const iconX = boxX + 120;
+  const iconY = currentY + 32;
+
+  if (isCrest || isFaith) {
+      const iconImg = isCrest ? crestArt : faithArt;
+      const displayName = isCrest ? extras.crestName : extras.faithName;
+
+      if (iconImg) {
+        const s = previewState[isCrest ? "crest" : "faith"];
+        const dWidth = iconImg.width * s.scale;
+        const dHeight = iconImg.height * s.scale;
+        const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
+          resizeWidth: Math.round(dWidth),
+          resizeHeight: Math.round(dHeight),
+          resizeQuality: "high"
+        });
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = Math.round(dWidth);
+        tempCanvas.height = Math.round(dHeight);
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(bmp, 0, 0);
+        applySharpen(tempCtx, tempCanvas.width, tempCanvas.height, 0.25);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(tempCanvas, iconX + s.tx, iconY + s.ty);
+        ctx.restore();
+        bmp.close();
+      }
+
+      if (displayName) {
+        ctx.save();
+        ctx.fillStyle = "#f3d87d";
+        ctx.shadowColor = "black";
+        ctx.shadowBlur = 4;
+        drawTextWithHyphenSwap(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10, 33, "left");
+        ctx.restore();
+      }
+  } else {
+       const costVal = isAccelerate ? extras.accelerateCost : extras.crystallizeCost;
+       const labelText = isAccelerate ? "Accelerate" : "Crystallize";
+       
+       ctx.save();
+       ctx.shadowColor = "black";
+       ctx.shadowBlur = 4;
+
+       ctx.fillStyle = "#efeee9";
+       drawScaledNumber(costVal, iconX - 38, iconY + ICON_H / 2 + 8, 28, 50, 'Sv_numbers', -2, 0);
+
+       ctx.fillStyle = "#f3d87d";
+       drawTextWithHyphenSwap(labelText, iconX + 7, iconY + ICON_H / 2 + 10, 33, "left");
+       ctx.restore();
+  }
+}
 
 // --- drawCard ---
 async function drawCard() {
@@ -630,7 +710,7 @@ async function drawCard() {
       const bottomBarStretchThreshold = 825;
       const stretchThreshold = showBottomBar ? bottomBarStretchThreshold : defaultStretchThreshold;
       
-      textStretchPixels = Math.max(0, calculatedTotalY - stretchThreshold);
+      textStretchPixels = Math.round(Math.max(0, calculatedTotalY - stretchThreshold));
 
       let currentBottomY = 206 + mainBoxImg.height + textStretchPixels;
       
@@ -638,7 +718,7 @@ async function drawCard() {
           currentBottomY += 35; 
       }
       
-      bgStretchPixels = Math.max(0, currentBottomY - 1050);
+      bgStretchPixels = Math.round(Math.max(0, currentBottomY - 1050));
   }
 
   const stretchCount = textStretchPixels / 50;
@@ -648,8 +728,9 @@ async function drawCard() {
   const newWidth = saveCardOnly ? 729 : baseWidth;
   const newHeight = saveCardOnly ? 882 : (baseHeight + bgStretchPixels);
 
-  if (canvas.height !== newHeight) canvas.height = newHeight;
-  if (canvas.width !== newWidth) canvas.width = newWidth;
+  // Hard wipe of canvas memory to guarantee clean renders
+  canvas.width = newWidth;
+  canvas.height = newHeight;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.imageSmoothingEnabled = true;
@@ -665,10 +746,14 @@ async function drawCard() {
       const slicePointY = 200;
       const topHeight = Math.min(slicePointY, bg.height);
       const bottomPartHeight = bg.height - topHeight;
+      
+      // Draw background top
       ctx.drawImage(bg, 0, 0, bg.width, topHeight, 0, 0, bg.width, topHeight);
+      
+      // Draw background bottom: exact original pixels, overlapping destination up by 1px
       if (bottomPartHeight > 0) {
-        const newBottomHeight = bottomPartHeight + bgStretchPixels;
-        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight, bg.width, newBottomHeight);
+        const newBottomHeight = Math.round(bottomPartHeight + bgStretchPixels);
+        ctx.drawImage(bg, 0, topHeight, bg.width, bottomPartHeight, 0, topHeight - 1, bg.width, newBottomHeight + 2);
       }
   }
 
@@ -702,20 +787,27 @@ async function drawCard() {
   if (!saveCardOnly) {
       const textBoxX = 722;
       const textBoxY = 206;
-      const dynamicBoxWidth = mainBoxImg.width;
-      const dynamicBoxHeight = mainBoxImg.height + textStretchPixels; 
+      
+      const dynamicBoxWidth = Math.round(mainBoxImg.width);
+      const dynamicBoxHeight = Math.round(mainBoxImg.height + textStretchPixels); 
 
       const offCanvas = document.createElement("canvas");
       offCanvas.width = dynamicBoxWidth - 18;
       offCanvas.height = dynamicBoxHeight - 22;
       const offCtx = offCanvas.getContext("2d");
-      offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
       offCtx.filter = "blur(5px)";
-      offCtx.drawImage(offCanvas, 0, 0);
+      offCtx.drawImage(canvas, textBoxX, textBoxY, dynamicBoxWidth, dynamicBoxHeight, 0, 0, dynamicBoxWidth, dynamicBoxHeight);
       ctx.drawImage(offCanvas, textBoxX + 9, textBoxY + 11);
 
       drawStretchBox(mainBoxImg, textBoxX, textBoxY, stretchCount, "main");
       
+      const extras = {
+        accelerateCost: document.getElementById("accelerateCost")?.value || "1",
+        crystallizeCost: document.getElementById("crystallizeCost")?.value || "1",
+        crestName: document.getElementById("crestName")?.value.trim() || "Crest",
+        faithName: document.getElementById("faithName")?.value.trim() || "Faith"
+      };
+
       let currentY = startY;
       for (const { key, box } of textOrder) {
         const textValue = textInputs[key].value.trim();
@@ -724,76 +816,8 @@ async function drawCard() {
         if (isEvolveBlock && !isFollower) continue;
 
         const blockHeight = await drawTextBlock(key, box, boxX, currentY);
+        await drawSpecialIcon(key, boxX, currentY, extras);
         
-        const isCrest = key === "crest";
-        const isFaith = key === "faith";
-        const isAccelerate = key === "accelerate";
-        const isCrystallize = key === "crystallize";
-
-        if (isCrest || isFaith || isAccelerate || isCrystallize) {
-          const iconX = boxX + 120;
-          const iconY = currentY + 32;
-
-          if (isCrest || isFaith) {
-            const iconImg = isCrest ? crestArt : faithArt;
-            const nameField = document.getElementById(isCrest ? "crestName" : "faithName");
-            const nameValue = nameField ? nameField.value.trim() : "";
-
-            if (iconImg) {
-              const s = previewState[isCrest ? "crest" : "faith"];
-              const dWidth = iconImg.width * s.scale;
-              const dHeight = iconImg.height * s.scale;
-              const bmp = await createImageBitmap(iconImg, 0, 0, iconImg.width, iconImg.height, {
-                resizeWidth: Math.round(dWidth),
-                resizeHeight: Math.round(dHeight),
-                resizeQuality: "high"
-              });
-              const tempCanvas = document.createElement('canvas');
-              tempCanvas.width = Math.round(dWidth);
-              tempCanvas.height = Math.round(dHeight);
-              const tempCtx = tempCanvas.getContext('2d');
-              tempCtx.drawImage(bmp, 0, 0);
-              applySharpen(tempCtx, tempCanvas.width, tempCanvas.height, 0.25);
-
-              ctx.save();
-              ctx.beginPath();
-              ctx.arc(iconX + ICON_W / 2, iconY + ICON_H / 2, ICON_W / 2, 0, Math.PI * 2);
-              ctx.closePath();
-              ctx.clip();
-              ctx.drawImage(tempCanvas, iconX + s.tx, iconY + s.ty);
-              ctx.restore();
-              bmp.close();
-            }
-
-            const defaultName = isCrest ? "Crest" : "Faith";
-            const displayName = nameValue || defaultName;
-            if (displayName) {
-              ctx.save();
-              ctx.fillStyle = "#dcbb78";
-              ctx.shadowColor = "black";
-              ctx.shadowBlur = 4;
-              drawTextWithHyphenSwap(displayName, iconX + ICON_W + 17, iconY + ICON_H / 2 + 10, 33, "left");
-              ctx.restore();
-            }
-          } else {
-             const costField = document.getElementById(isAccelerate ? "accelerateCost" : "crystallizeCost");
-             const costVal = costField ? costField.value : "1";
-             const labelText = isAccelerate ? "Accelerate" : "Crystallize";
-             
-             ctx.save();
-             ctx.shadowColor = "black";
-             ctx.shadowBlur = 4;
-
-             // Draw custom cost number
-             ctx.fillStyle = "#efeee9";
-             drawScaledNumber(costVal, 850, iconY + ICON_H / 2 + 8, 28, 50, 'Sv_numbers', -2, 0);
-
-             // Draw label
-             ctx.fillStyle = "#dcbb78";
-             drawTextWithHyphenSwap(labelText, 895, iconY + ICON_H / 2 + 10, 33, "left");
-             ctx.restore();
-          }
-        }
         currentY += blockHeight - 10;
       }
   }
@@ -907,18 +931,36 @@ const crestInput = document.getElementById("crestArtUpload");
 const faithInput = document.getElementById("faithArtUpload");
 
 const previewState = {
-  base: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H, minScale: 1 },
-  evolved: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H, minScale: 1 },
+  main: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H, minScale: 1 },
   crest: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W, maskH: ICON_H, minScale: 1 },
   faith: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W, maskH: ICON_H, minScale: 1 }
 };
 
-let activeArtKey = 'base'; // 'base' or 'evolved'
+function loadImageFromFile(file) {
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => res(img);
+      img.onerror = err => rej(err);
+      img.src = e.target.result;
+    };
+    reader.onerror = err => rej(err);
+    reader.readAsDataURL(file);
+  });
+}
 
-Object.defineProperty(previewState, 'main', {
-  get() { return this[activeArtKey]; },
-  set(val) { this[activeArtKey] = val; }
-});
+// Add this new helper function right underneath it to extract the data we need to save:
+function getArtSaveData(state) {
+  if (!state.img) return null;
+  return {
+    src: state.img.src,
+    scale: state.scale,
+    tx: state.tx,
+    ty: state.ty,
+    minScale: state.minScale
+  };
+}
 
 function fitImageToMask(img, s) {
   const scale = Math.max(s.maskW / img.width, s.maskH / img.height);
@@ -1032,8 +1074,7 @@ function syncIconToGlobals(which) {
 }
 
 function updateAll() {
-  clampPan(previewState.base);
-  clampPan(previewState.evolved);
+  clampPan(previewState.main);
   clampPan(previewState.crest);
   clampPan(previewState.faith);
 
@@ -1053,37 +1094,45 @@ if (artInput) {
     if (!file) return;
     const mainArtTitleEl = document.getElementById("mainArtPreviewTitle");
     if (mainArtTitleEl) {
-      mainArtTitleEl.textContent = `Card Art (${activeArtKey === 'base' ? 'Base' : 'Evolved'})`;
+      mainArtTitleEl.textContent = file.name;
     }
     try {
       const img = await loadImageFromFile(file);
       
-      const activeState = previewState[activeArtKey];
-      activeState.img = img;
-      fitImageToMask(img, activeState);
-
-      if (activeArtKey === 'base' && !previewState.evolved.img) {
-        previewState.evolved.img = img;
-        fitImageToMask(img, previewState.evolved);
-      }
-
+      // Update Main Art
+      previewState.main.img = img;
+      fitImageToMask(img, previewState.main);
       if (mainZoomSlider) {
-        const min = activeState.minScale;
+        const min = previewState.main.minScale;
         const max = min * 5; 
         mainZoomSlider.min = min;
         mainZoomSlider.max = max;
         mainZoomSlider.step = (max - min) / 100;
-        mainZoomSlider.value = activeState.scale;
+        mainZoomSlider.value = previewState.main.scale;
       }
 
-      // Automatically update Crest Art & Faith Art from base if empty
-      if (!previewState.crest.img) {
-        previewState.crest.img = img;
-        fitImageToMask(img, previewState.crest);
+      // Automatically update Crest Art
+      previewState.crest.img = img;
+      fitImageToMask(img, previewState.crest);
+      if (crestZoomSlider) {
+        const min = previewState.crest.minScale;
+        const max = min * 8; 
+        crestZoomSlider.min = min;
+        crestZoomSlider.max = max;
+        crestZoomSlider.step = (max - min) / 100;
+        crestZoomSlider.value = previewState.crest.scale;
       }
-      if (!previewState.faith.img) {
-        previewState.faith.img = img;
-        fitImageToMask(img, previewState.faith);
+
+      // Automatically update Faith Art
+      previewState.faith.img = img;
+      fitImageToMask(img, previewState.faith);
+      if (faithZoomSlider) {
+        const min = previewState.faith.minScale;
+        const max = min * 8; 
+        faithZoomSlider.min = min;
+        faithZoomSlider.max = max;
+        faithZoomSlider.step = (max - min) / 100;
+        faithZoomSlider.value = previewState.faith.scale;
       }
 
       updateAll();
@@ -1153,8 +1202,7 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   let lastX = 0, lastY = 0;
 
   canvasEl.addEventListener("pointerdown", (e) => {
-    const activeState = previewState.main;
-    if (!activeState.img) return;
+    if (!state.img) return;
     dragging = true;
     const p = getEventPos(e, canvasEl);
     lastX = p.x; lastY = p.y;
@@ -1162,19 +1210,18 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   });
 
   canvasEl.addEventListener("pointermove", (e) => {
-    const activeState = previewState.main;
-    if (!dragging || !activeState.img) return;
+    if (!dragging || !state.img) return;
     
     const rect = canvasEl.getBoundingClientRect();
-    const scaleX = activeState.maskW / rect.width; 
+    const scaleX = state.maskW / rect.width; 
 
     const p = getEventPos(e, canvasEl);
     const dx = (p.x - lastX) * scaleX;
     const dy = (p.y - lastY) * scaleX; 
 
     lastX = p.x; lastY = p.y;
-    activeState.tx += dx; activeState.ty += dy;
-    clampPan(activeState);
+    state.tx += dx; state.ty += dy;
+    clampPan(state);
     updateAll();
   });
 
@@ -1185,94 +1232,86 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   canvasEl.addEventListener("pointerleave", stopDrag);
 
   canvasEl.addEventListener("wheel", (ev) => {
-    const activeState = previewState.main;
-    if (!activeState.img) return;
+    if (!state.img) return;
     ev.preventDefault();
     
     const zoomIntensity = 0.05;
     const delta = ev.deltaY > 0 ? -1 : 1; 
-    const oldScale = activeState.scale;
+    const oldScale = state.scale;
     
-    const minScale = activeState.minScale;
+    const minScale = state.minScale;
     const maxScale = sliderEl ? parseFloat(sliderEl.max) : oldScale * 2;
     
     let newScale = oldScale * (1 + delta * zoomIntensity);
     newScale = Math.max(minScale, Math.min(maxScale, newScale));
     
     const rect = canvasEl.getBoundingClientRect();
-    const scaleFactor = activeState.maskW / rect.width;
+    const scaleFactor = state.maskW / rect.width;
 
     const cx = (ev.clientX - rect.left) * scaleFactor;
     const cy = (ev.clientY - rect.top) * scaleFactor;
 
-    const imgSpaceX = (cx - activeState.tx) / oldScale;
-    const imgSpaceY = (cy - activeState.ty) / oldScale;
+    const imgSpaceX = (cx - state.tx) / oldScale;
+    const imgSpaceY = (cy - state.ty) / oldScale;
     
-    activeState.scale = newScale;
-    activeState.tx = cx - imgSpaceX * newScale;
-    activeState.ty = cy - imgSpaceY * newScale;
-    clampPan(activeState);
-    if (sliderEl) sliderEl.value = activeState.scale;
+    state.scale = newScale;
+    state.tx = cx - imgSpaceX * newScale;
+    state.ty = cy - imgSpaceY * newScale;
+    clampPan(state);
+    if (sliderEl) sliderEl.value = state.scale;
     updateAll();
   }, { passive: false });
 
   if (sliderEl) {
     sliderEl.addEventListener("input", (ev) => {
-      const activeState = previewState.main;
-      if (!activeState.img) return;
-      const newScale = Math.max(activeState.minScale, parseFloat(ev.target.value)); 
-      const oldScale = activeState.scale;
-      const cx = activeState.maskW / 2, cy = activeState.maskH / 2;
-      const imgSpaceX = (cx - activeState.tx) / oldScale;
-      const imgSpaceY = (cy - activeState.ty) / oldScale;
-      activeState.scale = newScale;
-      activeState.tx = cx - imgSpaceX * newScale;
-      activeState.ty = cy - imgSpaceY * newScale;
-      clampPan(activeState);
+      if (!state.img) return;
+      const newScale = Math.max(state.minScale, parseFloat(ev.target.value)); 
+      const oldScale = state.scale;
+      const cx = state.maskW / 2, cy = state.maskH / 2;
+      const imgSpaceX = (cx - state.tx) / oldScale;
+      const imgSpaceY = (cy - state.ty) / oldScale;
+      state.scale = newScale;
+      state.tx = cx - imgSpaceX * newScale;
+      state.ty = cy - imgSpaceY * newScale;
+      clampPan(state);
       updateAll();
     });
   }
 }
 
-attachPanAndZoom(mainPreviewCanvas, previewState.base, mainZoomSlider);
+attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
-// Home Evolve Toggle Button
-const homeEvolveToggleBtn = document.getElementById("homeEvolveToggleBtn");
-if (homeEvolveToggleBtn) {
-  homeEvolveToggleBtn.addEventListener("click", () => {
-    activeArtKey = activeArtKey === 'base' ? 'evolved' : 'base';
-    
-    const titleEl = document.getElementById("mainArtPreviewTitle");
-    if (activeArtKey === 'evolved') {
-      homeEvolveToggleBtn.textContent = "Switch to Base Art";
-      if (titleEl) titleEl.textContent = "Card Art (Evolved)";
-    } else {
-      homeEvolveToggleBtn.textContent = "Switch to Evolved Art";
-      if (titleEl) titleEl.textContent = "Card Art (Base)";
-    }
+// --- Track the last active text area for the global formatting toolbar ---
+let activeTextarea = null;
 
-    const activeState = previewState[activeArtKey];
-    if (mainZoomSlider) {
-      const min = activeState.minScale || 1;
-      const max = min * 5;
-      mainZoomSlider.min = min;
-      mainZoomSlider.max = max;
-      mainZoomSlider.step = (max - min) / 100;
-      mainZoomSlider.value = activeState.scale || min;
-    }
-    updateAll();
-  });
-}
+document.addEventListener("focusin", (e) => {
+  if (e.target.tagName.toLowerCase() === "textarea") {
+    activeTextarea = e.target;
+  }
+});
 
-document.querySelectorAll(".text-toolbar button").forEach((button) => {
+// --- Formatting Button Logic (Global & Legacy support) ---
+document.querySelectorAll(".text-toolbar button, .global-text-toolbar button").forEach((button) => {
   button.addEventListener("click", (e) => {
     e.preventDefault();
     const format = button.dataset.format;
-    const field = button.closest(".field");
-    if (!field) return;
-    const textarea = field.querySelector("textarea");
+    
+    let textarea;
+    // If it's a bookmark button, apply to the globally tracked active text box
+    if (button.closest('.global-text-toolbar')) {
+      textarea = activeTextarea;
+      if (!textarea) {
+        return; // Fail silently if no text box is selected yet
+      }
+    } else {
+      // Legacy behavior (keeps Balance page formatting toolbars working)
+      const field = button.closest(".field");
+      if (!field) return;
+      textarea = field.querySelector("textarea");
+    }
+
     if (!textarea) return;
 
     const start = textarea.selectionStart;
@@ -1291,6 +1330,7 @@ document.querySelectorAll(".text-toolbar button").forEach((button) => {
       const before = value.slice(0, start);
       const after = value.slice(end);
       const currentlyWrapped = before.endsWith(openTag) && after.startsWith(closeTag);
+      
       if (currentlyWrapped) {
         const newBefore = before.slice(0, before.length - openTag.length);
         const newAfter = after.slice(closeTag.length);
@@ -1388,13 +1428,15 @@ const DB_NAME = "ShadowverseWorkshopDB";
 const STORE_NAME = "cards";
 const DB_VERSION = 1;
 
+// NEW: Global variables to track workshop navigation state
 let workshopCardsCache = []; 
-let visibleCardsCache = []; 
+let visibleCardsCache = []; // New cache for filtered results
 let currentCardIndex = -1;
-let currentClassFilter = "All"; 
-let currentSearchQuery = "";
-let renderSequenceId = 0;
-let modalIsEvolved = false;
+let currentClassFilter = "All"; // Default filter
+let currentSearchQuery = "";    // NEW: Tracks the search bar text
+let isDeleteMode = false;
+let cardsToDelete = new Set();
+let renderSequenceId = 0; // ADD THIS LINE TO TRACK RENDERS
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -1445,42 +1487,189 @@ async function getWorkshopData() {
   });
 }
 
-async function clearWorkshop() {
-  if(confirm("Are you sure you want to clear your card history?")) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
+async function performDeleteAnimation(deletedIds) {
+  const grid = document.getElementById("workshopGrid");
+  const allCards = Array.from(grid.querySelectorAll('.workshop-card'));
+  
+  // 1. FIRST: Record the initial positions of all cards on the screen
+  const initialRects = new Map();
+  allCards.forEach(card => {
+    initialRects.set(card.dataset.id, card.getBoundingClientRect());
+  });
+  
+  // 2. Separate the cards being deleted from the ones staying
+  const deletedCards = allCards.filter(card => deletedIds.has(Number(card.dataset.id)));
+  const remainingCards = allCards.filter(card => !deletedIds.has(Number(card.dataset.id)));
+  
+  // 3. SHRINK: Apply the shrink animation to deleted cards
+  deletedCards.forEach(card => card.classList.add('shrink-out'));
+  
+  // Wait 300ms for the shrink animation to finish
+  await new Promise(r => setTimeout(r, 300));
+  
+  // 4. Trigger layout shift by removing deleted cards from the DOM entirely
+  deletedCards.forEach(card => card.remove());
+  
+  // If there are no cards left, exit early
+  if (remainingCards.length === 0) return;
+  
+  // 5. LAST & INVERT: Figure out where remaining cards moved to, and snap them back instantly
+  remainingCards.forEach(card => {
+    const oldRect = initialRects.get(card.dataset.id);
+    const newRect = card.getBoundingClientRect();
+    
+    const deltaX = oldRect.left - newRect.left;
+    const deltaY = oldRect.top - newRect.top;
+    
+    // Snap them backwards using transform
+    card.style.transition = 'none';
+    card.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+  });
+  
+  // Force the browser to register the snapped positions (Reflow)
+  grid.offsetHeight; 
+  
+  // 6. PLAY: Turn transitions back on and tell them to slide to their true positions (0,0)
+  remainingCards.forEach(card => {
+    card.classList.add('slide-move');
+    card.style.transform = 'translate(0, 0)';
+  });
+  
+  // Wait 400ms for the sliding to finish
+  await new Promise(r => setTimeout(r, 400));
+  
+  // Clean up the inline styles so the cards behave normally again
+  remainingCards.forEach(card => {
+    card.classList.remove('slide-move');
+    card.style.transition = '';
+    card.style.transform = '';
+  });
+}
+
+async function toggleDeleteMode() {
+  const deleteBtn = document.getElementById("deleteWorkshopBtn");
+  const cancelBtn = document.getElementById("cancelDeleteBtn");
+  
+  if (!isDeleteMode) {
+    // 1. Enter Delete Mode
+    isDeleteMode = true;
+    cardsToDelete.clear();
+    deleteBtn.textContent = "Confirm Delete";
+    cancelBtn.style.display = "inline-block"; // Show the cancel button
+    
+    // Grayscale current cards
+    document.querySelectorAll(".workshop-card").forEach(card => card.classList.add("delete-mode"));
+  } else {
+    // 2. Execute Deletion
+    if (cardsToDelete.size > 0) {
+      const db = await openDB();
       const transaction = db.transaction([STORE_NAME], "readwrite");
       const store = transaction.objectStore(STORE_NAME);
-      const request = store.clear();
+      
+      // Delete all selected cards from IndexedDB
+      cardsToDelete.forEach(id => store.delete(id));
+      
+      transaction.oncomplete = async () => {
+        // Save the IDs so we know what to animate before clearing the set
+        const deletedIds = new Set(cardsToDelete);
+        
+        // Reset states and hide the cancel button
+        isDeleteMode = false;
+        cardsToDelete.clear();
+        deleteBtn.textContent = "Delete";
+        cancelBtn.style.display = "none";
+        
+        // Remove the grayscale/hover classes so they look normal while sliding
+        document.querySelectorAll(".workshop-card").forEach(card => {
+          card.classList.remove("delete-mode", "to-delete");
+        });
 
-      request.onsuccess = () => {
-        workshopCardsCache = [];
-        renderWorkshop(true);
-        resolve();
+        // Run the Shrink and Slide animations
+        await performDeleteAnimation(deletedIds);
+        
+        // 1. Sync the caches silently instead of redrawing the DOM
+        workshopCardsCache = workshopCardsCache.filter(card => !deletedIds.has(card.id));
+        visibleCardsCache = visibleCardsCache.filter(card => !deletedIds.has(card.id));
+        
+        // 2. If the grid is completely empty, let renderWorkshop handle the "No cards" text
+        if (visibleCardsCache.length === 0) {
+            renderWorkshop();
+        } else {
+            // 3. Patch the remaining DOM elements with their new cache indexes 
+            // so clicking them opens the correct modal without needing a flickering redraw
+            const remainingCardEls = document.querySelectorAll(".workshop-card");
+            remainingCardEls.forEach((cardEl, newIndex) => {
+                const cardId = Number(cardEl.dataset.id);
+                cardEl.onclick = () => {
+                    if (isDeleteMode) {
+                        if (cardsToDelete.has(cardId)) {
+                            cardsToDelete.delete(cardId);
+                            cardEl.classList.remove("to-delete");
+                        } else {
+                            cardsToDelete.add(cardId);
+                            cardEl.classList.add("to-delete");
+                        }
+                    } else {
+                        currentCardIndex = newIndex;
+                        openWorkshopModal(newIndex); 
+                    }
+                };
+            });
+        }
       };
-      request.onerror = (e) => reject(e.target.error);
-    });
+      
+      transaction.onerror = (e) => console.error("Error deleting cards:", e.target.error);
+    } else {
+      // Exit without deleting if none were selected (acts like a cancel)
+      cancelDeleteMode();
+    }
   }
 }
 
-async function renderWorkshop(forceFetch = false) {
+function cancelDeleteMode() {
+  // Reset states
+  isDeleteMode = false;
+  cardsToDelete.clear();
+  
+  // Reset buttons
+  const deleteBtn = document.getElementById("deleteWorkshopBtn");
+  const cancelBtn = document.getElementById("cancelDeleteBtn");
+  
+  deleteBtn.textContent = "Delete";
+  cancelBtn.style.display = "none"; // Hide the cancel button
+  
+  // Remove visual states from cards
+  document.querySelectorAll(".workshop-card").forEach(card => {
+    card.classList.remove("delete-mode");
+    card.classList.remove("to-delete");
+  });
+}
+
+async function renderWorkshop(fetchData = true) {
   const grid = document.getElementById("workshopGrid");
   if (!grid) return;
-  
+
+  // Increment sequence ID for every new keystroke/render call
   const currentRenderId = ++renderSequenceId;
 
   try {
-    if (workshopCardsCache.length === 0 || forceFetch) {
-      const data = await getWorkshopData();
-      if (currentRenderId !== renderSequenceId) return;
-      workshopCardsCache = data; 
+    // 1. Get fresh data ONLY if requested
+    if (fetchData) {
+        const data = await getWorkshopData();
+
+        // RACE CONDITION FIX: Check if another search was triggered while we waited for the database.
+        if (currentRenderId !== renderSequenceId) return;
+
+        workshopCardsCache = data; 
     }
 
+    // 2. Apply Class Filter (Use workshopCardsCache instead of data)
     let filteredData = workshopCardsCache;
     if (currentClassFilter !== "All") {
       filteredData = filteredData.filter(card => card.class === currentClassFilter);
     }
 
+    // 3. Apply Search Filter
     if (currentSearchQuery.trim() !== "") {
       const lowerQuery = currentSearchQuery.toLowerCase().trim();
       filteredData = filteredData.filter(card => 
@@ -1489,8 +1678,8 @@ async function renderWorkshop(forceFetch = false) {
     }
 
     visibleCardsCache = filteredData;
-    const fragment = document.createDocumentFragment();
 
+    // Clear the grid AFTER all data processing is complete
     grid.innerHTML = ""; 
 
     if (visibleCardsCache.length === 0) {
@@ -1502,13 +1691,32 @@ async function renderWorkshop(forceFetch = false) {
       return;
     }
 
+    // 4. Render only visible cards
     visibleCardsCache.forEach((card, index) => {
       const cardEl = document.createElement("div");
       cardEl.className = "workshop-card";
+      cardEl.dataset.id = card.id;
+      
+      if (isDeleteMode) {
+        cardEl.classList.add("delete-mode");
+        if (cardsToDelete.has(card.id)) {
+          cardEl.classList.add("to-delete");
+        }
+      }
       
       cardEl.onclick = () => {
-          currentCardIndex = index;
-          openWorkshopModal(index); 
+          if (isDeleteMode) {
+              if (cardsToDelete.has(card.id)) {
+                  cardsToDelete.delete(card.id);
+                  cardEl.classList.remove("to-delete");
+              } else {
+                  cardsToDelete.add(card.id);
+                  cardEl.classList.add("to-delete");
+              }
+          } else {
+              currentCardIndex = index;
+              openWorkshopModal(index); 
+          }
       };
 
       const img = document.createElement("img");
@@ -1516,11 +1724,8 @@ async function renderWorkshop(forceFetch = false) {
       img.loading = "lazy";
 
       cardEl.appendChild(img);
-      fragment.appendChild(cardEl);
+      grid.appendChild(cardEl);
     });
-
-    grid.appendChild(fragment);
-
   } catch (err) {
     if (currentRenderId === renderSequenceId) {
       console.error("Error loading workshop:", err);
@@ -1529,41 +1734,49 @@ async function renderWorkshop(forceFetch = false) {
   }
 }
 
-// Setup Filter & Search Listeners
+// Setup Filter Button Listeners
 document.addEventListener("DOMContentLoaded", () => {
   const filterBtns = document.querySelectorAll(".filter-btn");
   filterBtns.forEach(btn => {
     btn.addEventListener("click", () => {
+      // UI Update
       filterBtns.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
+      
+      // Logic Update
       currentClassFilter = btn.dataset.filter;
-      renderWorkshop();
+      renderWorkshop(false); // <-- Pass false to skip DB fetch
     });
   });
   
+  // NEW: Live Search Listener for Workshop
   const workshopSearchInput = document.getElementById("workshopSearchInput");
   if (workshopSearchInput) {
     workshopSearchInput.addEventListener("input", (e) => {
       currentSearchQuery = e.target.value;
-      renderWorkshop();
+      renderWorkshop(false); // <-- Pass false to skip DB fetch
     });
   }
 });
 
 const workshopModal = document.getElementById("workshopModal");
 
+// Helper to format text for HTML (Modal) matching Canvas logic
 function formatWorkshopHTML(text) {
   if (!text) return "";
 
+  // 1. Escape HTML entities
   let html = text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
+  // 2. Restore supported custom tags
   html = html
     .replace(/&lt;c&gt;/g, "<c>")
     .replace(/&lt;\/c&gt;/g, "</c>");
 
+  // 3. Handle Evolve/Super-Evolve start-of-line highlighting
   if (html.startsWith("Evolve")) {
     html = html.replace(/^Evolve/, '<span class="sv-keyword">Evolve</span>');
   }
@@ -1571,34 +1784,44 @@ function formatWorkshopHTML(text) {
     html = html.replace(/^Super-Evolve/, '<span class="sv-keyword">Super-Evolve</span>');
   }
 
+  // 4. Highlight standard keywords
   html = html.replace(HIGHLIGHT_REGEX, '<span class="sv-keyword">$1</span>');
 
-  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); 
-  html = html.replace(/_(.*?)_/g, '<i>$1</i>');       
-  html = html.replace(/<c>(.*?)<\/c>/g, '<span style="color:#dcbb78">$1</span>'); 
+  // 5. Apply formatting codes
+  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); // Bold
+  html = html.replace(/_(.*?)_/g, '<i>$1</i>');       // Italic
+  html = html.replace(/<c>(.*?)<\/c>/g, '<span style="color:#dcbb78">$1</span>'); // Color
   
+  // 6. Dividers (----------)
+  // UPDATED: Consumes the optional newline (\n?) immediately following the divider
+  // to prevent an extra line break from appearing after the line.
   html = html.replace(/----------\n?/g, '<hr class="sv-divider">');
+
+  // 7. Newlines (Convert remaining newlines to <br>)
   html = html.replace(/\n/g, '<br>');
 
   return html;
 }
 
+// REFACTORED: Now accepts an index and pulls from cache
 function openWorkshopModal(index) {
   if (index < 0 || index >= visibleCardsCache.length) return;
   
   const card = visibleCardsCache[index];
 
+  // Reset evolve state on open
   modalIsEvolved = false;
   const stack = document.getElementById("svCardImageStack");
   if (stack) stack.classList.remove("evolved");
   const evolveBtn = document.getElementById("modalEvolveBtn");
   if (evolveBtn) evolveBtn.textContent = "⟳ Evolve";
 
+  // Populate top and bottom image layers
   const imgTop = document.getElementById("modalCardImageTop");
   const imgBottom = document.getElementById("modalCardImageBottom");
   if (imgTop) imgTop.src = card.image;
   if (imgBottom) imgBottom.src = card.evolvedImage || card.image;
-
+  
   document.getElementById("modalCardName").textContent = card.name;
 
   const traitVal = card.trait ? card.trait : "-";
@@ -1621,6 +1844,7 @@ function openWorkshopModal(index) {
   const container = document.getElementById("modalTextContainer");
   container.innerHTML = ""; 
 
+  // 1. Render Main Card Text
   if (card.text.card) {
     const p = document.createElement("div");
     p.className = "sv-text-block";
@@ -1629,6 +1853,8 @@ function openWorkshopModal(index) {
   }
 
   const isFollower = card.type === "Follower";
+
+  // 2. Identify presence of extras to determine if divider is needed
   const hasEvolve = isFollower && card.text.evolve;
   const hasSuperEvolve = isFollower && card.text.superEvolve;
   const hasCrest = !!card.text.crest;
@@ -1638,12 +1864,14 @@ function openWorkshopModal(index) {
 
   const hasAnyExtra = hasEvolve || hasSuperEvolve || hasCrest || hasFaith || hasAccelerate || hasCrystallize;
 
+  // 3. Insert Structural Divider between Card Text and Extras
   if (card.text.card && hasAnyExtra) {
     const hr = document.createElement("hr");
     hr.className = "sv-divider";
     container.appendChild(hr);
   }
 
+  // 4. Render Evolve / Super-Evolve (Standard Text Blocks)
   if (hasEvolve) {
     const p = document.createElement("div");
     p.className = "sv-text-block";
@@ -1658,6 +1886,7 @@ function openWorkshopModal(index) {
     container.appendChild(p);
   }
 
+  // 5. Render Extras (New Sub-box Structure)
   const createSubBox = (type, name, text, cost = null) => {
     const wrapper = document.createElement("div");
     wrapper.className = "sv-sub-box";
@@ -1666,6 +1895,7 @@ function openWorkshopModal(index) {
     header.className = "sv-sub-header";
 
     if (type === "Accelerate" || type === "Crystallize") {
+        // Accelerate/Crystallize: Build the wrapper with the image and overlaid text
         const iconWrapper = document.createElement("div");
         iconWrapper.className = "sv-accelcryst-icon";
         
@@ -1681,14 +1911,17 @@ function openWorkshopModal(index) {
         iconWrapper.appendChild(costSpan);
         header.appendChild(iconWrapper);
     } else {
+        // Crest/Faith: Render normal images
         const img = document.createElement("img");
-        img.src = `assets/misc/${type.toLowerCase()}.png`;
+        img.src = `assets/misc/${type.toLowerCase()}.png`; // Expects 'crest.png' or 'faith.png'
         img.alt = type;
         header.appendChild(img);
     }
     
+    // Title
     const titleSpan = document.createElement("span");
-    titleSpan.textContent = name || type;
+    titleSpan.textContent = name || type; // Use custom name or default to Type (Crest/Faith)
+
     header.appendChild(titleSpan);
 
     const content = document.createElement("div");
@@ -1701,6 +1934,7 @@ function openWorkshopModal(index) {
     return wrapper;
   };
 
+  // 6. Append the sub-boxes to the container and pass the cost down
   if (hasAccelerate) {
     container.appendChild(createSubBox("Accelerate", "Accelerate", card.text.accelerate, card.costs?.accelerate || "1"));
   }
@@ -1717,6 +1951,8 @@ function openWorkshopModal(index) {
   document.getElementById("workshopModal").style.display = "block";
 }
 
+let modalIsEvolved = false;
+
 function toggleEvolveModalImage() {
   const stack = document.getElementById("svCardImageStack");
   const evolveBtn = document.getElementById("modalEvolveBtn");
@@ -1732,13 +1968,16 @@ function toggleEvolveModalImage() {
   }
 }
 
+// --- WORKSHOP EDIT FUNCTION ---
 async function editWorkshopCard() {
   if (currentCardIndex < 0 || currentCardIndex >= visibleCardsCache.length) return;
   const card = visibleCardsCache[currentCardIndex];
 
+  // 1. Close modal and navigate home
   closeWorkshopModal();
   navigateTo('home');
 
+  // 2. Populate Standard Fields
   document.getElementById('cardName').value = card.name || "";
   document.getElementById('cardTrait').value = card.trait || "";
   document.getElementById('cardClass').value = card.class || "Neutral";
@@ -1747,17 +1986,26 @@ async function editWorkshopCard() {
   document.getElementById('tokenCheckbox').checked = !!card.isToken;
   document.getElementById('illustratorName').value = card.illustrator || "";
 
+  // Restore base cost
+  if (card.cost !== undefined) {
+      document.getElementById('costValue').value = card.cost;
+  }
+
+  // Check if we need to set stats (Follower only)
   if (card.type === "Follower" && card.attack !== undefined) {
       document.getElementById('attackValue').value = card.attack;
       document.getElementById('defenseValue').value = card.defense;
   }
 
+  // 3. Populate Costs
   document.getElementById('accelerateCost').value = card.costs?.accelerate || "1";
   document.getElementById('crystallizeCost').value = card.costs?.crystallize || "1";
 
+  // 4. Populate Custom Names
   document.getElementById('crestName').value = card.names?.crest || "";
   document.getElementById('faithName').value = card.names?.faith || "";
 
+  // 5. Populate Text Fields
   textInputs.card.value = card.text?.card || "";
   textInputs.evolve.value = card.text?.evolve || "";
   textInputs.superEvolve.value = card.text?.superEvolve || "";
@@ -1766,6 +2014,7 @@ async function editWorkshopCard() {
   textInputs.accelerate.value = card.text?.accelerate || "";
   textInputs.crystallize.value = card.text?.crystallize || "";
 
+  // 6. Force Textareas to Auto-Resize
   Object.values(textInputs).forEach(textarea => {
     if(textarea) {
       textarea.style.height = 'auto';
@@ -1773,8 +2022,10 @@ async function editWorkshopCard() {
     }
   });
 
+  // 7. Update layout visibility based on newly set type
   toggleFieldVisibility();
 
+  // 8. Restore Art Data
   async function restoreArtState(state, savedData, sliderEl, sliderMultiplier) {
     if (!savedData) {
       state.img = null;
@@ -1801,62 +2052,20 @@ async function editWorkshopCard() {
     }
   }
 
-  await restoreArtState(previewState.base, card.artState?.base || card.artState?.main, mainZoomSlider, 5);
-  await restoreArtState(previewState.evolved, card.artState?.evolved || card.artState?.base || card.artState?.main, mainZoomSlider, 5);
+  // Multiply the slider limits correctly (5x for main, 8x for crest/faith)
+  await restoreArtState(previewState.main, card.artState?.main, mainZoomSlider, 5);
   await restoreArtState(previewState.crest, card.artState?.crest, crestZoomSlider, 8);
   await restoreArtState(previewState.faith, card.artState?.faith, faithZoomSlider, 8);
   
-  activeArtKey = 'base';
-  if (homeEvolveToggleBtn) homeEvolveToggleBtn.textContent = "Switch to Evolved Art";
-  const titleEl = document.getElementById("mainArtPreviewTitle");
-  if (titleEl) titleEl.textContent = "Card Art (Base)";
+  updateAll(); // Refresh canvases and globals
 
-  updateAll();
-  alert("Card data and art loaded successfully!");
-}
-
-function navigateModal(direction) {
-  if (visibleCardsCache.length === 0) return;
-
-  currentCardIndex += direction;
-  if (currentCardIndex < 0) {
-    currentCardIndex = visibleCardsCache.length - 1;
-  } else if (currentCardIndex >= visibleCardsCache.length) {
-    currentCardIndex = 0;
+  // Check if we restored from an older save before we added this feature
+  if (!card.artState) {
+    alert("Card text loaded! \n\nNote: This card was saved before the art-saving update. You will need to manually re-upload the original art.");
   }
-
-  openWorkshopModal(currentCardIndex);
 }
 
-const prevBtn = document.getElementById('modalPrevBtn');
-const nextBtn = document.getElementById('modalNextBtn');
-
-if(prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); navigateModal(-1); };
-if(nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); navigateModal(1); };
-
-document.addEventListener('keydown', (e) => {
-    const modal = document.getElementById("workshopModal");
-    if (modal.style.display === "block") {
-      if (e.key === "ArrowLeft") navigateModal(-1);
-      if (e.key === "ArrowRight") navigateModal(1);
-    }
-});
-
-function closeWorkshopModal() {
-  workshopModal.style.display = "none";
-}
-
-window.addEventListener("click", (e) => {
-  if (e.target === workshopModal) {
-    closeWorkshopModal();
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  renderWorkshop();
-});
-
-// Save Button Listener
+// --- HOME PAGE SAVE BUTTON LOGIC ---
 const saveBtn = document.getElementById("saveBtn");
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
@@ -1865,6 +2074,7 @@ if (saveBtn) {
     saveBtn.disabled = true;
 
     try {
+      // Ensure fonts are ready before drawing
       await document.fonts.ready;
       await Promise.all([
           document.fonts.load("60px 'Memento'"),
@@ -1873,34 +2083,26 @@ if (saveBtn) {
           document.fonts.load("30px 'Roboto'")
       ]);
 
+      // Force canvas to save just the card
       const wasChecked = saveCardOnlyCheckbox.checked;
-      
-      // Generate Base Image
-      activeArtKey = 'base';
-      updateAll();
       saveCardOnlyCheckbox.checked = true;
       await drawCard();
-      const baseImageBase64 = canvas.toDataURL("image/png", 0.8); 
-      
-      // Generate Evolved Image
-      activeArtKey = 'evolved';
-      updateAll();
-      await drawCard();
-      const evolvedImageBase64 = previewState.evolved.img ? canvas.toDataURL("image/png", 0.8) : baseImageBase64;
+      const workshopImageBase64 = canvas.toDataURL("image/png", 0.8);
 
-      activeArtKey = 'base';
-      updateAll();
-
+      // Package data for IndexedDB
       const cardMetadata = {
         id: Date.now(),
-        image: baseImageBase64,
-        evolvedImage: evolvedImageBase64,
+        image: workshopImageBase64,
+        evolvedImage: workshopImageBase64, // Stores bottom layer art
         name: nameInput.value.trim() || "Unnamed Card",
         trait: traitInput.value.trim(),
         class: classSelect.value,
         type: typeSelect.value,
         rarity: raritySelect.value,
         isToken: tokenCheckbox.checked,
+        cost: costInput.value,
+        attack: attackInput.value,
+        defense: defenseInput.value,
         illustrator: document.getElementById("illustratorName").value.trim(),
         names: {
           crest: document.getElementById("crestName").value.trim(),
@@ -1919,22 +2121,25 @@ if (saveBtn) {
           accelerate: textInputs.accelerate.value.trim(),
           crystallize: textInputs.crystallize.value.trim()
         },
+        // ADD THIS NEW PROPERTY:
         artState: {
-          base: getArtSaveData(previewState.base),
-          evolved: getArtSaveData(previewState.evolved),
+          main: getArtSaveData(previewState.main),
           crest: getArtSaveData(previewState.crest),
           faith: getArtSaveData(previewState.faith)
         }
       };
 
+      // Save to database and update grid
       await saveToWorkshop(cardMetadata);
-      await renderWorkshop(true);
+      await renderWorkshop();
 
+      // Revert drawing state if necessary
       if (!wasChecked) {
         saveCardOnlyCheckbox.checked = false;
-        await drawCard(); 
+        await drawCard();
       }
 
+      // Success feedback
       saveBtn.textContent = "Saved!";
       setTimeout(() => {
         saveBtn.textContent = originalText;
@@ -1950,7 +2155,84 @@ if (saveBtn) {
   });
 }
 
-// Download Button Listener
+// NEW: Animation flag to prevent rapid clicking glitches
+let isModalAnimating = false;
+
+function navigateModal(direction) {
+  // Prevent navigating if empty or if an animation is currently running
+  if (visibleCardsCache.length === 0 || isModalAnimating) return;
+  
+  isModalAnimating = true;
+  const modalContent = document.querySelector('.workshop-modal-content');
+
+  // Determine which way to slide based on the direction (1 for next, -1 for prev)
+  const outClass = direction === 1 ? 'slide-out-left' : 'slide-out-right';
+  const inClass = direction === 1 ? 'slide-in-right' : 'slide-in-left';
+
+  // 1. Slide out current content
+  modalContent.classList.add(outClass);
+
+  // 2. Wait for the slide-out animation to finish (250ms matches CSS)
+  setTimeout(() => {
+    // Update the index logic
+    currentCardIndex += direction;
+    if (currentCardIndex < 0) {
+      currentCardIndex = visibleCardsCache.length - 1;
+    } else if (currentCardIndex >= visibleCardsCache.length) {
+      currentCardIndex = 0;
+    }
+
+    // Load the new card data into the HTML while it's invisible
+    openWorkshopModal(currentCardIndex);
+
+    // 3. Swap the CSS classes to slide it back in
+    modalContent.classList.remove(outClass);
+    modalContent.classList.add(inClass);
+
+    // 4. Clean up the slide-in class once it's done so it's ready for next time
+    setTimeout(() => {
+      modalContent.classList.remove(inClass);
+      isModalAnimating = false;
+    }, 250);
+    
+  }, 250); 
+}
+
+// Attach Event Listeners for Navigation
+const prevBtn = document.getElementById('modalPrevBtn');
+const nextBtn = document.getElementById('modalNextBtn');
+
+if(prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); navigateModal(-1); };
+if(nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); navigateModal(1); };
+
+// Optional: Keyboard support
+document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById("workshopModal");
+    if (modal.style.display === "block") {
+      if (e.key === "ArrowLeft") navigateModal(-1);
+      if (e.key === "ArrowRight") navigateModal(1);
+    }
+});
+
+function closeWorkshopModal() {
+  workshopModal.style.display = "none";
+  
+  // Clean up any lingering animation classes and reset the flag
+  const modalContent = document.querySelector('.workshop-modal-content');
+  if (modalContent) {
+      modalContent.classList.remove('slide-out-left', 'slide-in-right', 'slide-out-right', 'slide-in-left');
+  }
+  isModalAnimating = false;
+}
+
+window.addEventListener("click", (e) => {
+  if (e.target === workshopModal) {
+    closeWorkshopModal();
+  }
+});
+
+document.addEventListener("DOMContentLoaded", renderWorkshop);
+
 document.getElementById("downloadBtn").addEventListener("click", async () => { 
   const btn = document.getElementById("downloadBtn");
   const originalText = btn.textContent;
@@ -1969,30 +2251,23 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
 
     const wasChecked = saveCardOnlyCheckbox.checked;
     
-    activeArtKey = 'base';
-    updateAll();
     saveCardOnlyCheckbox.checked = true;
     await drawCard();
-    const baseImageBase64 = canvas.toDataURL("image/png", 0.8); 
+    const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); 
     
-    activeArtKey = 'evolved';
-    updateAll();
-    await drawCard();
-    const evolvedImageBase64 = previewState.evolved.img ? canvas.toDataURL("image/png", 0.8) : baseImageBase64;
-
-    activeArtKey = 'base';
-    updateAll();
-
     const cardMetadata = {
       id: Date.now(),
-      image: baseImageBase64,
-      evolvedImage: evolvedImageBase64,
+      image: workshopImageBase64,
+      evolvedImage: workshopImageBase64, // Stores bottom layer art
       name: nameInput.value.trim() || "Unnamed Card",
       trait: traitInput.value.trim(),
       class: classSelect.value,
       type: typeSelect.value,
       rarity: raritySelect.value,
       isToken: tokenCheckbox.checked,
+      cost: costInput.value,
+      attack: attackInput.value,
+      defense: defenseInput.value,
       illustrator: document.getElementById("illustratorName").value.trim(),
       names: {
         crest: document.getElementById("crestName").value.trim(),
@@ -2011,9 +2286,9 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
         accelerate: textInputs.accelerate.value.trim(),
         crystallize: textInputs.crystallize.value.trim()
       },
+      // ADD THIS NEW PROPERTY:
       artState: {
-        base: getArtSaveData(previewState.base),
-        evolved: getArtSaveData(previewState.evolved),
+        main: getArtSaveData(previewState.main),
         crest: getArtSaveData(previewState.crest),
         faith: getArtSaveData(previewState.faith)
       }
@@ -2021,9 +2296,9 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
 
     try {
       await saveToWorkshop(cardMetadata);
-      await renderWorkshop(true);
+      await renderWorkshop();
     } catch (dbError) {
-      console.warn("Failed to save to workshop history:", dbError);
+      console.warn("Failed to save to workshop history (IndexedDB error):", dbError);
     }
 
     if (!wasChecked) {
@@ -2052,8 +2327,12 @@ let officialCards = [];
 
 async function fetchOfficialCards() {
   try {
+    // Assuming cards.txt is at cards/cards.txt relative to the HTML
     const response = await fetch('cards.txt');
-    if (!response.ok) return;
+    if (!response.ok) {
+      console.warn("Could not fetch cards.txt");
+      return;
+    }
     const text = await response.text();
     parseOfficialCards(text);
   } catch (err) {
@@ -2075,9 +2354,10 @@ function parseOfficialCards(fullText) {
         id: idMatch[1].trim(),
         fullText: section,
         text: {},
-        costs: {}
+        costs: {} // Initialize for Accelerate/Crystallize
       };
 
+      // Extract Stats
       const classMatch = section.match(/Class:\s*(.+)/);
       if (classMatch) card.class = classMatch[1].trim();
 
@@ -2096,35 +2376,43 @@ function parseOfficialCards(fullText) {
       const traitMatch = section.match(/Trait:\s*(.+)/);
       if (traitMatch) card.trait = traitMatch[1].trim();
 
+      // Extract Text Section
       const textSplit = section.split(/-{30,}/);
       if (textSplit.length > 1) {
         let rawText = textSplit[1].trim();
+        
+        // Clean stray tags from txt file
         rawText = rawText.replace(/\\s*/g, '');
 
+        // Parse <ev> blocks (Keep the 'Evolve:' string!)
         const evMatch = rawText.match(/<ev>([\s\S]*?)<\/ev>/);
         if (evMatch) {
           card.text.evolve = evMatch[1].trim(); 
           rawText = rawText.replace(/<ev>[\s\S]*?<\/ev>/, '');
         }
 
+        // Parse <sev> blocks (Keep the 'Super-Evolve:' string!)
         const sevMatch = rawText.match(/<sev>([\s\S]*?)<\/sev>/);
         if (sevMatch) {
           card.text.superEvolve = sevMatch[1].trim(); 
           rawText = rawText.replace(/<sev>[\s\S]*?<\/sev>/, '');
         }
 
+        // Parse Crest blocks
         const crestMatch = rawText.match(/Crest\s*<add>([\s\S]*?)<\/add>/);
         if (crestMatch) {
           card.text.crest = crestMatch[1].trim();
           rawText = rawText.replace(/Crest\s*<add>[\s\S]*?<\/add>/, '');
         }
 
+        // Parse Faith blocks
         const faithMatch = rawText.match(/Faith\s*<add>([\s\S]*?)<\/add>/);
         if (faithMatch) {
           card.text.faith = faithMatch[1].trim();
           rawText = rawText.replace(/Faith\s*<add>[\s\S]*?<\/add>/, '');
         }
 
+        // Parse Accelerate blocks
         const accMatch = rawText.match(/\((\d+)\)\s*Accelerate\s*<add>([\s\S]*?)<\/add>/);
         if (accMatch) {
           card.costs.accelerate = accMatch[1];
@@ -2132,6 +2420,7 @@ function parseOfficialCards(fullText) {
           rawText = rawText.replace(/\(\d+\)\s*Accelerate\s*<add>[\s\S]*?<\/add>/, '');
         }
 
+        // Parse Crystallize blocks
         const cryMatch = rawText.match(/\((\d+)\)\s*Crystallize\s*<add>([\s\S]*?)<\/add>/);
         if (cryMatch) {
           card.costs.crystallize = cryMatch[1];
@@ -2139,6 +2428,7 @@ function parseOfficialCards(fullText) {
           rawText = rawText.replace(/\(\d+\)\s*Crystallize\s*<add>[\s\S]*?<\/add>/, '');
         }
 
+        // Clean up trailing ---------- left over after extracting Evolve/Super-Evolve
         rawText = rawText.trim();
         if (rawText.endsWith('----------')) {
             rawText = rawText.slice(0, -10).trim();
@@ -2152,6 +2442,7 @@ function parseOfficialCards(fullText) {
   });
 
   officialCards.sort((a, b) => a.name.localeCompare(b.name));
+  console.log(`Loaded ${officialCards.length} official cards.`);
 }
 
 function setupSearch(inputId, resultsId) {
@@ -2160,6 +2451,7 @@ function setupSearch(inputId, resultsId) {
 
   if (!input || !resultsContainer) return;
 
+  // On Input
   input.addEventListener('input', (e) => {
     const query = e.target.value.toLowerCase().trim();
     if (query.length === 0) {
@@ -2174,12 +2466,14 @@ function setupSearch(inputId, resultsId) {
     renderResults(matches, resultsContainer, input);
   });
 
+  // Hide when clicking outside
   document.addEventListener('click', (e) => {
     if (!input.contains(e.target) && !resultsContainer.contains(e.target)) {
       resultsContainer.style.display = 'none';
     }
   });
   
+  // Show results again on focus if text exists
   input.addEventListener('focus', () => {
       if (input.value.trim().length > 0) {
           input.dispatchEvent(new Event('input'));
@@ -2203,8 +2497,13 @@ function renderResults(matches, container, inputField) {
       inputField.value = card.name;
       container.style.display = 'none';
       
+      // NEW: Logic for Balance Page
       if (inputField.id === 'balanceSearchInput') {
         populateBalanceForm(card);
+      } 
+      // Existing Logic for Workshop/Other
+      else {
+        console.log("Selected card:", card);
       }
     };
     
@@ -2215,31 +2514,354 @@ function renderResults(matches, container, inputField) {
 }
 
 function populateBalanceForm(card) {
+  // Hide placeholder, show form
   const placeholder = document.querySelector('#page-balance .placeholder-content');
   if (placeholder) placeholder.style.display = 'none';
   
   const form = document.getElementById('balanceAdjustmentForm');
   if (form) form.style.display = 'block';
 
+  // Stats
   document.getElementById('adjCost').value = card.cost !== undefined ? card.cost : '';
   document.getElementById('adjAttack').value = card.attack !== undefined ? card.attack : '';
   document.getElementById('adjDefense').value = card.defense !== undefined ? card.defense : '';
+
+  // Trait
   document.getElementById('adjTrait').value = (card.trait === '-' ? '' : card.trait) || '';
 
+  // Text Fields
   document.getElementById('adjCardText').value = card.text.card || '';
   document.getElementById('adjEvolveText').value = card.text.evolve || '';
   document.getElementById('adjSuperEvolveText').value = card.text.superEvolve || '';
   document.getElementById('adjCrestText').value = card.text.crest || '';
   document.getElementById('adjFaithText').value = card.text.faith || '';
 
+  // Accelerate / Crystallize Fields
   document.getElementById('adjAccelerateCost').value = card.costs && card.costs.accelerate ? card.costs.accelerate : '';
   document.getElementById('adjAccelerateText').value = card.text.accelerate || '';
+  
   document.getElementById('adjCrystallizeCost').value = card.costs && card.costs.crystallize ? card.costs.crystallize : '';
   document.getElementById('adjCrystallizeText').value = card.text.crystallize || '';
 }
 
+// Initialize Search on Load
 document.addEventListener("DOMContentLoaded", () => {
   fetchOfficialCards().then(() => {
     setupSearch('balanceSearchInput', 'balanceSearchResults');
   });
+});
+
+
+// ------------------------------------
+// BALANCE ADJUSTMENTS GENERATION
+// ------------------------------------
+
+async function drawBalanceCard() {
+  const bgImg = await getImage("assets/backgrounds/balance_changes.png").catch(() => null);
+  const textChangeImg = await getImage("assets/boxes/text_change.png").catch(() => null);
+
+  const searchInputVal = document.getElementById("balanceSearchInput").value.trim();
+  const selectedCard = officialCards.find(c => c.name === searchInputVal);
+  const currentClass = (selectedCard && selectedCard.class) ? selectedCard.class : (document.getElementById("cardClass").value || "Neutral");
+  const cardNameText = (selectedCard && selectedCard.name) ? selectedCard.name : (searchInputVal || "Unnamed Card");
+  
+  const currentType = document.getElementById("cardType").value.toLowerCase() || "follower";
+  const actualType = (selectedCard && selectedCard.type) ? selectedCard.type.toLowerCase() : currentType;
+  
+  const strokeImg = await getImage(`assets/misc/stroke_${actualType}.png`).catch(() => null);
+  const emblemImg = await getImage(`assets/emblems/emblem_${currentClass}.png`).catch(() => null);
+
+  let fullCardImg = null;
+  if (selectedCard && selectedCard.id && selectedCard.name) {
+    const cardImagePath = `cards/${selectedCard.id}_${selectedCard.name}.png`;
+    fullCardImg = await getImage(cardImagePath).catch(() => null);
+  }
+
+  // Map Data for Original Text box
+  const origData = {
+    card: selectedCard?.text?.card || "",
+    evolve: selectedCard?.text?.evolve || "",
+    superEvolve: selectedCard?.text?.superEvolve || "",
+    crest: selectedCard?.text?.crest || "",
+    faith: selectedCard?.text?.faith || "",
+    accelerate: selectedCard?.text?.accelerate || "",
+    crystallize: selectedCard?.text?.crystallize || ""
+  };
+  
+  const origExtras = {
+    accelerateCost: selectedCard?.costs?.accelerate || "1",
+    crystallizeCost: selectedCard?.costs?.crystallize || "1",
+    crestName: "Crest",
+    faithName: "Faith"
+  };
+
+  // Map Data for Adjusted Text box
+  const isSpell = actualType === "spell";
+  const isAmulet = actualType === "amulet";
+  const isFollower = actualType === "follower";
+
+  const adjData = {
+    card: document.getElementById('adjCardText').value.trim(),
+    evolve: isFollower && document.getElementById('adjEvolveTextField').style.display !== 'none' ? document.getElementById('adjEvolveText').value.trim() : "",
+    superEvolve: isFollower && document.getElementById('adjSuperEvolveTextField').style.display !== 'none' ? document.getElementById('adjSuperEvolveText').value.trim() : "",
+    crest: document.getElementById('adjCrestText').value.trim(),
+    faith: document.getElementById('adjFaithText').value.trim(),
+    accelerate: !isSpell && document.getElementById('adjAccelerateSection').style.display !== 'none' ? document.getElementById('adjAccelerateText').value.trim() : "",
+    crystallize: !isAmulet && document.getElementById('adjCrystallizeSection').style.display !== 'none' ? document.getElementById('adjCrystallizeText').value.trim() : ""
+  };
+
+  const adjExtras = {
+    accelerateCost: document.getElementById('adjAccelerateCost').value,
+    crystallizeCost: document.getElementById('adjCrystallizeCost').value,
+    crestName: document.getElementById('crestName')?.value.trim() || "Crest",
+    faithName: document.getElementById('faithName')?.value.trim() || "Faith"
+  };
+
+  const textOrder = [
+    { key: "card", box: null },
+    { key: "evolve", box: "evolve" },
+    { key: "superEvolve", box: "superEvolve" },
+    { key: "crest", box: "crest" },
+    { key: "faith", box: "faith" },
+    { key: "accelerate", box: "accelerate" },
+    { key: "crystallize", box: "crystallize" }
+  ];
+
+  const boxX = 701;
+  const box1Y = 181;
+  const stretchThreshold = textChangeImg ? textChangeImg.height - 40 : 300; 
+  
+  // Calculate Internal Component Heights
+  let origInnerHeight = 0;
+  for (const {key} of textOrder) {
+     if (origData[key]) origInnerHeight += (await calculateTextBlockHeight(key, origData[key], boxX)) - 10;
+  }
+  
+  let adjInnerHeight = 0;
+  for (const {key} of textOrder) {
+     if (adjData[key]) adjInnerHeight += (await calculateTextBlockHeight(key, adjData[key], boxX)) - 10;
+  }
+
+  // Calculate Stretches
+  const origStretchPixels = Math.max(0, origInnerHeight - stretchThreshold);
+  const origStretchCount = origStretchPixels / 50;
+  const box1ActualHeight = (textChangeImg ? textChangeImg.height : 300) + origStretchPixels;
+
+  const box2Y = Math.floor(box1Y + box1ActualHeight + 33);
+  
+  const adjStretchPixels = Math.max(0, adjInnerHeight - stretchThreshold);
+  const adjStretchCount = adjStretchPixels / 50;
+  const box2ActualHeight = (textChangeImg ? textChangeImg.height : 300) + adjStretchPixels;
+
+  // Determine Background Stretch & Canvas Reset
+  let bgStretchPixels = Math.max(0, (box2Y + box2ActualHeight + 50) - 1080);
+  
+  const newWidth = 1920;
+  const newHeight = 1080 + Math.ceil(bgStretchPixels);
+
+  // Hard wipe of canvas memory to guarantee clean renders
+  canvas.width = newWidth;
+  canvas.height = newHeight;
+
+  // --- HARD STATE RESET ---
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.filter = "none";
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 1.0;
+  ctx.globalCompositeOperation = 'source-over';
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  // 1. Draw Background (stretched)
+  if (bgImg) {
+    const slicePointY = 200;
+    const topHeight = Math.min(slicePointY, bgImg.height);
+    const bottomPartHeight = bgImg.height - topHeight;
+    
+    // Draw background top
+    ctx.drawImage(bgImg, 0, 0, bgImg.width, topHeight, 0, 0, bgImg.width, topHeight);
+    
+    // Draw background bottom: exact original pixels, overlapping destination up by 1px
+    if (bottomPartHeight > 0) {
+      const newBottomHeight = Math.round(bottomPartHeight + bgStretchPixels);
+      ctx.drawImage(bgImg, 0, topHeight, bgImg.width, bottomPartHeight, 0, topHeight - 1, bgImg.width, newBottomHeight + 2);
+    }
+  } else {
+    ctx.fillStyle = "#1a1a1a";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // 2. Draw Card Display Overlay Scaled to 90%
+  ctx.save();
+  ctx.scale(0.9, 0.9);
+
+  if (strokeImg) {
+    ctx.drawImage(strokeImg, 112, 209);
+  }
+
+  if (uploadedArt) {
+    const s = previewState.main;
+    const dWidth = uploadedArt.width * s.scale;
+    const dHeight = uploadedArt.height * s.scale;
+    const bmp = await createImageBitmap(uploadedArt, 0, 0, uploadedArt.width, uploadedArt.height, {
+      resizeWidth: Math.round(dWidth),
+      resizeHeight: Math.round(dHeight),
+      resizeQuality: "high" 
+    });
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(MAIN_ART_X, MAIN_ART_Y, MAIN_MASK_W, MAIN_MASK_H);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(bmp, MAIN_ART_X + s.tx, MAIN_ART_Y + s.ty);
+    ctx.restore();
+    bmp.close();
+  }
+
+  if (fullCardImg) {
+    ctx.save();
+    ctx.drawImage(fullCardImg, 147, 254);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = "#222";
+    ctx.fillRect(48, 153, 580, 770); 
+    ctx.fillStyle = "#fff";
+    ctx.font = "30px 'Roboto'";
+    ctx.textAlign = "center";
+    ctx.fillText("Card Image Missing", 48 + 290, 153 + 385);
+  }
+
+  // Draw Overlay Stats
+  ctx.fillStyle = "#efeee9";
+  ctx.shadowColor = "black";
+  ctx.shadowBlur = 4;
+  
+  const costVal = document.getElementById('adjCost').value || document.getElementById('costValue').value;
+  drawScaledNumber(costVal, 209, 370, 80, 95, 'Sv_numbers', -5, -0.2);
+
+  if (actualType === "follower") {
+    const atkVal = document.getElementById('adjAttack').value || document.getElementById('attackValue').value;
+    const defVal = document.getElementById('adjDefense').value || document.getElementById('defenseValue').value;
+    drawScaledNumber(atkVal, 211, 902, 82, 90, 'Sv_numbers', -5, -0.2);
+    drawScaledNumber(defVal, 612, 897, 82, 90, 'Sv_numbers', -5, -0.2);
+  }
+
+  // Draw Overlay Name & Emblem
+  const classShadowColors = {
+    "Neutral": "transparent",
+    "Forestcraft": "#04742c",
+    "Swordcraft": "#818c26",
+    "Runecraft": "#2e48a9",
+    "Dragoncraft": "#8a4f15",
+    "Abysscraft": "#a3284e",
+    "Havencraft": "#88847b",
+    "Portalcraft": "#0b8c78"
+  };
+
+  ctx.font = "42px 'Memento'";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#efeee9";
+  
+  if (emblemImg) {
+    ctx.drawImage(emblemImg, 280, 959, 46, 46); 
+  }
+  
+  ctx.shadowColor = classShadowColors[currentClass] || "black"; 
+  ctx.shadowBlur = 10;
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = classShadowColors[currentClass] || "black";
+
+  ctx.strokeText(currentClass, 439, 998);
+  ctx.fillText(currentClass, 439, 998);
+
+  ctx.strokeText(cardNameText, 412, 1059);
+  ctx.fillText(cardNameText, 412, 1059);
+
+  ctx.restore(); 
+
+  // 3. Draw Box 1 (Original Text & Icons)
+  if (textChangeImg) {
+    drawStretchBox(textChangeImg, boxX, box1Y, origStretchCount, "change");
+  }
+  let currentY = box1Y + 40; 
+  for (const { key, box } of textOrder) {
+    if (!origData[key]) continue;
+    const blockHeight = await drawTextBlock(key, box, boxX, currentY, origData[key]);
+    await drawSpecialIcon(key, boxX, currentY, origExtras);
+    currentY += blockHeight - 10;
+  }
+
+  // 4. Draw Box 2 (Adjusted Text & Icons)
+  if (textChangeImg) {
+    drawStretchBox(textChangeImg, boxX, box2Y, adjStretchCount, "change");
+  }
+  currentY = box2Y + 40; 
+  for (const { key, box } of textOrder) {
+    if (!adjData[key]) continue;
+    const blockHeight = await drawTextBlock(key, box, boxX, currentY, adjData[key]);
+    await drawSpecialIcon(key, boxX, currentY, adjExtras);
+    currentY += blockHeight - 10;
+  }
+}
+
+// ------------------------------------
+// BALANCE BUTTON EVENT LISTENERS
+// ------------------------------------
+
+document.getElementById("balancePreviewBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("balancePreviewBtn");
+  const originalText = btn.textContent;
+  btn.textContent = "Loading...";
+  btn.disabled = true;
+
+  try {
+      await document.fonts.ready;
+      await drawBalanceCard(); // Call the dedicated balance drawing function
+      
+      const dataUrl = canvas.toDataURL("image/png", 1.0);
+      const previewWindow = window.open("");
+      
+      if (previewWindow) {
+          const cardTitle = document.getElementById("balanceSearchInput").value.trim() || "balance-preview";
+          previewWindow.document.title = cardTitle;
+          previewWindow.document.body.style.margin = "0";
+          previewWindow.document.body.style.backgroundColor = "#222";
+          previewWindow.document.body.innerHTML = `<img src="${dataUrl}" alt="Card Preview" style="max-width: 100%; height: auto; display: block; margin: auto;">`;
+      } else {
+          alert("Pop-up blocked! Please allow pop-ups for this site to use the preview feature.");
+      }
+  } catch (err) {
+      console.error("Balance preview failed:", err);
+      alert("Error: Could not generate balance preview. Try again.");
+  } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
+  }
+});
+
+document.getElementById("balanceDownloadBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("balanceDownloadBtn");
+  const originalText = btn.textContent;
+  btn.textContent = "Processing...";
+  btn.disabled = true;
+
+  try {
+      await document.fonts.ready;
+      await drawBalanceCard(); // Call the dedicated balance drawing function
+
+      const downloadLink = document.createElement("a");
+      const cardTitle = document.getElementById("balanceSearchInput").value.trim() || "Balance_Adjustment";
+      downloadLink.download = `${cardTitle}.png`;
+      downloadLink.href = canvas.toDataURL("image/png", 1.0);
+      downloadLink.click();
+  } catch (err) {
+      console.error("Balance download failed:", err);
+      alert("Error: Could not download balance card. Try again.");
+  } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
+  }
 });
