@@ -930,6 +930,23 @@ const artInput = document.getElementById("artUpload");
 const crestInput = document.getElementById("crestArtUpload");
 const faithInput = document.getElementById("faithArtUpload");
 
+let evolvedArt = null;
+const evolvedArtInput = document.getElementById("evolvedArtUpload");
+
+if (evolvedArtInput) {
+  evolvedArtInput.addEventListener("change", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      const img = await loadImageFromFile(file);
+      evolvedArt = img;
+      evolvedArtInput.parentElement.style.borderColor = "#2aa48a";
+    } catch (err) {
+      console.error("Failed to load evolved art:", err);
+    }
+  });
+}
+
 const previewState = {
   main: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H, minScale: 1 },
   crest: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W, maskH: ICON_H, minScale: 1 },
@@ -2250,15 +2267,23 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     ]);
 
     const wasChecked = saveCardOnlyCheckbox.checked;
-    
     saveCardOnlyCheckbox.checked = true;
     await drawCard();
     const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); 
     
+    let evolvedImageBase64 = workshopImageBase64;
+    if (evolvedArt) {
+      const originalUploadedArt = uploadedArt;
+      uploadedArt = evolvedArt;
+      await drawCard();
+      evolvedImageBase64 = canvas.toDataURL("image/png", 0.8);
+      uploadedArt = originalUploadedArt;
+    }
+    
     const cardMetadata = {
       id: Date.now(),
       image: workshopImageBase64,
-      evolvedImage: workshopImageBase64, // Stores bottom layer art
+      evolvedImage: evolvedImageBase64, // Stores bottom layer art
       name: nameInput.value.trim() || "Unnamed Card",
       trait: traitInput.value.trim(),
       class: classSelect.value,
