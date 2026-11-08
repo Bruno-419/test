@@ -1990,3 +1990,23 @@ body {
   transform: translateY(0) scale(1) rotate(0deg);
   z-index: 2;
 }
+
+
+
+.preview-block .upload-btn.small {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--input);
+  border: 1px solid #444;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.preview-block .upload-btn.small:hover {
+  background: #333;
+}
