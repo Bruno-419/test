@@ -949,9 +949,11 @@ if (evolvedArtInput) {
 
 const previewState = {
   main: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H, minScale: 1 },
+  evolved: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H, minScale: 1 },
   crest: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W, maskH: ICON_H, minScale: 1 },
   faith: { img: null, scale: 1, tx: 0, ty: 0, maskW: ICON_W, maskH: ICON_H, minScale: 1 }
 };
+let activeArtTab = 'main'; // 'main' or 'evolved'
 
 function loadImageFromFile(file) {
   return new Promise((res, rej) => {
@@ -1092,6 +1094,7 @@ function syncIconToGlobals(which) {
 
 function updateAll() {
   clampPan(previewState.main);
+  clampPan(previewState.evolved);
   clampPan(previewState.crest);
   clampPan(previewState.faith);
 
@@ -1099,9 +1102,24 @@ function updateAll() {
   syncIconToGlobals("crest");
   syncIconToGlobals("faith");
 
-  drawPreviewCanvas(mainPreviewCtx, mainPreviewCanvas, previewState.main, "rect");
+  drawPreviewCanvas(mainPreviewCtx, mainPreviewCanvas, previewState[activeArtTab], "rect");
   drawPreviewCanvas(crestPreviewCtx, crestPreviewCanvas, previewState.crest, "circle");
   drawPreviewCanvas(faithPreviewCtx, faithPreviewCanvas, previewState.faith, "circle");
+}
+
+if (evolvedArtInput) {
+  evolvedArtInput.addEventListener("change", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      const img = await loadImageFromFile(file);
+      previewState.evolved.img = img;
+      fitImageToMask(img, previewState.evolved);
+      switchArtTab('evolved'); // Automatically switch Card Art preview box to Evolved Art
+    } catch (err) {
+      console.error("Failed to load evolved art:", err);
+    }
+  });
 }
 
 /* ---------- Upload handlers ---------- */
@@ -1202,6 +1220,43 @@ if (faithInput) {
     }
   });
 }
+
+const tabBase = document.getElementById("tabBaseArt");
+const tabEvolved = document.getElementById("tabEvolvedArt");
+
+function switchArtTab(tab) {
+  activeArtTab = tab;
+  if (tab === 'main') {
+    tabBase.classList.add("active");
+    tabBase.style.background = "var(--accent)";
+    tabBase.style.borderColor = "var(--accent)";
+    tabEvolved.classList.remove("active");
+    tabEvolved.style.background = "";
+    tabEvolved.style.borderColor = "";
+    if (mainZoomSlider && previewState.main.img) {
+      mainZoomSlider.min = previewState.main.minScale;
+      mainZoomSlider.max = previewState.main.minScale * 5;
+      mainZoomSlider.value = previewState.main.scale;
+    }
+  } else {
+    tabEvolved.classList.add("active");
+    tabEvolved.style.background = "var(--accent)";
+    tabEvolved.style.borderColor = "var(--accent)";
+    tabBase.classList.remove("active");
+    tabBase.style.background = "";
+    tabBase.style.borderColor = "";
+    if (mainZoomSlider && previewState.evolved.img) {
+      mainZoomSlider.min = previewState.evolved.minScale;
+      mainZoomSlider.max = previewState.evolved.minScale * 5;
+      mainZoomSlider.value = previewState.evolved.scale;
+    }
+  }
+  updateAll();
+}
+
+if (tabBase) tabBase.onclick = () => switchArtTab('main');
+if (tabEvolved) tabEvolved.onclick = () => switchArtTab('evolved');
+
 
 /* ---------- Pan & zoom helpers ---------- */
 function getEventPos(e, canvasEl) {
