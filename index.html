@@ -217,6 +217,10 @@
           <div class="app-grid">
             <aside class="preview-column" aria-label="Art previews">
               <div class="preview-block">
+                <div class="preview-tabs" style="display: flex; gap: 5px; margin-bottom: 8px; width: 100%;">
+                  <button type="button" id="tabBaseArt" class="preview-tab active" style="flex:1; padding: 4px; font-size:12px; background: var(--accent); border-color: var(--accent);">Base Art</button>
+                  <button type="button" id="tabEvolvedArt" class="preview-tab" style="flex:1; padding: 4px; font-size:12px;">Evolved Art</button>
+                </div>
                 <div class="preview-title" id="mainArtPreviewTitle">Card Art</div>
                 <canvas id="mainPreviewCanvas" width="450" height="560" class="preview-canvas rect"></canvas>
                 <input id="mainZoomSlider" class="zoom-slider" type="range" min="1" max="5" value="1">
