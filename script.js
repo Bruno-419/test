@@ -1268,13 +1268,13 @@ function getEventPos(e, canvasEl) {
   }
 }
 
-function attachPanAndZoom(canvasEl, previewState[activeArtTab], sliderEl) {
+function attachPanAndZoom(canvasEl, state, sliderEl) {
   if (!canvasEl) return;
   let dragging = false;
   let lastX = 0, lastY = 0;
 
   canvasEl.addEventListener("pointerdown", (e) => {
-    if (!previewState[activeArtTab].img) return;
+    if (!state.img) return;
     dragging = true;
     const p = getEventPos(e, canvasEl);
     lastX = p.x; lastY = p.y;
@@ -1282,18 +1282,18 @@ function attachPanAndZoom(canvasEl, previewState[activeArtTab], sliderEl) {
   });
 
   canvasEl.addEventListener("pointermove", (e) => {
-    if (!dragging || !previewState[activeArtTab].img) return;
+    if (!dragging || !state.img) return;
     
     const rect = canvasEl.getBoundingClientRect();
-    const scaleX = previewState[activeArtTab].maskW / rect.width; 
+    const scaleX = state.maskW / rect.width; 
 
     const p = getEventPos(e, canvasEl);
     const dx = (p.x - lastX) * scaleX;
     const dy = (p.y - lastY) * scaleX; 
 
     lastX = p.x; lastY = p.y;
-    previewState[activeArtTab].tx += dx; previewState[activeArtTab].ty += dy;
-    clampPan(previewState[activeArtTab]);
+    state.tx += dx; state.ty += dy;
+    clampPan(state);
     updateAll();
   });
 
@@ -1304,12 +1304,12 @@ function attachPanAndZoom(canvasEl, previewState[activeArtTab], sliderEl) {
   canvasEl.addEventListener("pointerleave", stopDrag);
 
   canvasEl.addEventListener("wheel", (ev) => {
-    if (!previewState[activeArtTab].img) return;
+    if (!state.img) return;
     ev.preventDefault();
     
     const zoomIntensity = 0.05;
     const delta = ev.deltaY > 0 ? -1 : 1; 
-    const oldScale = previewState[activeArtTab].scale;
+    const oldScale = state.scale;
     
     const minScale = state.minScale;
     const maxScale = sliderEl ? parseFloat(sliderEl.max) : oldScale * 2;
@@ -1318,34 +1318,34 @@ function attachPanAndZoom(canvasEl, previewState[activeArtTab], sliderEl) {
     newScale = Math.max(minScale, Math.min(maxScale, newScale));
     
     const rect = canvasEl.getBoundingClientRect();
-    const scaleFactor = previewState[activeArtTab].maskW / rect.width;
+    const scaleFactor = state.maskW / rect.width;
 
     const cx = (ev.clientX - rect.left) * scaleFactor;
     const cy = (ev.clientY - rect.top) * scaleFactor;
 
-    const imgSpaceX = (cx - previewState[activeArtTab].tx) / oldScale;
-    const imgSpaceY = (cy - previewState[activeArtTab].ty) / oldScale;
+    const imgSpaceX = (cx - state.tx) / oldScale;
+    const imgSpaceY = (cy - state.ty) / oldScale;
     
-    previewState[activeArtTab].scale = newScale;
-    previewState[activeArtTab].tx = cx - imgSpaceX * newScale;
-    previewState[activeArtTab].ty = cy - imgSpaceY * newScale;
-    clampPan(previewState[activeArtTab]);
-    if (sliderEl) sliderEl.value = previewState[activeArtTab].scale;
+    state.scale = newScale;
+    state.tx = cx - imgSpaceX * newScale;
+    state.ty = cy - imgSpaceY * newScale;
+    clampPan(state);
+    if (sliderEl) sliderEl.value = state.scale;
     updateAll();
   }, { passive: false });
 
   if (sliderEl) {
     sliderEl.addEventListener("input", (ev) => {
-      if (!previewState[activeArtTab].img) return;
-      const newScale = Math.max(previewState[activeArtTab].minScale, parseFloat(ev.target.value)); 
-      const oldScale = previewState[activeArtTab].scale;
-      const cx = previewState[activeArtTab].maskW / 2, cy = previewState[activeArtTab].maskH / 2;
-      const imgSpaceX = (cx - previewState[activeArtTab].tx) / oldScale;
-      const imgSpaceY = (cy - previewState[activeArtTab].ty) / oldScale;
-      previewState[activeArtTab].scale = newScale;
-      previewState[activeArtTab].tx = cx - imgSpaceX * newScale;
-      previewState[activeArtTab].ty = cy - imgSpaceY * newScale;
-      clampPan(previewState[activeArtTab]);
+      if (!state.img) return;
+      const newScale = Math.max(state.minScale, parseFloat(ev.target.value)); 
+      const oldScale = state.scale;
+      const cx = state.maskW / 2, cy = state.maskH / 2;
+      const imgSpaceX = (cx - state.tx) / oldScale;
+      const imgSpaceY = (cy - state.ty) / oldScale;
+      state.scale = newScale;
+      state.tx = cx - imgSpaceX * newScale;
+      state.ty = cy - imgSpaceY * newScale;
+      clampPan(state);
       updateAll();
     });
   }
@@ -2161,27 +2161,6 @@ if (saveBtn) {
       await drawCard();
       const workshopImageBase64 = canvas.toDataURL("image/png", 0.8);
 
-      let evolvedImageBase64 = workshopImageBase64;
-      if (previewState.evolved.img) {
-        const origImg = previewState.main.img;
-        const origScale = previewState.main.scale;
-        const origTx = previewState.main.tx;
-        const origTy = previewState.main.ty;
-      
-        previewState.main.img = previewState.evolved.img;
-        previewState.main.scale = previewState.evolved.scale;
-        previewState.main.tx = previewState.evolved.tx;
-        previewState.main.ty = previewState.evolved.ty;
-      
-        await drawCard();
-        evolvedImageBase64 = canvas.toDataURL("image/png", 0.8);
-      
-        previewState.main.img = origImg;
-        previewState.main.scale = origScale;
-        previewState.main.tx = origTx;
-        previewState.main.ty = origTy;
-      }
-
       // Package data for IndexedDB
       const cardMetadata = {
         id: Date.now(),
@@ -2348,24 +2327,12 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); 
     
     let evolvedImageBase64 = workshopImageBase64;
-    if (previewState.evolved.img) {
-      const origImg = previewState.main.img;
-      const origScale = previewState.main.scale;
-      const origTx = previewState.main.tx;
-      const origTy = previewState.main.ty;
-    
-      previewState.main.img = previewState.evolved.img;
-      previewState.main.scale = previewState.evolved.scale;
-      previewState.main.tx = previewState.evolved.tx;
-      previewState.main.ty = previewState.evolved.ty;
-    
+    if (evolvedArt) {
+      const originalUploadedArt = uploadedArt;
+      uploadedArt = evolvedArt;
       await drawCard();
       evolvedImageBase64 = canvas.toDataURL("image/png", 0.8);
-    
-      previewState.main.img = origImg;
-      previewState.main.scale = origScale;
-      previewState.main.tx = origTx;
-      previewState.main.ty = origTy;
+      uploadedArt = originalUploadedArt;
     }
     
     const cardMetadata = {
