@@ -1102,7 +1102,8 @@ function updateAll() {
   syncIconToGlobals("crest");
   syncIconToGlobals("faith");
 
-  drawPreviewCanvas(mainPreviewCtx, mainPreviewCanvas, previewState[activeArtTab], "rect");
+  const currentMainState = (activeArtTab === 'evolved') ? previewState.evolved : previewState.main;
+  drawPreviewCanvas(mainPreviewCtx, mainPreviewCanvas, currentMainState, "rect");
   drawPreviewCanvas(crestPreviewCtx, crestPreviewCanvas, previewState.crest, "circle");
   drawPreviewCanvas(faithPreviewCtx, faithPreviewCanvas, previewState.faith, "circle");
 }
@@ -1267,9 +1268,15 @@ function getEventPos(e, canvasEl) {
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   }
 }
+
 function attachPanAndZoom(canvasEl, state, sliderEl) {
   if (!canvasEl) return;
-  const getState = () => (canvasEl === mainPreviewCanvas ? previewState[activeArtTab] : state);
+  const getState = () => {
+    if (canvasEl === mainPreviewCanvas) {
+      return activeArtTab === 'evolved' ? previewState.evolved : previewState.main;
+    }
+    return state;
+  };
   
   let dragging = false;
   let lastX = 0, lastY = 0;
