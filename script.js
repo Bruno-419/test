@@ -1267,14 +1267,16 @@ function getEventPos(e, canvasEl) {
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   }
 }
-
 function attachPanAndZoom(canvasEl, state, sliderEl) {
   if (!canvasEl) return;
+  const getState = () => (canvasEl === mainPreviewCanvas ? previewState[activeArtTab] : state);
+  
   let dragging = false;
   let lastX = 0, lastY = 0;
 
   canvasEl.addEventListener("pointerdown", (e) => {
-    if (!state.img) return;
+    const s = getState();
+    if (!s.img) return;
     dragging = true;
     const p = getEventPos(e, canvasEl);
     lastX = p.x; lastY = p.y;
@@ -1282,18 +1284,19 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   });
 
   canvasEl.addEventListener("pointermove", (e) => {
-    if (!dragging || !state.img) return;
+    const s = getState();
+    if (!dragging || !s.img) return;
     
     const rect = canvasEl.getBoundingClientRect();
-    const scaleX = state.maskW / rect.width; 
+    const scaleX = s.maskW / rect.width; 
 
     const p = getEventPos(e, canvasEl);
     const dx = (p.x - lastX) * scaleX;
     const dy = (p.y - lastY) * scaleX; 
 
     lastX = p.x; lastY = p.y;
-    state.tx += dx; state.ty += dy;
-    clampPan(state);
+    s.tx += dx; s.ty += dy;
+    clampPan(s);
     updateAll();
   });
 
@@ -1304,65 +1307,54 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   canvasEl.addEventListener("pointerleave", stopDrag);
 
   canvasEl.addEventListener("wheel", (ev) => {
-    if (!state.img) return;
+    const s = getState();
+    if (!s.img) return;
     ev.preventDefault();
     
     const zoomIntensity = 0.05;
     const delta = ev.deltaY > 0 ? -1 : 1; 
-    const oldScale = state.scale;
+    const oldScale = s.scale;
     
-    const minScale = state.minScale;
+    const minScale = s.minScale;
     const maxScale = sliderEl ? parseFloat(sliderEl.max) : oldScale * 2;
     
     let newScale = oldScale * (1 + delta * zoomIntensity);
     newScale = Math.max(minScale, Math.min(maxScale, newScale));
     
     const rect = canvasEl.getBoundingClientRect();
-    const scaleFactor = state.maskW / rect.width;
+    const scaleFactor = s.maskW / rect.width;
 
     const cx = (ev.clientX - rect.left) * scaleFactor;
     const cy = (ev.clientY - rect.top) * scaleFactor;
 
-    const imgSpaceX = (cx - state.tx) / oldScale;
-    const imgSpaceY = (cy - state.ty) / oldScale;
+    const imgSpaceX = (cx - s.tx) / oldScale;
+    const imgSpaceY = (cy - s.ty) / oldScale;
     
-    state.scale = newScale;
-    state.tx = cx - imgSpaceX * newScale;
-    state.ty = cy - imgSpaceY * newScale;
-    clampPan(state);
-    if (sliderEl) sliderEl.value = state.scale;
+    s.scale = newScale;
+    s.tx = cx - imgSpaceX * newScale;
+    s.ty = cy - imgSpaceY * newScale;
+    clampPan(s);
+    if (sliderEl) sliderEl.value = s.scale;
     updateAll();
   }, { passive: false });
 
   if (sliderEl) {
     sliderEl.addEventListener("input", (ev) => {
-      if (!state.img) return;
-      const newScale = Math.max(state.minScale, parseFloat(ev.target.value)); 
-      const oldScale = state.scale;
-      const cx = state.maskW / 2, cy = state.maskH / 2;
-      const imgSpaceX = (cx - state.tx) / oldScale;
-      const imgSpaceY = (cy - state.ty) / oldScale;
-      state.scale = newScale;
-      state.tx = cx - imgSpaceX * newScale;
-      state.ty = cy - imgSpaceY * newScale;
-      clampPan(state);
+      const s = getState();
+      if (!s.img) return;
+      const newScale = Math.max(s.minScale, parseFloat(ev.target.value)); 
+      const oldScale = s.scale;
+      const cx = s.maskW / 2, cy = s.maskH / 2;
+      const imgSpaceX = (cx - s.tx) / oldScale;
+      const imgSpaceY = (cy - s.ty) / oldScale;
+      s.scale = newScale;
+      s.tx = cx - imgSpaceX * newScale;
+      s.ty = cy - imgSpaceY * newScale;
+      clampPan(s);
       updateAll();
     });
   }
 }
-
-attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
-attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
-attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
-
-// --- Track the last active text area for the global formatting toolbar ---
-let activeTextarea = null;
-
-document.addEventListener("focusin", (e) => {
-  if (e.target.tagName.toLowerCase() === "textarea") {
-    activeTextarea = e.target;
-  }
-});
 
 // --- Formatting Button Logic (Global & Legacy support) ---
 document.querySelectorAll(".text-toolbar button, .global-text-toolbar button").forEach((button) => {
@@ -2161,11 +2153,34 @@ if (saveBtn) {
       await drawCard();
       const workshopImageBase64 = canvas.toDataURL("image/png", 0.8);
 
+      // Draw Evolved Art if present
+      let evolvedImageBase64 = workshopImageBase64;
+      if (previewState.evolved.img) {
+        const origImg = previewState.main.img;
+        const origScale = previewState.main.scale;
+        const origTx = previewState.main.tx;
+        const origTy = previewState.main.ty;
+
+        previewState.main.img = previewState.evolved.img;
+        previewState.main.scale = previewState.evolved.scale;
+        previewState.main.tx = previewState.evolved.tx;
+        previewState.main.ty = previewState.evolved.ty;
+
+        await drawCard();
+        evolvedImageBase64 = canvas.toDataURL("image/png", 0.8);
+
+        // Restore main preview state
+        previewState.main.img = origImg;
+        previewState.main.scale = origScale;
+        previewState.main.tx = origTx;
+        previewState.main.ty = origTy;
+      }
+
       // Package data for IndexedDB
       const cardMetadata = {
         id: Date.now(),
         image: workshopImageBase64,
-        evolvedImage: workshopImageBase64, // Stores bottom layer art
+        evolvedImage: evolvedImageBase64, // Stores bottom layer art
         name: nameInput.value.trim() || "Unnamed Card",
         trait: traitInput.value.trim(),
         class: classSelect.value,
@@ -2196,6 +2211,7 @@ if (saveBtn) {
         // ADD THIS NEW PROPERTY:
         artState: {
           main: getArtSaveData(previewState.main),
+          evolved: getArtSaveData(previewState.evolved),
           crest: getArtSaveData(previewState.crest),
           faith: getArtSaveData(previewState.faith)
         }
@@ -2326,13 +2342,27 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     await drawCard();
     const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); 
     
+    // Draw Evolved Art if present
     let evolvedImageBase64 = workshopImageBase64;
-    if (evolvedArt) {
-      const originalUploadedArt = uploadedArt;
-      uploadedArt = evolvedArt;
+    if (previewState.evolved.img) {
+      const origImg = previewState.main.img;
+      const origScale = previewState.main.scale;
+      const origTx = previewState.main.tx;
+      const origTy = previewState.main.ty;
+
+      previewState.main.img = previewState.evolved.img;
+      previewState.main.scale = previewState.evolved.scale;
+      previewState.main.tx = previewState.evolved.tx;
+      previewState.main.ty = previewState.evolved.ty;
+
       await drawCard();
       evolvedImageBase64 = canvas.toDataURL("image/png", 0.8);
-      uploadedArt = originalUploadedArt;
+
+      // Restore main preview state
+      previewState.main.img = origImg;
+      previewState.main.scale = origScale;
+      previewState.main.tx = origTx;
+      previewState.main.ty = origTy;
     }
     
     const cardMetadata = {
@@ -2369,6 +2399,7 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
       // ADD THIS NEW PROPERTY:
       artState: {
         main: getArtSaveData(previewState.main),
+        evolved: getArtSaveData(previewState.evolved),
         crest: getArtSaveData(previewState.crest),
         faith: getArtSaveData(previewState.faith)
       }
