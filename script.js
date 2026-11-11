@@ -1363,6 +1363,14 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   }
 }
 
+const crestZoomSlider = document.getElementById("crestZoomSlider");
+const faithZoomSlider = document.getElementById("faithZoomSlider");
+
+// --- INITIALIZE PAN & ZOOM ---
+attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
+attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
+attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
+
 // --- Formatting Button Logic (Global & Legacy support) ---
 document.querySelectorAll(".text-toolbar button, .global-text-toolbar button").forEach((button) => {
   button.addEventListener("click", (e) => {
