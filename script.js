@@ -1363,9 +1363,6 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   }
 }
 
-const crestZoomSlider = document.getElementById("crestZoomSlider");
-const faithZoomSlider = document.getElementById("faithZoomSlider");
-
 // --- INITIALIZE PAN & ZOOM ---
 attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
