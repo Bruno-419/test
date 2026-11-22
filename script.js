@@ -1355,6 +1355,13 @@ attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
 
+let activeTextarea = textInputs.card || null;
+document.addEventListener("focusin", (e) => {
+  if (e.target && (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT")) {
+    activeTextarea = e.target;
+  }
+});
+
 // --- Formatting Button Logic (Global & Legacy support) ---
 document.querySelectorAll(".text-toolbar button, .global-text-toolbar button").forEach((button) => {
   button.addEventListener("click", (e) => {
