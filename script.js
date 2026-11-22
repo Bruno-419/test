@@ -3026,11 +3026,12 @@ if (globalResetBtn) {
     window.navigateTo = function (p) { root.style.setProperty('--pg', PG[p] ?? 1); return nav.apply(this, arguments); };
   }
 
-  if (fx && matchMedia('(pointer:fine)').matches) {
-    let raf;
+  const spot = fx && fx.querySelector('.spot');
+  if (spot && matchMedia('(pointer:fine)').matches) {
+    let raf = 0, x = 0, y = 0;
     addEventListener('pointermove', e => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => { fx.style.setProperty('--mx', e.clientX + 'px'); fx.style.setProperty('--my', e.clientY + 'px'); });
+      x = e.clientX; y = e.clientY;
+      if (!raf) raf = requestAnimationFrame(() => { raf = 0; spot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)'; });
     }, { passive: true });
   }
 })();
