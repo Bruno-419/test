@@ -933,20 +933,6 @@ const faithInput = document.getElementById("faithArtUpload");
 let evolvedArt = null;
 const evolvedArtInput = document.getElementById("evolvedArtUpload");
 
-if (evolvedArtInput) {
-  evolvedArtInput.addEventListener("change", async (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    try {
-      const img = await loadImageFromFile(file);
-      evolvedArt = img;
-      evolvedArtInput.parentElement.style.borderColor = "#2aa48a";
-    } catch (err) {
-      console.error("Failed to load evolved art:", err);
-    }
-  });
-}
-
 const previewState = {
   main: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H, minScale: 1 },
   evolved: { img: null, scale: 1, tx: 0, ty: 0, maskW: MAIN_MASK_W, maskH: MAIN_MASK_H, minScale: 1 },
@@ -1102,8 +1088,7 @@ function updateAll() {
   syncIconToGlobals("crest");
   syncIconToGlobals("faith");
 
-  const currentMainState = (activeArtTab === 'evolved') ? previewState.evolved : previewState.main;
-  drawPreviewCanvas(mainPreviewCtx, mainPreviewCanvas, currentMainState, "rect");
+  drawPreviewCanvas(mainPreviewCtx, mainPreviewCanvas, previewState[activeArtTab], "rect");
   drawPreviewCanvas(crestPreviewCtx, crestPreviewCanvas, previewState.crest, "circle");
   drawPreviewCanvas(faithPreviewCtx, faithPreviewCanvas, previewState.faith, "circle");
 }
@@ -1114,8 +1099,17 @@ if (evolvedArtInput) {
     if (!file) return;
     try {
       const img = await loadImageFromFile(file);
+      evolvedArt = img;
       previewState.evolved.img = img;
       fitImageToMask(img, previewState.evolved);
+      if (mainZoomSlider) {
+        const min = previewState.evolved.minScale;
+        const max = min * 5;
+        mainZoomSlider.min = min;
+        mainZoomSlider.max = max;
+        mainZoomSlider.step = (max - min) / 100;
+        mainZoomSlider.value = previewState.evolved.scale;
+      }
       switchArtTab('evolved'); // Automatically switch Card Art preview box to Evolved Art
     } catch (err) {
       console.error("Failed to load evolved art:", err);
@@ -1268,15 +1262,9 @@ function getEventPos(e, canvasEl) {
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   }
 }
-
 function attachPanAndZoom(canvasEl, state, sliderEl) {
   if (!canvasEl) return;
-  const getState = () => {
-    if (canvasEl === mainPreviewCanvas) {
-      return activeArtTab === 'evolved' ? previewState.evolved : previewState.main;
-    }
-    return state;
-  };
+  const getState = () => (canvasEl === mainPreviewCanvas ? previewState[activeArtTab] : state);
   
   let dragging = false;
   let lastX = 0, lastY = 0;
@@ -1363,7 +1351,6 @@ function attachPanAndZoom(canvasEl, state, sliderEl) {
   }
 }
 
-// --- INITIALIZE PAN & ZOOM ---
 attachPanAndZoom(mainPreviewCanvas, previewState.main, mainZoomSlider);
 attachPanAndZoom(crestPreviewCanvas, previewState.crest, crestZoomSlider);
 attachPanAndZoom(faithPreviewCanvas, previewState.faith, faithZoomSlider);
@@ -2130,9 +2117,11 @@ async function editWorkshopCard() {
 
   // Multiply the slider limits correctly (5x for main, 8x for crest/faith)
   await restoreArtState(previewState.main, card.artState?.main, mainZoomSlider, 5);
+  await restoreArtState(previewState.evolved, card.artState?.evolved, null, 5);
   await restoreArtState(previewState.crest, card.artState?.crest, crestZoomSlider, 8);
   await restoreArtState(previewState.faith, card.artState?.faith, faithZoomSlider, 8);
   
+  switchArtTab('main');
   updateAll(); // Refresh canvases and globals
 
   // Check if we restored from an older save before we added this feature
@@ -2162,6 +2151,7 @@ if (saveBtn) {
       // Force canvas to save just the card
       const wasChecked = saveCardOnlyCheckbox.checked;
       saveCardOnlyCheckbox.checked = true;
+      syncMainToGlobals();
       await drawCard();
       const workshopImageBase64 = canvas.toDataURL("image/png", 0.8);
 
@@ -2177,6 +2167,7 @@ if (saveBtn) {
         previewState.main.scale = previewState.evolved.scale;
         previewState.main.tx = previewState.evolved.tx;
         previewState.main.ty = previewState.evolved.ty;
+        syncMainToGlobals();
 
         await drawCard();
         evolvedImageBase64 = canvas.toDataURL("image/png", 0.8);
@@ -2186,6 +2177,7 @@ if (saveBtn) {
         previewState.main.scale = origScale;
         previewState.main.tx = origTx;
         previewState.main.ty = origTy;
+        syncMainToGlobals();
       }
 
       // Package data for IndexedDB
@@ -2351,6 +2343,7 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
 
     const wasChecked = saveCardOnlyCheckbox.checked;
     saveCardOnlyCheckbox.checked = true;
+    syncMainToGlobals();
     await drawCard();
     const workshopImageBase64 = canvas.toDataURL("image/png", 0.8); 
     
@@ -2366,6 +2359,7 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
       previewState.main.scale = previewState.evolved.scale;
       previewState.main.tx = previewState.evolved.tx;
       previewState.main.ty = previewState.evolved.ty;
+      syncMainToGlobals();
 
       await drawCard();
       evolvedImageBase64 = canvas.toDataURL("image/png", 0.8);
@@ -2375,6 +2369,7 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
       previewState.main.scale = origScale;
       previewState.main.tx = origTx;
       previewState.main.ty = origTy;
+      syncMainToGlobals();
     }
     
     const cardMetadata = {
@@ -2988,3 +2983,20 @@ document.getElementById("balanceDownloadBtn").addEventListener("click", async ()
       btn.disabled = false;
   }
 });
+
+
+// Ensure Reset button also clears preview art states
+const globalResetBtn = document.getElementById('resetBtn');
+if (globalResetBtn) {
+  globalResetBtn.addEventListener('click', () => {
+    previewState.main.img = null;
+    previewState.evolved.img = null;
+    previewState.crest.img = null;
+    previewState.faith.img = null;
+    evolvedArt = null;
+    const mainArtTitleEl = document.getElementById("mainArtPreviewTitle");
+    if (mainArtTitleEl) mainArtTitleEl.textContent = "Card Art";
+    switchArtTab('main');
+    updateAll();
+  });
+}
