@@ -2052,12 +2052,19 @@ body{padding:0;color:#eef1fb}
 .bg-fx i:nth-child(1){width:46vmax;height:46vmax;left:2%;top:-8%;background:var(--accent)}
 .bg-fx i:nth-child(2){width:38vmax;height:38vmax;right:0;top:30%;background:#4b34d6;animation-duration:32s;animation-delay:-9s}
 .bg-fx i:nth-child(3){width:30vmax;height:30vmax;left:30%;bottom:-12%;background:#b02a64;opacity:.3;animation-duration:38s;animation-delay:-17s}
-.bg-fx::before,.bg-fx::after{content:"";position:absolute;inset:0 0 -400px;background-repeat:repeat}
-.bg-fx::before{--t:-240px;background-image:radial-gradient(1.5px 1.5px at 20px 30px,#fff 50%,transparent 52%),radial-gradient(1px 1px at 120px 90px,#cfd6ff 50%,transparent 52%),radial-gradient(1.5px 1.5px at 200px 200px,var(--accent) 50%,transparent 52%),radial-gradient(1px 1px at 80px 170px,#fff 50%,transparent 52%);background-size:240px 240px;opacity:.7;animation:rise 60s linear infinite}
-.bg-fx::after{--t:-340px;background-image:radial-gradient(2px 2px at 60px 60px,var(--accent) 50%,transparent 52%),radial-gradient(1.5px 1.5px at 170px 150px,#fff 50%,transparent 52%);background-size:340px 340px;opacity:.55;animation:rise 38s linear infinite,twinkle 5s ease-in-out infinite alternate}
+.bg-fx{--ac:color-mix(in srgb,var(--accent) 20%,transparent);--ar:color-mix(in srgb,var(--accent) 44%,transparent);--wc:rgba(255,255,255,.06);--wr:rgba(255,255,255,.2);--vc:rgba(139,124,255,.1);--vr:rgba(139,124,255,.3)}
+/* Bokeh: two depth layers of soft light discs drifting in opposite directions */
+.bg-fx::before,.bg-fx::after{content:"";position:absolute;z-index:1;mix-blend-mode:screen;will-change:transform,opacity}
+.bg-fx::before{--p:.9;inset:-640px 0 0 -640px;background-size:640px 640px;filter:blur(2px);
+  background-image:radial-gradient(circle 46px at 90px 120px,var(--ac) 0 62%,var(--ar) 90%,transparent 95%),radial-gradient(circle 30px at 400px 80px,var(--wc) 0 62%,var(--wr) 90%,transparent 95%),radial-gradient(circle 64px at 520px 360px,var(--vc) 0 62%,var(--vr) 90%,transparent 95%),radial-gradient(circle 36px at 210px 430px,var(--wc) 0 62%,var(--wr) 90%,transparent 95%),radial-gradient(circle 52px at 330px 560px,var(--ac) 0 62%,var(--ar) 90%,transparent 95%),radial-gradient(circle 24px at 40px 330px,var(--vc) 0 62%,var(--vr) 90%,transparent 95%);
+  animation:bokeh-a 110s linear infinite,bokeh-pulse 7s ease-in-out infinite alternate}
+.bg-fx::after{--p:.65;inset:0 -900px -900px 0;background-size:900px 900px;filter:blur(5px);
+  background-image:radial-gradient(circle 120px at 180px 220px,var(--ac) 0 60%,var(--ar) 88%,transparent 96%),radial-gradient(circle 90px at 650px 160px,var(--wc) 0 60%,var(--wr) 88%,transparent 96%),radial-gradient(circle 150px at 560px 600px,var(--vc) 0 60%,var(--vr) 88%,transparent 96%),radial-gradient(circle 100px at 140px 700px,var(--wc) 0 60%,var(--wr) 88%,transparent 96%),radial-gradient(circle 70px at 780px 420px,var(--ac) 0 60%,var(--ar) 88%,transparent 96%);
+  animation:bokeh-b 160s linear infinite,bokeh-pulse 11s ease-in-out -4s infinite alternate}
+@keyframes bokeh-a{to{transform:translate(640px,640px)}}
+@keyframes bokeh-b{to{transform:translate(-900px,-900px)}}
+@keyframes bokeh-pulse{from{opacity:calc(var(--p) * .45)}to{opacity:var(--p)}}
 @keyframes drift{to{transform:translate(9vw,7vh) scale(1.18)}}
-@keyframes rise{to{transform:translateY(var(--t))}}
-@keyframes twinkle{to{opacity:.15}}
 #app-viewport{position:relative;z-index:1;scrollbar-width:thin;scrollbar-color:var(--accent) transparent}
 
 /* --- Title + one orchestrated load-in --- */
