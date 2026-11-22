@@ -2039,7 +2039,7 @@ body {
    selected card class (see end of script.js).
    ========================================================== */
 @property --accent{syntax:'<color>';inherits:true;initial-value:#2aa48a}
-:root{--accent:#2aa48a;--ink:#07080f;--glass:rgba(16,18,32,.86);--line:rgba(255,255,255,.09);--muted:#9aa3bd;--input:rgba(7,8,16,.72);--panel:rgba(16,18,32,.86);--border:rgba(255,255,255,.1);transition:--accent .9s ease}
+:root{--accent:#2aa48a;--ink:#07080f;--glass:rgba(16,18,32,.86);--line:rgba(255,255,255,.09);--muted:#9aa3bd;--input:rgba(7,8,16,.72);--panel:rgba(16,18,32,.86);--border:rgba(255,255,255,.1)}
 html,body{background:var(--ink)}
 body{padding:0;color:#eef1fb}
 
@@ -2121,3 +2121,22 @@ button:active{transform:translateY(0) scale(.97)}
 
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition-duration:.01ms !important}}
+
+
+/* ==========================================================
+   LITE MODE (phones/tablets/small windows): static glow, one slow
+   ember layer, no continuous shimmer or full-screen compositing.
+   Desktop keeps the full effects.
+   ========================================================== */
+@media (hover:hover) and (pointer:fine){:root{transition:--accent .9s ease}}
+@media (max-width:980px),(pointer:coarse){
+  .bg-fx .orbs{will-change:auto}
+  .bg-fx i{animation:none;will-change:auto}
+  .bg-fx i:nth-child(3),.bg-fx .spot,.bg-fx::after{display:none}
+  .bg-fx::before{bottom:-240px;opacity:.55;will-change:transform;animation:riseA 28s linear infinite}
+  h1{animation:none;filter:none}
+  .preview-block{overflow:visible;isolation:auto;border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);background:linear-gradient(160deg,rgba(24,26,46,.96),rgba(10,11,22,.96));box-shadow:0 0 28px -12px var(--accent)}
+  .preview-block::before,.preview-block::after,.side-nav::after{display:none}
+  .side-nav{backdrop-filter:none}
+  .workshop-card:hover{filter:none}
+}
