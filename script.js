@@ -3007,3 +3007,30 @@ if (globalResetBtn) {
     updateAll();
   });
 }
+
+
+/* ===== Revamp: class-reactive aura, background parallax, cursor spotlight ===== */
+(function () {
+  const root = document.documentElement, fx = document.querySelector('.bg-fx');
+  const TINT = { Neutral:'#2aa48a', Forestcraft:'#46d17a', Swordcraft:'#e8b93c', Runecraft:'#4d8dff', Dragoncraft:'#ff7a3d', Abysscraft:'#e5384f', Havencraft:'#e9e4cf', Portalcraft:'#2ad7e0' };
+  const sel = document.getElementById('cardClass');
+  let last;
+  const apply = () => {
+    const v = sel && sel.value;
+    if (v && v !== last) { last = v; root.style.setProperty('--accent', TINT[v] || TINT.Neutral); }
+  };
+  if (sel) { sel.addEventListener('change', apply); setInterval(apply, 400); apply(); }
+
+  const PG = { balance: 0, home: 1, workshop: 2 }, nav = window.navigateTo;
+  if (typeof nav === 'function') {
+    window.navigateTo = function (p) { root.style.setProperty('--pg', PG[p] ?? 1); return nav.apply(this, arguments); };
+  }
+
+  if (fx && matchMedia('(pointer:fine)').matches) {
+    let raf;
+    addEventListener('pointermove', e => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => { fx.style.setProperty('--mx', e.clientX + 'px'); fx.style.setProperty('--my', e.clientY + 'px'); });
+    }, { passive: true });
+  }
+})();
