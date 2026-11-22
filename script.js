@@ -1002,7 +1002,7 @@ function drawPreviewCanvas(ctx, canvasEl, s, shape) {
   const { img, scale, tx, ty, maskW, maskH } = s;
   
   ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-  ctx.fillStyle = "rgba(20,20,20,0.95)";
+  const bgG = ctx.createLinearGradient(0, 0, 0, canvasEl.height); bgG.addColorStop(0, "rgba(18,20,38,0.96)"); bgG.addColorStop(1, "rgba(8,9,18,0.96)"); ctx.fillStyle = bgG;
   ctx.fillRect(0, 0, canvasEl.width, canvasEl.height); 
 
   const renderScale = canvasEl.width / maskW;
