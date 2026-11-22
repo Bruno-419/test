@@ -2140,3 +2140,26 @@ button:active{transform:translateY(0) scale(.97)}
   .side-nav{backdrop-filter:none}
   .workshop-card:hover{filter:none}
 }
+
+
+/* ==========================================================
+   Theme pass: art boxes, keyword sections, formatting bar
+   ========================================================== */
+.preview-canvas{background:#0a0b16;border:1px solid color-mix(in srgb,var(--accent) 28%,rgba(255,255,255,.08));box-shadow:0 0 18px -8px var(--accent)}
+.preview-title{color:var(--muted)}
+.preview-block .upload-btn.small{background:rgba(255,255,255,.06);border:1px solid var(--line);color:#dfe4f5;border-radius:10px}
+.preview-block .upload-btn.small:hover{background:rgba(255,255,255,.12);border-color:var(--accent)}
+
+/* Keyword sections keep their identity color (silver / orange / pink / lime) */
+.adorned-crest{--k:#bcbcbc}.adorned-faith{--k:#e6781f}.adorned-accelerate{--k:#fe80ff}.adorned-crystallize{--k:#d7ff80}
+.adorned-crest,.adorned-faith,.adorned-accelerate,.adorned-crystallize{border-left:4px solid var(--k);border-radius:14px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--k) 11%,transparent),transparent 55%),linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.01) 40%),rgba(14,16,30,.86);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--k) 22%,transparent),0 10px 30px -16px color-mix(in srgb,var(--k) 55%,transparent)}
+
+/* Formatting bar: same glass as the panel it attaches to */
+.global-text-toolbar{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.015) 60%),rgba(15,17,31,.97);border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 -8px 24px -16px var(--accent)}
+.right-column-wrapper .right-panel{border-top:0}
+button[data-format="bold"]{font-weight:800}
+button[data-format="italic"]{font-style:italic;font-family:Georgia,serif}
+button[data-format="color"]{color:#f1c75b}
+button[data-format="color"]:hover{color:#f1c75b;border-color:#f1c75b;box-shadow:0 0 16px -4px #f1c75b}
