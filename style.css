@@ -2039,24 +2039,24 @@ body {
    selected card class (see end of script.js).
    ========================================================== */
 @property --accent{syntax:'<color>';inherits:true;initial-value:#2aa48a}
-@property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
-:root{--accent:#2aa48a;--ink:#07080f;--glass:rgba(16,18,32,.62);--line:rgba(255,255,255,.09);--muted:#9aa3bd;--input:rgba(7,8,16,.72);--panel:rgba(16,18,32,.62);--border:rgba(255,255,255,.1);transition:--accent .9s ease}
+:root{--accent:#2aa48a;--ink:#07080f;--glass:rgba(16,18,32,.86);--line:rgba(255,255,255,.09);--muted:#9aa3bd;--input:rgba(7,8,16,.72);--panel:rgba(16,18,32,.86);--border:rgba(255,255,255,.1);transition:--accent .9s ease}
 html,body{background:var(--ink)}
 body{padding:0;color:#eef1fb}
 
-/* --- Living background --- */
-.bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
-  background:radial-gradient(520px circle at var(--mx,50%) var(--my,25%),color-mix(in srgb,var(--accent) 16%,transparent),transparent 70%),radial-gradient(120% 80% at 50% 0%,#15132e 0%,var(--ink) 62%)}
-.bg-fx .orbs{position:absolute;inset:-20%;transform:translateX(calc((1 - var(--pg,1)) * 7vw));transition:transform .9s cubic-bezier(.25,1,.5,1)}
-.bg-fx i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:drift 26s ease-in-out infinite alternate}
-.bg-fx i:nth-child(1){width:46vmax;height:46vmax;left:2%;top:-8%;background:var(--accent)}
-.bg-fx i:nth-child(2){width:38vmax;height:38vmax;right:0;top:30%;background:#4b34d6;animation-duration:32s;animation-delay:-9s}
-.bg-fx i:nth-child(3){width:30vmax;height:30vmax;left:30%;bottom:-12%;background:#b02a64;opacity:.3;animation-duration:38s;animation-delay:-17s}
-.bg-fx::before,.bg-fx::after{content:"";position:absolute;inset:0 0 -400px;background-repeat:repeat}
-.bg-fx::before{--t:-240px;background-image:radial-gradient(1.5px 1.5px at 20px 30px,#fff 50%,transparent 52%),radial-gradient(1px 1px at 120px 90px,#cfd6ff 50%,transparent 52%),radial-gradient(1.5px 1.5px at 200px 200px,var(--accent) 50%,transparent 52%),radial-gradient(1px 1px at 80px 170px,#fff 50%,transparent 52%);background-size:240px 240px;opacity:.7;animation:rise 60s linear infinite}
-.bg-fx::after{--t:-340px;background-image:radial-gradient(2px 2px at 60px 60px,var(--accent) 50%,transparent 52%),radial-gradient(1.5px 1.5px at 170px 150px,#fff 50%,transparent 52%);background-size:340px 340px;opacity:.55;animation:rise 38s linear infinite,twinkle 5s ease-in-out infinite alternate}
-@keyframes drift{to{transform:translate(9vw,7vh) scale(1.18)}}
-@keyframes rise{to{transform:translateY(var(--t))}}
+/* --- Living background (transform/opacity only, so it runs on the GPU) --- */
+.bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:radial-gradient(120% 80% at 50% 0%,#15132e 0%,var(--ink) 62%)}
+.bg-fx .spot{position:absolute;left:-320px;top:-320px;width:640px;height:640px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 22%,transparent),transparent);transform:translate3d(50vw,25vh,0);transition:transform .4s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.bg-fx .orbs{position:absolute;inset:-20%;transform:translateX(calc((1 - var(--pg,1)) * 7vw));transition:transform .9s cubic-bezier(.25,1,.5,1);will-change:transform}
+.bg-fx i{position:absolute;border-radius:50%;background:radial-gradient(closest-side,var(--c),color-mix(in srgb,var(--c) 40%,transparent) 50%,transparent);opacity:.55;animation:drift 26s ease-in-out infinite alternate;will-change:transform}
+.bg-fx i:nth-child(1){--c:var(--accent);width:46vmax;height:46vmax;left:2%;top:-8%}
+.bg-fx i:nth-child(2){--c:#4b34d6;width:38vmax;height:38vmax;right:0;top:30%;animation-duration:32s;animation-delay:-9s}
+.bg-fx i:nth-child(3){--c:#b02a64;width:30vmax;height:30vmax;left:30%;bottom:-12%;opacity:.32;animation-duration:38s;animation-delay:-17s}
+.bg-fx::before,.bg-fx::after{content:"";position:absolute;left:0;right:0;top:0;bottom:-400px;background-repeat:repeat;backface-visibility:hidden;will-change:transform,opacity}
+.bg-fx::before{background-image:radial-gradient(1.5px 1.5px at 20px 30px,#fff 50%,transparent 52%),radial-gradient(1px 1px at 120px 90px,#cfd6ff 50%,transparent 52%),radial-gradient(1.5px 1.5px at 200px 200px,var(--accent) 50%,transparent 52%),radial-gradient(1px 1px at 80px 170px,#fff 50%,transparent 52%);background-size:240px 240px;opacity:.7;animation:riseA 22s linear infinite}
+.bg-fx::after{background-image:radial-gradient(2px 2px at 60px 60px,var(--accent) 50%,transparent 52%),radial-gradient(1.5px 1.5px at 170px 150px,#fff 50%,transparent 52%);background-size:340px 340px;opacity:.55;animation:riseB 15s linear infinite,twinkle 5s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate3d(9vw,7vh,0) scale(1.18)}}
+@keyframes riseA{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-240px,0)}}
+@keyframes riseB{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-340px,0)}}
 @keyframes twinkle{to{opacity:.15}}
 #app-viewport{position:relative;z-index:1;scrollbar-width:thin;scrollbar-color:var(--accent) transparent}
 
@@ -2074,11 +2074,11 @@ h1{font-family:'Memento','Roboto',sans-serif;font-weight:600;font-size:clamp(28p
 .right-column-wrapper{animation:rise-in .9s .35s cubic-bezier(.2,.8,.2,1) backwards}
 
 /* --- Glass panels + orbiting card frame --- */
-.left-panel,.right-panel,.adjustment-form{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.015) 40%),var(--glass);border:1px solid var(--line);border-radius:16px;backdrop-filter:blur(16px) saturate(150%);box-shadow:0 18px 50px -20px #000,inset 0 1px 0 rgba(255,255,255,.07)}
-.preview-block{border:1px solid transparent;border-radius:16px;
-  background:linear-gradient(160deg,rgba(24,26,46,.96),rgba(10,11,22,.96)) padding-box,conic-gradient(from var(--ang),transparent 0 55%,var(--accent) 80%,#fff 88%,transparent 92% 100%) border-box;
-  box-shadow:0 0 60px -18px var(--accent),0 18px 50px -20px #000;animation:orbit 5s linear infinite}
-@keyframes orbit{to{--ang:360deg}}
+.left-panel,.right-panel,.adjustment-form{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.015) 40%),var(--glass);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 50px -20px #000,inset 0 1px 0 rgba(255,255,255,.07)}
+.preview-block{position:relative;isolation:isolate;overflow:hidden;border:0;border-radius:16px;background:none;box-shadow:0 0 60px -18px var(--accent),0 18px 50px -20px #000}
+.preview-block::before{content:"";position:absolute;z-index:-2;left:50%;top:50%;width:1000px;height:1000px;margin:-500px 0 0 -500px;background:conic-gradient(transparent 0 55%,var(--accent) 80%,#fff 88%,transparent 92% 100%);animation:spin 5s linear infinite;will-change:transform}
+.preview-block::after{content:"";position:absolute;z-index:-1;inset:1px;border-radius:15px;background:linear-gradient(160deg,rgba(24,26,46,.96),rgba(10,11,22,.96))}
+@keyframes spin{to{transform:rotate(360deg)}}
 canvas{border:1px solid rgba(255,255,255,.1);border-radius:12px}
 .preview-canvas{box-shadow:0 12px 40px -12px #000}
 
@@ -2107,17 +2107,17 @@ button:active{transform:translateY(0) scale(.97)}
 .filter-btn.active,.preview-tab.active{background:color-mix(in srgb,var(--accent) 30%,transparent) !important;border-color:var(--accent) !important;color:#fff;box-shadow:0 0 22px -6px var(--accent)}
 
 /* --- Edge navigation, search, workshop, modal --- */
-.side-nav{background:rgba(14,16,30,.72) !important;backdrop-filter:blur(12px);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);box-shadow:0 0 28px -6px var(--accent);animation:breathe 3.6s ease-in-out infinite}
+.side-nav{background:rgba(14,16,30,.72) !important;backdrop-filter:blur(12px);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);box-shadow:0 0 28px -6px var(--accent)}
 .side-nav.left{border-left:0}.side-nav.right{border-right:0}
 .side-nav:hover{background:color-mix(in srgb,var(--accent) 28%,rgba(14,16,30,.8)) !important}
 .side-nav img{filter:drop-shadow(0 0 8px var(--accent))}
-@keyframes breathe{50%{box-shadow:0 0 40px -2px var(--accent)}}
+.side-nav::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 40px -2px var(--accent);opacity:0;pointer-events:none;animation:breathe 3.6s ease-in-out infinite}
+@keyframes breathe{50%{opacity:1}}
 .search-results-list{background:rgba(12,14,26,.97);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:12px;box-shadow:0 24px 60px -12px #000}
 .search-results-list li:hover{background:color-mix(in srgb,var(--accent) 22%,transparent)}
 .workshop-card{border-radius:12px;transition:transform .25s,filter .3s}
 .workshop-card:hover{filter:drop-shadow(0 14px 24px color-mix(in srgb,var(--accent) 55%,transparent))}
-.modal{background:rgba(4,5,12,.78);backdrop-filter:blur(10px) saturate(120%)}
+.modal{background:rgba(4,5,12,.86)}
 
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-@media (max-width:640px){.bg-fx i{filter:blur(60px)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition-duration:.01ms !important}}
