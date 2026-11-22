@@ -3023,7 +3023,7 @@ if (globalResetBtn) {
 
   const PG = { balance: 0, home: 1, workshop: 2 }, nav = window.navigateTo;
   if (typeof nav === 'function') {
-    window.navigateTo = function (p) { root.style.setProperty('--pg', PG[p] ?? 1); return nav.apply(this, arguments); };
+    window.navigateTo = function (p) { (fx || root).style.setProperty('--pg', PG[p] ?? 1); return nav.apply(this, arguments); };
   }
 
   const spot = fx && fx.querySelector('.spot');
