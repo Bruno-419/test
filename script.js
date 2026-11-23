@@ -3034,4 +3034,14 @@ if (globalResetBtn) {
       if (!raf) raf = requestAnimationFrame(() => { raf = 0; spot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)'; });
     }, { passive: true });
   }
+
+  // Tint the Workshop modal to the class of the card being viewed
+  const modal = document.getElementById('workshopModal'), meta = document.getElementById('modalMetaString');
+  if (modal && meta) {
+    const T = Object.fromEntries(Object.entries(TINT).map(([k, v]) => [k.toLowerCase(), v]));
+    new MutationObserver(() => {
+      const m = /class:\s*([a-z]+)/i.exec(meta.textContent);
+      modal.style.setProperty('--accent', (m && T[m[1].toLowerCase()]) || TINT.Neutral);
+    }).observe(meta, { childList: true, characterData: true, subtree: true });
+  }
 })();
