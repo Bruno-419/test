@@ -86,6 +86,12 @@ const textInputs = {
   crystallize: document.getElementById("crystallizeText")
 };
 
+// Text from a section hidden by card type (Spell/Amulet) counts as empty in renders, saves and word counts
+function textOf(key) {
+  const el = textInputs[key];
+  return el && !el.closest('.hide-section') ? el.value.trim() : "";
+}
+
 // --- Crest and Faith uploads ---
 const crestArtUpload = document.getElementById("crestArtUpload");
 const faithArtUpload = document.getElementById("faithArtUpload");
@@ -190,7 +196,7 @@ function drawScaledNumber(text, x, y, maxFontSize, maxWidth, fontFace, letterSpa
 
 // --- Word Count Functions ---
 function calculateTotalWordCount() {
-  const allText = Object.values(textInputs).map(t => t.value).join(" ");
+  const allText = Object.keys(textInputs).map(textOf).join(" ");
   const initialTokens = allText.split(/\s+/);
   let wordCount = 0;
   for (const token of initialTokens) {
@@ -327,7 +333,7 @@ function drawStretchBox(img, x, y, stretchCount = 0, key = "") {
 
 // --- Calculate Height ---
 async function calculateTextBlockHeight(key, textOverride = null, xOverride = null) {
-  const textValue = textOverride !== null ? textOverride : textInputs[key].value.trim();
+  const textValue = textOverride !== null ? textOverride : textOf(key);
   if (!textValue) return 0;
 
   const isSpecialBox = (key !== "card");
@@ -425,7 +431,7 @@ async function calculateTextBlockHeight(key, textOverride = null, xOverride = nu
 
 // --- drawTextBlock ---
 async function drawTextBlock(key, box, x, startY, textOverride = null) {
-  const textValue = textOverride !== null ? textOverride : textInputs[key].value.trim();
+  const textValue = textOverride !== null ? textOverride : textOf(key);
   if (!textValue) return 0;
 
   const isSpecialBox = (key !== "card");
@@ -698,7 +704,7 @@ async function drawCard() {
   if (!saveCardOnly) {
       let calculatedTotalY = startY;
       for (const { key } of textOrder) {
-          const textValue = textInputs[key].value.trim();
+          const textValue = textOf(key);
           if (!textValue) continue; 
           const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
           if (isEvolveBlock && !isFollower) continue;
@@ -810,7 +816,7 @@ async function drawCard() {
 
       let currentY = startY;
       for (const { key, box } of textOrder) {
-        const textValue = textInputs[key].value.trim();
+        const textValue = textOf(key);
         if (!textValue) continue; 
         const isEvolveBlock = (key === 'evolve' || key === 'superEvolve');
         if (isEvolveBlock && !isFollower) continue;
@@ -2216,8 +2222,8 @@ if (saveBtn) {
           superEvolve: textInputs.superEvolve.value.trim(),
           crest: textInputs.crest.value.trim(),
           faith: textInputs.faith.value.trim(),
-          accelerate: textInputs.accelerate.value.trim(),
-          crystallize: textInputs.crystallize.value.trim()
+          accelerate: textOf('accelerate'),
+          crystallize: textOf('crystallize')
         },
         // ADD THIS NEW PROPERTY:
         artState: {
@@ -2407,8 +2413,8 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
         superEvolve: textInputs.superEvolve.value.trim(),
         crest: textInputs.crest.value.trim(),
         faith: textInputs.faith.value.trim(),
-        accelerate: textInputs.accelerate.value.trim(),
-        crystallize: textInputs.crystallize.value.trim()
+        accelerate: textOf('accelerate'),
+        crystallize: textOf('crystallize')
       },
       // ADD THIS NEW PROPERTY:
       artState: {
@@ -2732,7 +2738,7 @@ async function drawBalanceCard() {
     crest: document.getElementById('adjCrestText').value.trim(),
     faith: document.getElementById('adjFaithText').value.trim(),
     accelerate: !isSpell && document.getElementById('adjAccelerateSection').style.display !== 'none' ? document.getElementById('adjAccelerateText').value.trim() : "",
-    crystallize: !isAmulet && document.getElementById('adjCrystallizeSection').style.display !== 'none' ? document.getElementById('adjCrystallizeText').value.trim() : ""
+    crystallize: !isAmulet && !isSpell && document.getElementById('adjCrystallizeSection').style.display !== 'none' ? document.getElementById('adjCrystallizeText').value.trim() : ""
   };
 
   const adjExtras = {
