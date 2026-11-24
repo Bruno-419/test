@@ -3020,16 +3020,23 @@ if (globalResetBtn) {
   const root = document.documentElement, fx = document.querySelector('.bg-fx');
   const TINT = { Neutral:'#2aa48a', Forestcraft:'#46d17a', Swordcraft:'#e8b93c', Runecraft:'#4d8dff', Dragoncraft:'#ff7a3d', Abysscraft:'#e5384f', Havencraft:'#e9e4cf', Portalcraft:'#2ad7e0' };
   const sel = document.getElementById('cardClass');
-  let last;
-  const apply = () => {
-    const v = sel && sel.value;
+  // Accent source depends on the page: Home follows the card class, Workshop follows its class filter
+  let page = 'home', wsClass = 'All', last;
+  const paint = () => {
+    const v = page === 'workshop' ? (wsClass === 'All' ? 'Neutral' : wsClass) : (sel && sel.value);
     if (v && v !== last) { last = v; root.style.setProperty('--accent', TINT[v] || TINT.Neutral); }
   };
-  if (sel) { sel.addEventListener('change', apply); setInterval(apply, 400); apply(); }
+  if (sel) { sel.addEventListener('change', paint); setInterval(paint, 400); }
+  const bar = document.getElementById('workshopFilterBar');
+  if (bar) bar.addEventListener('click', e => {
+    const b = e.target.closest('.filter-btn');
+    if (b) { wsClass = b.dataset.filter || 'All'; paint(); }
+  });
+  paint();
 
   const PG = { balance: 0, home: 1, workshop: 2 }, nav = window.navigateTo;
   if (typeof nav === 'function') {
-    window.navigateTo = function (p) { (fx || root).style.setProperty('--pg', PG[p] ?? 1); return nav.apply(this, arguments); };
+    window.navigateTo = function (p) { (fx || root).style.setProperty('--pg', PG[p] ?? 1); page = p; paint(); return nav.apply(this, arguments); };
   }
 
   const spot = fx && fx.querySelector('.spot');
