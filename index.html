@@ -85,7 +85,7 @@
               <input type="text" id="adjTrait">
             </label>
           
-            <div class="field">
+            <div class="field adorned-card">
               <div class="text-toolbar">
                 <label class="field-label" for="adjCardText">Card Text</label>
                 <button type="button" data-format="bold">B</button>
@@ -96,7 +96,7 @@
               <textarea id="adjCardText"></textarea>
             </div>
           
-            <div class="field" id="adjEvolveTextField">
+            <div class="field adorned-evolve" id="adjEvolveTextField">
               <div class="text-toolbar">
                 <label class="field-label" for="adjEvolveText">Evolve Text</label>
                 <button type="button" data-format="bold">B</button>
@@ -107,7 +107,7 @@
               <textarea id="adjEvolveText"></textarea>
             </div>
           
-            <div class="field" id="adjSuperEvolveTextField">
+            <div class="field adorned-superevolve" id="adjSuperEvolveTextField">
               <div class="text-toolbar">
                 <label class="field-label" for="adjSuperEvolveText">Super-Evolve Text</label>
                 <button type="button" data-format="bold">B</button>
@@ -323,17 +323,17 @@
                 </div>
               
               <section class="right-panel">
-                <div class="field">
+                <div class="field adorned-card">
                   <label class="field-label" for="cardText">Card Text</label>
                   <textarea id="cardText"></textarea>
                 </div>
 
-                <div class="field" id="evolveTextField">
+                <div class="field adorned-evolve" id="evolveTextField">
                   <label class="field-label" for="evolveText">Evolve Text</label>
                   <textarea id="evolveText"></textarea>
                 </div>
 
-                <div class="field" id="superEvolveTextField">
+                <div class="field adorned-superevolve" id="superEvolveTextField">
                   <label class="field-label" for="superEvolveText">Super-Evolve Text</label>
                   <textarea id="superEvolveText"></textarea>
                 </div>
@@ -386,7 +386,7 @@
                   </div>
                 </div>
 
-                <div class="accelerate-section adorned-accelerate">
+                <div class="accelerate-section adorned-accelerate" id="accelerateSection">
                   <div class="field" style="max-width: 120px;">
                     <span class="field-label">Accelerate Cost</span>
                     <input id="accelerateCost" type="number" min="0" value="1">
@@ -398,7 +398,7 @@
                   </div>
                 </div>
 
-                <div class="crystallize-section adorned-crystallize">
+                <div class="crystallize-section adorned-crystallize" id="crystallizeSection">
                   <div class="field" style="max-width: 120px;">
                     <span class="field-label">Crystallize Cost</span>
                     <input id="crystallizeCost" type="number" min="0" value="1">
@@ -509,8 +509,8 @@
     const statExtraFields = document.getElementById('statExtraFields');
     const evolveTextField = document.getElementById('evolveTextField');
     const superEvolveTextField = document.getElementById('superEvolveTextField');
-    const accelerateSection = document.querySelector('.accelerate-section');
-    const crystallizeSection = document.querySelector('.crystallize-section');
+    const accelerateSection = document.getElementById('accelerateSection');
+    const crystallizeSection = document.getElementById('crystallizeSection');
     const resetBtn = document.getElementById('resetBtn');
 
     function toggleFieldVisibility() {
@@ -604,7 +604,7 @@
       if (accSec) accSec.style.display = isSpell ? 'none' : '';
 
       const crySec = document.getElementById('adjCrystallizeSection');
-      if (crySec) crySec.style.display = isAmulet ? 'none' : '';
+      if (crySec) crySec.style.display = (isSpell || isAmulet) ? 'none' : '';
     };
   </script>
 </body>
