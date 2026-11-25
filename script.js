@@ -3021,9 +3021,10 @@ if (globalResetBtn) {
   const TINT = { Neutral:'#2aa48a', Forestcraft:'#46d17a', Swordcraft:'#e8b93c', Runecraft:'#4d8dff', Dragoncraft:'#ff7a3d', Abysscraft:'#e5384f', Havencraft:'#e9e4cf', Portalcraft:'#2ad7e0' };
   const sel = document.getElementById('cardClass');
   // Accent source depends on the page: Home follows the card class, Workshop follows its class filter
-  let page = 'home', wsClass = 'All', last;
+  const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
+  let page = 'home', wsClass = 'All', last, tint = store.get('tint') !== 'off';
   const paint = () => {
-    const v = page === 'workshop' ? (wsClass === 'All' ? 'Neutral' : wsClass) : (sel && sel.value);
+    const v = !tint ? 'Neutral' : page === 'workshop' ? (wsClass === 'All' ? 'Neutral' : wsClass) : (sel && sel.value);
     if (v && v !== last) { last = v; root.style.setProperty('--accent', TINT[v] || TINT.Neutral); }
   };
   if (sel) { sel.addEventListener('change', paint); setInterval(paint, 400); }
@@ -3036,7 +3037,7 @@ if (globalResetBtn) {
 
   const PG = { balance: 0, home: 1, workshop: 2 }, nav = window.navigateTo;
   if (typeof nav === 'function') {
-    window.navigateTo = function (p) { (fx || root).style.setProperty('--pg', PG[p] ?? 1); page = p; paint(); return nav.apply(this, arguments); };
+    window.navigateTo = function (p) { (fx || root).style.setProperty('--pg', PG[p] ?? 1); page = p; paint(); markNav(p); return nav.apply(this, arguments); };
   }
 
   const spot = fx && fx.querySelector('.spot');
@@ -3056,5 +3057,36 @@ if (globalResetBtn) {
       const m = /class:\s*([a-z]+)/i.exec(meta.textContent);
       modal.style.setProperty('--accent', (m && T[m[1].toLowerCase()]) || TINT.Neutral);
     }).observe(meta, { childList: true, characterData: true, subtree: true });
+  }
+
+  // ---- Bookmarks: the active page's tab is pulled out further ----
+  const marks = document.querySelectorAll('.bookmark');
+  const markNav = p => marks.forEach(b => { const on = b.dataset.page === p; b.classList.toggle('active', on); b.setAttribute('aria-current', on ? 'page' : 'false'); });
+  markNav('home');
+
+  // ---- Light / dark mode (remembered in this browser) ----
+  const setTheme = (t, animate) => {
+    if (animate) { root.classList.add('theme-anim'); setTimeout(() => root.classList.remove('theme-anim'), 450); }
+    root.dataset.theme = t; store.set('theme', t);
+    const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === 'light' ? '#eceef8' : '#07080f';
+  };
+  setTheme(root.dataset.theme === 'light' ? 'light' : 'dark');
+  const tbtn = document.getElementById('themeBtn');
+  if (tbtn) tbtn.addEventListener('click', () => setTheme(root.dataset.theme === 'light' ? 'dark' : 'light', true));
+
+  // ---- Settings panel ----
+  const sbtn = document.getElementById('settingsBtn'), panel = document.getElementById('settingsPanel');
+  const fxBox = document.getElementById('setFx'), tintBox = document.getElementById('setTint');
+  if (sbtn && panel && fxBox && tintBox) {
+    const setFx = on => { root.classList.toggle('fx-off', !on); fxBox.checked = on; store.set('fx', on ? 'on' : 'off'); };
+    const setTint = on => { tint = on; tintBox.checked = on; store.set('tint', on ? 'on' : 'off'); last = null; paint(); };
+    const open = o => { panel.hidden = !o; sbtn.setAttribute('aria-expanded', String(o)); };
+    setFx(store.get('fx') !== 'off'); setTint(tint);
+    sbtn.addEventListener('click', e => { e.stopPropagation(); open(panel.hidden); });
+    fxBox.addEventListener('change', () => setFx(fxBox.checked));
+    tintBox.addEventListener('change', () => setTint(tintBox.checked));
+    document.getElementById('setReset').addEventListener('click', () => { setFx(true); setTint(true); setTheme('dark', true); });
+    document.addEventListener('click', e => { if (!panel.hidden && !panel.contains(e.target)) open(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') open(false); });
   }
 })();
